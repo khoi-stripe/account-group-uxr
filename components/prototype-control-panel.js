@@ -220,7 +220,7 @@ class PrototypeControlPanel {
         </div>
       </div>
       
-      <div class="panel-footer">
+      <div class="panel-footer" id="main-footer">
         <div class="footer-left">
         </div>
         <div class="footer-actions">
@@ -1485,6 +1485,16 @@ class PrototypeControlPanel {
     const targetTab = document.getElementById(`${tabName}-tab`);
     if (targetTab) {
       targetTab.classList.add('active');
+    }
+    
+    // Show/hide footer based on tab
+    const footer = document.getElementById('main-footer');
+    if (footer) {
+      if (tabName === 'main') {
+        footer.style.display = 'flex';
+      } else {
+        footer.style.display = 'none';
+      }
     }
     
     // Initialize share tab if switching to it
