@@ -13,7 +13,26 @@ class PrototypeControlPanel {
     this.isOpen = false;
     this.panel = null;
     this.overlay = null;
-    this.init();
+    this.isParticipantMode = this.checkParticipantMode();
+    
+    // Only initialize controls in admin mode
+    if (!this.isParticipantMode) {
+      this.init();
+    } else {
+      // Add subtle indicator for participant mode
+      this.addParticipantModeIndicator();
+    }
+  }
+
+  checkParticipantMode() {
+    // Check if this is a shared link (has ?share= parameter or came from shared data)
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasShareParam = urlParams.has('share');
+    
+    // Also check if we loaded shared data (indicates this was accessed via shared link)
+    const hasSharedData = sessionStorage.getItem('loaded_shared_data') === 'true';
+    
+    return hasShareParam || hasSharedData;
   }
 
   init() {
@@ -1653,6 +1672,48 @@ class PrototypeControlPanel {
     if (!shareStatus) return;
     
     shareStatus.style.display = 'none';
+  }
+
+  // Add visual indicator for participant mode
+  addParticipantModeIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'participant-mode-indicator';
+    indicator.innerHTML = `
+      <div style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      ">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-right: 6px; vertical-align: -1px;">
+          <path d="M6 0C4.675 0 3.5 1.175 3.5 2.5C3.5 3.825 4.675 5 6 5C7.325 5 8.5 3.825 8.5 2.5C8.5 1.175 7.325 0 6 0ZM6 7C4.25 7 0.75 7.875 0.75 9.625V11.25H11.25V9.625C11.25 7.875 7.75 7 6 7Z" fill="currentColor"/>
+        </svg>
+        View Mode
+      </div>
+    `;
+    
+    document.body.appendChild(indicator);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (indicator.parentNode) {
+        indicator.style.transition = 'opacity 0.3s ease';
+        indicator.style.opacity = '0';
+        setTimeout(() => {
+          if (indicator.parentNode) {
+            indicator.parentNode.removeChild(indicator);
+          }
+        }, 300);
+      }
+    }, 5000);
   }
 }
 

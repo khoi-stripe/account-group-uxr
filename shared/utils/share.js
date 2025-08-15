@@ -351,6 +351,9 @@ if (typeof window !== 'undefined') {
       const result = await share.loadSharedPrototype(shareId);
       
       if (result.success) {
+        // Mark this session as participant mode (accessed via shared link)
+        sessionStorage.setItem('loaded_shared_data', 'true');
+        
         // Clean URL to remove share parameter
         const cleanUrl = new URL(window.location);
         cleanUrl.searchParams.delete('share');
