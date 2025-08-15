@@ -328,14 +328,53 @@ class PrototypeShare {
 if (typeof window !== 'undefined') {
   window.PrototypeShare = PrototypeShare;
   
-  // Auto-check for shared data when DOM is ready
-  document.addEventListener('DOMContentLoaded', async () => {
-    // Wait for OrgDataManager to be available and ready
-    if (window.OrgDataManager) {
-      await window.OrgDataManager.waitForReady();
-    }
+  // Create a promise that resolves when shared data check is complete
+  window.sharedDataReady = new Promise(async (resolve) => {
+    // Check URL immediately for share parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
     
-    const share = new PrototypeShare();
-    await share.checkForSharedData();
+    if (shareId) {
+      console.log('🔗 Shared link detected, loading data before page initialization...');
+      
+      // Wait for page to be minimally ready
+      if (document.readyState === 'loading') {
+        await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
+      }
+      
+      // Wait for OrgDataManager to be available and ready
+      if (window.OrgDataManager) {
+        await window.OrgDataManager.waitForReady();
+      }
+      
+      const share = new PrototypeShare();
+      const result = await share.loadSharedPrototype(shareId);
+      
+      if (result.success) {
+        // Clean URL to remove share parameter
+        const cleanUrl = new URL(window.location);
+        cleanUrl.searchParams.delete('share');
+        window.history.replaceState({}, document.title, cleanUrl);
+        
+        // Show success message
+        share.showShareLoadMessage(result.createdAt);
+        console.log('✅ Shared data loaded successfully before page initialization');
+      } else {
+        // Show error message
+        share.showShareErrorMessage(result.error);
+        console.error('❌ Failed to load shared data:', result.error);
+      }
+      
+      resolve(result.success);
+    } else {
+      // No shared data, resolve immediately
+      resolve(false);
+    }
+  });
+  
+  // Fallback: Auto-check for shared data when DOM is ready (for backwards compatibility)
+  document.addEventListener('DOMContentLoaded', async () => {
+    // This ensures sharedDataReady resolves even if no share ID
+    await window.sharedDataReady;
   });
 }

@@ -1598,6 +1598,13 @@
                  <script>
    // Initialize UXR functionality
          document.addEventListener('DOMContentLoaded', async function() {
+       // FIRST: Wait for shared data check to complete
+       console.log('⏳ Waiting for shared data check to complete...');
+       if (window.sharedDataReady) {
+         await window.sharedDataReady;
+       }
+       console.log('✅ Shared data check complete, proceeding with page initialization');
+       
        // Wait for OrgDataManager to be ready
        await window.OrgDataManager.waitForReady();
        
