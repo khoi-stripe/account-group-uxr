@@ -221,6 +221,8 @@ class PrototypeControlPanel {
       </div>
       
       <div class="panel-footer">
+        <div class="footer-left">
+        </div>
         <div class="footer-actions">
           <button class="btn btn-destructive" onclick="window.prototypePanel.resetAllData()">
             Reset Data
@@ -294,6 +296,7 @@ class PrototypeControlPanel {
         display: flex;
         border-bottom: 1px solid var(--neutral-200);
         flex-shrink: 0;
+        padding: 0 16px;
       }
       
       .tab-button {
@@ -333,13 +336,17 @@ class PrototypeControlPanel {
         padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 24px;
         min-height: 0;
       }
       
       .section {
         display: flex;
         flex-direction: column;
+      }
+      
+      .section + .section {
+        margin-top: 8px;
       }
       
       .section-content {
