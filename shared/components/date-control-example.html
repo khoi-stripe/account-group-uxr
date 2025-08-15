@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date Control - Preview</title>
+  
+  <!-- Import shared styles -->
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../styles/typography.css">
+  <link rel="stylesheet" href="../styles/components.css">
+
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: var(--neutral-25);
+      font-family: var(--font-family-ui);
+    }
+    
+    .preview-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .preview-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--neutral-100);
+    }
+    
+    h1, h2, h3 {
+      color: var(--neutral-900);
+      font-weight: var(--font-weight-semibold);
+      margin: 0 0 16px 0;
+    }
+    
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    
+    h2 {
+      font-size: 18px;
+    }
+    
+    h3 {
+      font-size: 16px;
+    }
+    
+    .description {
+      color: var(--neutral-600);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .preview-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .preview-label {
+      font-size: 14px;
+      font-weight: var(--font-weight-medium);
+      color: var(--neutral-700);
+    }
+    
+    .usage-info {
+      background: var(--neutral-50);
+      padding: 16px;
+      border-radius: 6px;
+      margin-top: 16px;
+    }
+    
+    .usage-info h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--neutral-900);
+    }
+    
+    .usage-info p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--neutral-600);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-container">
+    <div class="preview-section">
+      <h1>Date Control Component</h1>
+      <p class="description">
+        A date control component that matches the Account Groups Filter styling. Features period selection and date range display.
+      </p>
+      
+      <h3>Standard Implementation</h3>
+      <div class="preview-grid">
+                 <div class="preview-item">
+           <div class="preview-label">Default State</div>
+           <div class="date-range-display" id="dateRangeDisplay">
+             <span class="date-period-text">Last month</span>
+             <svg class="date-period-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
+             </svg>
+             <span class="date-range-divider">|</span>
+             <svg class="date-range-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+               <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+               <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+               <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+             </svg>
+             <span class="date-range-text">Jun 30–Jul 30</span>
+           </div>
+         </div>
+        
+                 <div class="preview-item">
+           <div class="preview-label">Different Period</div>
+           <div class="date-range-display" id="dateRangeDisplay2">
+             <span class="date-period-text">Last week</span>
+             <svg class="date-period-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
+             </svg>
+             <span class="date-range-divider">|</span>
+             <svg class="date-range-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+               <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+               <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+               <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+             </svg>
+             <span class="date-range-text">Jul 23–Jul 30</span>
+           </div>
+         </div>
+      </div>
+      
+      <div class="usage-info">
+                 <h4>Usage Information</h4>
+         <p>
+           The date range display is a static pill-shaped element that shows the current period (Last month, Last week, etc.) with a chevron, 
+           a divider, and the actual date range with calendar icon. The format follows: "Last month ▼ | 📅 Jun 30–Jul 30".
+           It matches the styling of the Account Groups Filter component with identical padding, borders, and typography.
+           This is a display-only component with no interactive functionality.
+         </p>
+      </div>
+    </div>
+  </div>
+
+     <!-- JavaScript -->
+   <script>
+     // Date range display is now static (no interactions)
+     console.log('Date range displays loaded - static elements');
+   </script>
+</body>
+</html> 

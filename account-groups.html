@@ -1,0 +1,3068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Groups - Stripe Dashboard UXR</title>
+  
+  <!-- Import shared styles -->
+  <link rel="stylesheet" href="./shared/styles/variables.css">
+  <link rel="stylesheet" href="./shared/styles/base.css">
+  <link rel="stylesheet" href="./shared/styles/typography.css">
+  <link rel="stylesheet" href="./shared/styles/components.css">
+  <link rel="stylesheet" href="./shared/styles/color-utilities.css">
+  <link rel="stylesheet" href="./shared/styles/modal.css">
+  <link rel="stylesheet" href="./shared/styles/figma-background-pattern.css">
+  
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: white;
+      font-family: var(--font-family-ui);
+      overflow: hidden;
+    }
+
+    /* Ensure proper font loading for all text elements */
+    * {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* Wireframe bar styles to match Figma design */
+    .wireframe-bar {
+      background: #E8EAED;
+      border-radius: 8px;
+      height: 8px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .wireframe-bar.short {
+      width: 48px;
+    }
+    
+    .wireframe-bar.medium {
+      width: 96px;
+    }
+    
+    .wireframe-bar.long {
+      width: 128px;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    /* Tooltip hover styles */
+    .info-icon-container:hover .info-tooltip {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
+    /* Increase z-index of entire card when hovering info icon */
+    .info-icon-container:hover {
+      z-index: 10000;
+    }
+    
+    .account-group-card:has(.info-icon-container:hover) {
+      z-index: 10000 !important;
+      position: relative !important;
+    }
+    
+    /* Fallback for browsers without :has() support */
+    .account-group-card {
+      position: relative;
+      z-index: 1;
+      overflow: visible !important;
+    }
+    
+    .info-tooltip {
+      position: absolute;
+      bottom: 100%; /* Position above the icon */
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 8px; /* Space between icon and tooltip */
+      background: #ffffff;
+      color: #353a44;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 39, 77, 0.12);
+      box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 400;
+      width: max-content;
+      max-width: 300px;
+      text-align: left;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      z-index: 10001 !important;
+      white-space: normal;
+      word-wrap: break-word;
+      pointer-events: none;
+      will-change: transform, top, left;
+    }
+
+    /* Portal variant for fixed-position tooltips (e.g., +N more) */
+    .info-tooltip.portal {
+      position: fixed;
+      top: auto; /* controlled via JS */
+      bottom: auto; /* neutralize default */
+      left: 0; /* controlled via JS */
+      transform: none; /* neutralize default */
+      margin: 0; /* handled by JS spacing */
+      will-change: transform, top, left;
+      max-width: 400px;
+      max-height: 320px;
+      overflow: auto;
+    }
+
+    /* Prevent positional overrides from .bottom when using portal; keep arrow-only flips */
+    .info-tooltip.portal.bottom {
+      top: auto !important;
+      bottom: auto !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* Tooltip Arrow */
+    .info-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%; /* At the bottom of the tooltip */
+      left: var(--arrow-left, 50%);
+      transform: var(--arrow-transform, translateX(-50%));
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #ffffff;
+    }
+
+    /* Border arrow behind main arrow for border effect */
+    .info-tooltip::before {
+      content: '';
+      position: absolute;
+      top: calc(100% + 1px);
+      left: var(--arrow-left, 50%);
+      transform: var(--arrow-transform, translateX(-50%));
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 7px solid rgba(0, 39, 77, 0.12);
+    }
+
+    /* Class to flip tooltip to the bottom */
+    .info-tooltip.bottom {
+      top: 100%;
+      bottom: auto;
+      margin-top: 8px;
+      margin-bottom: 0;
+    }
+
+    .info-tooltip.bottom::after {
+      top: auto;
+      bottom: 100%;
+      border-top: none;
+      border-bottom: 6px solid #ffffff;
+    }
+
+    .info-tooltip.bottom::before {
+      top: auto;
+      bottom: calc(100% + 1px);
+      border-top: none;
+      border-bottom: 7px solid rgba(0, 39, 77, 0.12);
+    }
+
+    /* Kebab Menu Styles */
+    .kebab-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: -4px;
+      background: #ffffff;
+      border: 1px solid rgba(0, 39, 77, 0.12);
+      border-radius: 8px;
+      box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
+      z-index: 10001 !important;
+      min-width: 160px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-4px);
+      transition: opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease;
+      padding: 4px;
+      pointer-events: none;
+    }
+
+    /* Increase card z-index when kebab menu is open */
+    .account-group-card:has(.kebab-menu.show) {
+      z-index: 10000 !important;
+    }
+
+    /* Loading spinner for account chips */
+    .accounts-loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 20px 0;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e5e7eb;
+      border-top: 2px solid #9ca3af;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .kebab-menu.show {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
+      display: block !important;
+    }
+
+    /* Sort filter menu positioning - 4px below trigger instead of overlapping */
+    #sort-filter-menu {
+      margin-top: 4px;
+    }
+
+    .kebab-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: #353a44;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    .kebab-menu-item:hover {
+      background: #f5f6f8;
+      color: #353a44;
+    }
+
+    .kebab-menu-item.destructive {
+      color: #dc2626;
+    }
+
+    .kebab-menu-item.destructive:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .kebab-menu-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .group-card-kebab {
+      position: relative;
+    }
+
+    .layout-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+         /* Navigation Panel */
+     .nav-panel {
+       width: 240px;
+       background: white;
+       border-right: 1px solid rgba(0, 39, 77, 0.08);
+       flex-shrink: 0;
+       position: relative;
+       display: flex;
+       flex-direction: column;
+       height: 100vh;
+       overflow: hidden;
+     }
+
+    .nav-panel.collapsed {
+       width: 64px;
+       overflow: visible;
+     }
+     
+          .nav-panel.collapsed .nav-item-label,
+     .nav-panel.collapsed .workload-caret-icon,
+     .nav-panel.collapsed .section-header {
+       display: none;
+     }
+     
+     /* Account Switcher in Nav Panel */
+     #nav-account-switcher {
+       margin-bottom: 16px;
+     }
+     
+
+     
+     .nav-panel.collapsed #nav-account-switcher .account-details,
+     .nav-panel.collapsed #nav-account-switcher .account-switcher-caret {
+       display: none;
+     }
+     
+     .nav-panel.collapsed #nav-account-switcher {
+       margin: 0 -20px 16px -20px;
+       display: flex;
+       justify-content: center;
+     }
+     
+     .nav-panel.collapsed #nav-account-switcher .account-switcher-trigger {
+       width: 24px;
+       margin: 0 auto;
+       justify-content: center;
+     }
+     
+     /* Disable animations for account switcher during nav collapse */
+     #nav-account-switcher,
+     #nav-account-switcher *,
+     #nav-account-switcher .account-switcher-trigger,
+     #nav-account-switcher .account-avatar {
+       transition: none !important;
+     }
+     
+     /* Custom pinkish red avatar color */
+     #nav-account-switcher .account-avatar {
+       background-color: #E11D48 !important; /* Pinkish red */
+     }
+     
+     /* Nav item tooltips for collapsed state */
+     .workload-item {
+       position: relative;
+     }
+     
+     .nav-item-tooltip {
+       position: absolute;
+       left: 100%;
+       top: 50%;
+       transform: translateY(-50%);
+       margin-left: 8px;
+       padding: 4px 8px;
+       background: var(--neutral-900);
+       color: white;
+       font-family: var(--font-family-ui);
+       font-size: var(--font-size-12);
+       font-weight: var(--font-weight-medium);
+       line-height: var(--line-height-16);
+       border-radius: 4px;
+       white-space: nowrap;
+       opacity: 0;
+       visibility: hidden;
+       transition: opacity 0.2s ease, visibility 0.2s ease;
+       pointer-events: none;
+       z-index: 99999;
+       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+     }
+     
+     .nav-item-tooltip::before {
+       content: '';
+       position: absolute;
+       top: 50%;
+       left: -4px;
+       transform: translateY(-50%);
+      width: 0;
+       height: 0;
+       border-style: solid;
+       border-width: 4px 4px 4px 0;
+       border-color: transparent var(--neutral-900) transparent transparent;
+     }
+     
+     .nav-panel.collapsed .nav-item:hover .nav-item-tooltip,
+     .nav-panel.collapsed .workload-item:hover .nav-item-tooltip {
+       opacity: 1;
+       visibility: visible;
+     }
+     
+     .nav-panel:not(.collapsed) .nav-item-tooltip {
+       display: none;
+     }
+     
+     /* Customize account switcher for nav panel */
+     #nav-account-switcher .account-switcher {
+       display: block;
+       width: 100%;
+     }
+     
+     #nav-account-switcher .account-switcher-trigger {
+       width: 100%;
+       min-width: auto;
+       background: transparent;
+       border: none;
+       border-radius: var(--radius-sm);
+       padding: 4px 6px;
+       height: 36px;
+       max-width: 240px;
+       box-sizing: content-box;
+       margin: 0 -6px;
+     }
+     
+     #nav-account-switcher .account-switcher-trigger:hover {
+       background: var(--neutral-50);
+    }
+
+         /* Content Panel */
+     .content-panel {
+       flex: 1;
+       background: white;
+       min-width: 0; /* Allows flex item to shrink below content size */
+       position: relative;
+       display: flex;
+       flex-direction: column;
+     }
+
+     /* Content Header */
+     .content-header {
+       height: 60px;
+       padding: 12px 32px;
+       background: white;
+       display: flex;
+       align-items: center;
+       width: 100%;
+       box-sizing: border-box;
+     }
+     
+     /* Header Actions */
+     .header-actions {
+       display: flex;
+       align-items: center;
+       gap: 8px; /* 8px spacing between icons */
+       margin-left: auto; /* Push to right side */
+     }
+     
+     .header-icon {
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       cursor: pointer;
+     }
+
+
+
+     /* Main Navigation */
+     .main-nav {
+       display: flex;
+       flex-direction: column;
+       gap: 4px;
+     }
+     
+     /* Workloads Section */
+     .workloads-section {
+       margin-top: 24px;
+     }
+     
+         /* Workloads Navigation */
+    .workloads-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 0;
+    }
+
+    /* Expandable workload item styles */
+    .workload-item-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .workload-item.expandable {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .workload-item.expandable:hover {
+      background-color: var(--neutral-50);
+      text-decoration: none;
+    }
+
+    .workload-submenu {
+      display: none;
+      flex-direction: column;
+      padding-left: 32px;
+      margin-top: 4px;
+      gap: 4px;
+    }
+
+    .workload-submenu.expanded {
+      display: flex;
+    }
+
+    .workload-subitem {
+      display: flex;
+      align-items: center;
+      padding: 0;
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--neutral-700);
+      font-size: 14px;
+      transition: background-color 0.15s ease;
+      height: 24px;
+      min-height: 24px;
+    }
+
+    .workload-subitem .nav-item-label {
+      margin-left: 0;
+    }
+
+    .workload-subitem {
+      position: relative;
+    }
+
+    .workload-subitem::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -32px;
+      right: -4px;
+      bottom: -4px;
+      background-color: transparent;
+      border-radius: 8px;
+      transition: background-color 0.15s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .workload-subitem:hover:not(.disabled)::before {
+      background-color: var(--neutral-50);
+    }
+
+    .workload-subitem:hover:not(.disabled) {
+      color: var(--neutral-900);
+    }
+
+    .workload-subitem .nav-item-label {
+      position: relative;
+      z-index: 1;
+    }
+
+    .workload-subitem.disabled {
+      color: var(--neutral-500);
+      cursor: default;
+    }
+
+    .workload-subitem.disabled:hover {
+      background-color: transparent;
+    }
+
+    /* Workload Subitem Active state */
+    .workload-subitem.active .nav-item-label {
+      color: var(--brand-600);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    /* No background for active workload subitems */
+    .workload-subitem.active::before {
+      background-color: transparent;
+    }
+
+    .workload-subitem.active:hover::before {
+      background-color: var(--neutral-50);
+    }
+
+    .workload-subitem.active:hover .nav-item-label {
+      color: var(--brand-600);
+    }
+
+    /* Workload Item Active state when containing active subitems - ONLY when collapsed */
+    .workload-item-container:has(.workload-subitem.active) .workload-item:not(.expanded) .nav-item-label {
+      color: var(--brand-600);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .workload-item-container:has(.workload-subitem.active) .workload-item:not(.expanded) .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    .workload-item-container:has(.workload-subitem.active) .workload-item:not(.expanded) .workload-caret-icon svg {
+      color: var(--brand-600);
+    }
+
+    /* Active state for workload items when nav panel is collapsed (workloads are always collapsed when nav is collapsed) */
+    .nav-panel.collapsed .workload-item-container:has(.workload-subitem.active) .workload-item .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    /* Fallback for browsers that don't support :has() - check active subitems via JavaScript */
+    .workload-item.has-active-subitem:not(.expanded) .nav-item-label {
+      color: var(--brand-600);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .workload-item.has-active-subitem:not(.expanded) .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    .workload-item.has-active-subitem:not(.expanded) .workload-caret-icon svg {
+      color: var(--brand-600);
+    }
+
+    /* When nav panel is collapsed, always show active state regardless of expanded state */
+    .nav-panel.collapsed .workload-item.has-active-subitem .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    /* Caret icon rotation */
+    .workload-item.expandable .workload-caret-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .workload-item.expandable.expanded .workload-caret-icon {
+      transform: rotate(180deg);
+    }
+     
+     /* Bottom Navigation */
+     .bottom-nav {
+       display: flex;
+       flex-direction: column;
+       gap: 4px;
+       padding: 12px 20px;
+       margin-top: auto; /* This pushes it to the bottom */
+     }
+     
+     /* Floating Collapse Handle */
+     .collapse-handle {
+       position: fixed;
+       left: 240px; /* Right edge of nav panel */
+       top: 50%;
+       transform: translateY(-50%);
+       padding: 8px;
+       z-index: 10;
+       cursor: pointer;
+     }
+     
+     .collapse-handle.collapsed {
+       left: 64px; /* Adjust position when collapsed */
+     }
+     
+     .collapse-line {
+       width: 2px;
+       height: 14px;
+       background-color: var(--neutral-200);
+       border-radius: 1px; /* Rounded ends */
+       transition: opacity 0.2s ease;
+     }
+     
+     .collapse-arrow {
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%) rotate(180deg); /* Default: left-pointing when expanded */
+       opacity: 0;
+       transition: opacity 0.2s ease, transform 0.2s ease;
+     }
+     
+     /* Show arrow and hide line on hover */
+     .collapse-handle:hover .collapse-line {
+       opacity: 0;
+     }
+     
+     .collapse-handle:hover .collapse-arrow {
+       opacity: 1;
+     }
+     
+     /* Right-pointing arrow when collapsed (expand direction) */
+     .collapse-handle.collapsed .collapse-arrow {
+       transform: translate(-50%, -50%) rotate(0deg);
+     }
+     
+     .collapse-tooltip {
+       position: absolute;
+       left: 100%;
+       top: 50%;
+       transform: translateY(-50%);
+       margin-left: 8px;
+       padding: 4px 8px;
+       background: var(--neutral-900);
+       color: white;
+       font-family: var(--font-family-ui);
+       font-size: var(--font-size-12);
+       font-weight: var(--font-weight-medium);
+       line-height: var(--line-height-16);
+       border-radius: 4px;
+       white-space: nowrap;
+       opacity: 0;
+       visibility: hidden;
+       transition: opacity 0.2s ease, visibility 0.2s ease;
+       pointer-events: none;
+     }
+     
+     .collapse-handle:hover .collapse-tooltip {
+       opacity: 1;
+       visibility: visible;
+     }
+     
+     .collapse-handle.no-hover:hover .collapse-tooltip {
+       opacity: 0;
+       visibility: hidden;
+     }
+     
+     .collapse-handle.no-hover:hover .collapse-line {
+       opacity: 1;
+     }
+     
+     .collapse-handle.no-hover:hover .collapse-arrow {
+       opacity: 0;
+     }
+
+     /* Content Body */
+     .content-body {
+       flex: 1;
+       background: white;
+       overflow-y: auto;
+       padding: 20px 32px 32px 32px;
+       display: flex;
+       flex-direction: column;
+     }
+
+     /* Groups Container - specific styling for account groups page */
+    #groups-container {
+      flex: 0 0 auto; /* Hug content instead of growing */
+      overflow: visible; /* Allow content to expand naturally */
+      margin-bottom: 0; /* use spacer element for reliable bottom space */
+     }
+     
+     .content-placeholder {
+       width: 100%;
+       height: 100%;
+       background-color: var(--neutral-50);
+       border-radius: 12px;
+     }
+
+
+
+    /* Responsive behavior */
+    @media (max-width: 768px) {
+      .nav-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 999;
+        box-shadow: var(--shadow-lg);
+      }
+      
+
+      
+      .content-panel {
+        width: 100%;
+      }
+      
+      .nav-toggle {
+        left: 20px !important;
+      }
+      
+      .collapse-handle {
+        display: none; /* Hide on mobile */
+      }
+      
+      .nav-panel.collapsed {
+        width: 64px;
+      }
+    }
+  </style>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const navPanel = document.getElementById('navPanel');
+        const collapseHandle = document.querySelector('.collapse-handle');
+        const tooltip = document.querySelector('.collapse-tooltip');
+        
+        let isCollapsed = false;
+        
+        // Toggle navigation panel on handle click
+        collapseHandle.addEventListener('click', function() {
+          // Dismiss tooltip immediately and prevent hover
+          collapseHandle.classList.add('no-hover');
+          
+          isCollapsed = !isCollapsed;
+          
+          if (isCollapsed) {
+            navPanel.classList.add('collapsed');
+            collapseHandle.classList.add('collapsed');
+            tooltip.textContent = 'Expand';
+            // Allow hover again once collapsed
+            collapseHandle.classList.remove('no-hover');
+          } else {
+            navPanel.classList.remove('collapsed');
+            collapseHandle.classList.remove('collapsed');
+            tooltip.textContent = 'Collapse';
+            // Allow hover again once expanded
+            collapseHandle.classList.remove('no-hover');
+          }
+        });
+      });
+    </script>
+    <!-- Flyout for collapsed nav workloads -->
+    <style>
+    /* Flyout for collapsed nav workloads */
+    .workload-flyout {
+      position: fixed;
+      left: 64px; /* width of collapsed nav */
+      top: 0;
+      min-width: 220px;
+      background: #fff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1.5px 4px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      z-index: 10000;
+      padding: 8px 0;
+      border: 1px solid var(--neutral-100);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+    }
+    .workload-flyout.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .workload-flyout .section-header {
+      padding: 12px 16px 8px 24px;
+      font-size: 12px;
+      color: var(--neutral-600);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .workload-flyout .workload-submenu {
+      display: flex;
+      flex-direction: column;
+      padding-left: 0;
+      margin-top: 0;
+      gap: 0;
+    }
+    </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navPanel = document.getElementById('navPanel');
+      const workloadsNav = navPanel.querySelector('.workloads-nav');
+      let flyoutParent = null;
+      let flyout = null;
+      let currentTrigger = null;
+
+      function showWorkloadFlyout(workloadItem) {
+        if (flyoutParent && currentTrigger === workloadItem) return;
+        hideWorkloadFlyout();
+        currentTrigger = workloadItem;
+
+        // Find the section header and submenu for this workload
+        const container = workloadItem.closest('.workload-item-container');
+        const sectionHeader = container.querySelector('.section-header');
+        const submenu = container.querySelector('.workload-submenu');
+        if (!submenu) return;
+
+        // Create parent container
+        flyoutParent = document.createElement('div');
+        flyoutParent.className = 'workload-flyout-parent';
+        flyoutParent.style.position = 'fixed';
+        flyoutParent.style.zIndex = '10000';
+        flyoutParent.style.pointerEvents = 'none'; // Only the flyout itself is interactive
+
+        // Position parent to cover trigger and flyout area
+        const triggerRect = workloadItem.getBoundingClientRect();
+        const flyoutWidth = 260;
+        const flyoutHeight = Math.max(120, submenu.children.length * 32 + 48);
+        flyoutParent.style.top = `${Math.max(0, triggerRect.top - 8)}px`;
+        flyoutParent.style.left = `${triggerRect.right + 8}px`;
+        flyoutParent.style.width = `${flyoutWidth}px`;
+        flyoutParent.style.height = `${flyoutHeight}px`;
+
+        // Create flyout
+        flyout = document.createElement('div');
+        flyout.className = 'popover workload-flyout show';
+        flyout.style.position = 'absolute';
+        flyout.style.top = '0';
+        flyout.style.left = '0';
+        flyout.style.pointerEvents = 'auto';
+
+        // Clone header and submenu
+        if (sectionHeader) {
+          const headerClone = sectionHeader.cloneNode(true);
+          flyout.appendChild(headerClone);
+        }
+        const submenuClone = submenu.cloneNode(true);
+        submenuClone.classList.add('expanded');
+        flyout.appendChild(submenuClone);
+
+        flyoutParent.appendChild(flyout);
+        document.body.appendChild(flyoutParent);
+
+        // Mouseleave on parent hides flyout
+        flyoutParent.addEventListener('mouseleave', hideWorkloadFlyout);
+        // Mouseenter on parent cancels hide
+        flyoutParent.addEventListener('mouseenter', function() {
+          if (flyoutParent.hideTimeout) {
+            clearTimeout(flyoutParent.hideTimeout);
+            flyoutParent.hideTimeout = null;
+          }
+        });
+      }
+
+      function hideWorkloadFlyout() {
+        if (flyoutParent) {
+          if (flyoutParent.hideTimeout) {
+            clearTimeout(flyoutParent.hideTimeout);
+            flyoutParent.hideTimeout = null;
+          }
+          flyoutParent.remove();
+          flyoutParent = null;
+          flyout = null;
+          currentTrigger = null;
+        }
+      }
+
+      // Attach listeners to only expandable workload items
+      function attachWorkloadFlyoutListeners() {
+        const triggers = workloadsNav.querySelectorAll('.workload-item.expandable');
+        triggers.forEach(trigger => {
+          trigger.addEventListener('mouseenter', function() {
+            if (!navPanel.classList.contains('collapsed')) return;
+            showWorkloadFlyout(trigger);
+          });
+          trigger.addEventListener('mouseleave', function() {
+            if (flyoutParent) {
+              // Delay hide to allow mouse to enter flyoutParent
+              flyoutParent.hideTimeout = setTimeout(() => {
+                hideWorkloadFlyout();
+              }, 200);
+            }
+          });
+          // Prevent expand/collapse in collapsed state
+          trigger.addEventListener('click', function(e) {
+            if (navPanel.classList.contains('collapsed')) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          });
+          trigger.addEventListener('keydown', function(e) {
+            if (navPanel.classList.contains('collapsed') && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          });
+        });
+      }
+
+      attachWorkloadFlyoutListeners();
+    });
+    </script>
+
+    <!-- Force-disable tooltip for workload items in collapsed nav -->
+    <style>
+    /* Force-disable tooltip for workload items in collapsed nav */
+    .nav-panel.collapsed .workload-item:hover .nav-item-tooltip {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    </style>
+    <style>
+    .workload-flyout-parent {
+      /* No background, invisible container for event handling */
+      position: relative;
+    }
+    </style>
+    <style>
+    .workload-flyout .workload-submenu {
+      padding-left: 0 !important;
+    }
+    .workload-flyout .workload-subitem {
+      padding-left: 0 !important;
+    }
+    .workload-flyout .workload-subitem::before {
+      left: 0 !important;
+    }
+    </style>
+    <style>
+.workload-flyout .workload-subitem {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 16px !important;
+  display: flex;
+  align-items: center;
+  border-radius: 6px !important;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fff !important;
+  box-sizing: border-box;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+.workload-flyout .workload-subitem::before {
+  background: transparent !important;
+}
+.workload-flyout .workload-subitem .nav-item-icon {
+  display: none !important;
+}
+.workload-flyout .workload-subitem .nav-item-label {
+  margin-left: 0 !important;
+}
+.workload-flyout .workload-subitem:hover .nav-item-label,
+.workload-flyout .workload-subitem.active .nav-item-label {
+  color: var(--brand-600) !important;
+}
+.workload-flyout .workload-subitem:hover:not(.disabled),
+.workload-flyout .workload-subitem.active {
+  background: var(--neutral-50) !important;
+  text-decoration: none !important;
+  /* color intentionally omitted to allow label override */
+}
+</style>
+</head>
+<body>
+  <div class="layout-container">
+         <!-- Navigation Panel -->
+     <div class="nav-panel" id="navPanel">
+       <div style="padding: 12px 20px; flex: 1;">
+         <!-- Account Switcher -->
+         <div id="nav-account-switcher"></div>
+         <div class="main-nav">
+                     <a href="./index.html" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M3 16C1.61929 16 0.5 14.8807 0.5 13.5V5.54791C0.5 4.89162 0.821983 4.27709 1.36158 3.90352L6.48633 0.355616C6.82081 0.124056 7.21794 0 7.62475 0H8.37525C8.78206 0 9.17919 0.124056 9.51367 0.355615L14.6384 3.90352C15.178 4.27709 15.5 4.89162 15.5 5.54791V13.5C15.5 14.8807 14.3807 16 13 16H3ZM5 14.5H3C2.44772 14.5 2 14.0523 2 13.5V5.54791C2 5.38383 2.0805 5.2302 2.21539 5.13681L7.34015 1.5889C7.42377 1.53101 7.52305 1.5 7.62475 1.5H8.37525C8.47695 1.5 8.57623 1.53101 8.65985 1.5889L13.7846 5.13681C13.9195 5.2302 14 5.38383 14 5.54791V13.5C14 14.0523 13.5523 14.5 13 14.5H11V8C11 7.44772 10.5523 7 10 7H6C5.44772 7 5 7.44772 5 8V14.5ZM6.5 14.5H9.5V8.5H6.5V14.5Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Home</span>
+            <div class="nav-item-tooltip">Home</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 2C1 1.58579 1.33579 1.25 1.75 1.25H9.25C9.66421 1.25 10 1.58579 10 2C10 2.41421 9.66421 2.75 9.25 2.75H1.75C1.33579 2.75 1 2.41421 1 2Z" fill="currentColor"/>
+                <path d="M1 10C1 9.58579 1.33579 9.25 1.75 9.25H6.75C7.16421 9.25 7.5 9.58579 7.5 10C7.5 10.4142 7.16421 10.75 6.75 10.75H1.75C1.33579 10.75 1 10.4142 1 10Z" fill="currentColor"/>
+                <path d="M3.25 5.25C2.83579 5.25 2.5 5.58579 2.5 6C2.5 6.41421 2.83579 6.75 3.25 6.75H10.75C11.1642 6.75 11.5 6.41421 11.5 6C11.5 5.58579 11.1642 5.25 10.75 5.25H3.25Z" fill="currentColor"/>
+                <path d="M2.5 14C2.5 13.5858 2.83579 13.25 3.25 13.25H7.25C7.66421 13.25 8 13.5858 8 14C8 14.4142 7.66421 14.75 7.25 14.75H3.25C2.83579 14.75 2.5 14.4142 2.5 14Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16 11.5C16 13.433 14.433 15 12.5 15C10.567 15 9 13.433 9 11.5C9 9.567 10.567 8 12.5 8C14.433 8 16 9.567 16 11.5ZM14.5 11.5C14.5 12.6046 13.6046 13.5 12.5 13.5C11.3954 13.5 10.5 12.6046 10.5 11.5C10.5 10.3954 11.3954 9.5 12.5 9.5C13.6046 9.5 14.5 10.3954 14.5 11.5Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Balances</span>
+            <div class="nav-item-tooltip">Balances</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.71445 6.69302C9.43459 6.99838 9.45526 7.4728 9.76062 7.75267C10.066 8.03254 10.5404 8.01187 10.8203 7.7065L13.7526 4.50699C14.0154 4.22029 14.0154 3.7803 13.7527 3.49356L10.8203 0.293368C10.5405 -0.0120257 10.0661 -0.0327462 9.76068 0.247088C9.45529 0.526922 9.43457 1.00134 9.7144 1.30674L11.4953 3.25028L4.60029 3.24993C2.52914 3.24983 0.850098 4.92879 0.850098 6.99993V7.06671C0.850098 7.48092 1.18588 7.81671 1.6001 7.81671C2.01431 7.81671 2.3501 7.48092 2.3501 7.06671V6.99993C2.3501 5.75725 3.35753 4.74987 4.60021 4.74993L11.495 4.75028L9.71445 6.69302Z" fill="currentColor"/>
+                <path d="M6.28588 9.3068C6.56571 9.0014 6.54499 8.52698 6.2396 8.24715C5.9342 7.96731 5.45978 7.98803 5.17994 8.29343L2.24759 11.4936C1.98486 11.7803 1.98488 12.2203 2.24762 12.507L5.17998 15.7068C5.45983 16.0122 5.93425 16.0329 6.23963 15.753C6.54501 15.4732 6.5657 14.9988 6.28584 14.6934L4.50542 12.7506H11.4C13.4711 12.7506 15.15 11.0716 15.15 9.00058V8.93365C15.15 8.51944 14.8142 8.18365 14.4 8.18365C13.9858 8.18365 13.65 8.51944 13.65 8.93365V9.00058C13.65 10.2432 12.6427 11.2506 11.4 11.2506H4.50478L6.28588 9.3068Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Transactions</span>
+            <div class="nav-item-tooltip">Transactions</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M2.5 14.4H13.5C13.7209 14.4 13.9 14.2209 13.9 14C13.9 12.1222 12.3778 10.6 10.5 10.6H5.5C3.62223 10.6 2.1 12.1222 2.1 14C2.1 14.2209 2.27909 14.4 2.5 14.4ZM2.5 16H13.5C14.6046 16 15.5 15.1046 15.5 14C15.5 11.2386 13.2614 9 10.5 9H5.5C2.73858 9 0.5 11.2386 0.5 14C0.5 15.1046 1.39543 16 2.5 16Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8 6.4C9.32548 6.4 10.4 5.32548 10.4 4C10.4 2.67452 9.32548 1.6 8 1.6C6.67452 1.6 5.6 2.67452 5.6 4C5.6 5.32548 6.67452 6.4 8 6.4ZM8 8C10.2091 8 12 6.20914 12 4C12 1.79086 10.2091 0 8 0C5.79086 0 4 1.79086 4 4C4 6.20914 5.79086 8 8 8Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Customers</span>
+            <div class="nav-item-tooltip">Customers</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.97311 0C7.66262 0 7.3564 0.0722903 7.07869 0.211146L1.60655 2.94721C0.928981 3.286 0.500977 3.97852 0.500977 4.73607V11.3054C0.500977 12.0412 0.904957 12.7175 1.55278 13.0664L6.33503 15.6414C6.77216 15.8768 7.26086 16 7.75733 16H8.24452C8.74105 16 9.22982 15.8768 9.66699 15.6413L14.4483 13.0664C15.096 12.7175 15.4999 12.0412 15.4999 11.3055V4.73599C15.4999 3.97848 15.072 3.28599 14.3945 2.94718L8.92331 0.211199C8.64557 0.0723089 8.33931 0 8.02878 0H7.97311ZM13.9999 11.3055V5.62105L8.7499 8.44799V14.4123C8.82049 14.387 8.88932 14.3564 8.95576 14.3207L13.737 11.7457C13.899 11.6585 13.9999 11.4894 13.9999 11.3055ZM8.25241 1.5528L13.5093 4.18162L11.4495 5.29075L6.06848 2.3933L7.74951 1.55279C7.81893 1.51807 7.89549 1.5 7.97311 1.5H8.02878C8.10641 1.5 8.18298 1.51808 8.25241 1.5528ZM4.75605 3.04951L2.49116 4.18196L7.9999 7.14821L10.1839 5.9722L4.75605 3.04951ZM7.2499 8.44799L2.00098 5.62165V11.3054C2.00098 11.4894 2.10197 11.6584 2.26393 11.7456L7.04618 14.3207C7.11195 14.3561 7.18006 14.3865 7.2499 14.4116V8.44799Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Product Catalog</span>
+            <div class="nav-item-tooltip">Product Catalog</div>
+          </a>
+         </div>
+         
+         <div class="workloads-section">
+           <div class="section-header text-label-small text-neutral-600" style="padding: 12px 16px 8px 0px;">Products</div>
+           <div class="workloads-nav">
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 6C0 5.6898 0.162753 5.40235 0.428746 5.24275L7.07125 1.25725C7.3518 1.08892 7.67283 1 8 1C8.32717 1 8.6482 1.08892 8.92875 1.25725L15.5713 5.24275C15.8372 5.40235 16 5.6898 16 6C16 6.3102 15.8372 6.59765 15.5713 6.75725L8.92875 10.7428C8.6482 10.9111 8.32717 11 8 11C7.67283 11 7.3518 10.9111 7.07125 10.7428L0.428746 6.75725C0.162753 6.59765 0 6.3102 0 6ZM7.89445 9.37076L2.27651 6L7.89445 2.62924C7.92633 2.61011 7.96282 2.6 8 2.6C8.03718 2.6 8.07367 2.61011 8.10555 2.62924L13.7235 6L8.10555 9.37076C8.07367 9.38989 8.03718 9.4 8 9.4C7.96281 9.4 7.92633 9.38989 7.89445 9.37076Z" fill="currentColor"/>
+                <path d="M1.43422 9.82811C1.06312 9.58833 0.5679 9.69478 0.328114 10.0659C0.0883268 10.437 0.194776 10.9322 0.565875 11.172L6.69425 15.1319C7.06621 15.3722 7.49965 15.5 7.9425 15.5H8.0576C8.50045 15.5 8.93388 15.3722 9.30584 15.1319L15.4342 11.172C15.8053 10.9322 15.9118 10.437 15.672 10.0659C15.4322 9.69478 14.937 9.58833 14.5659 9.82811L8.4375 13.788C8.32429 13.8611 8.19238 13.9 8.0576 13.9H7.9425C7.80772 13.9 7.6758 13.8611 7.5626 13.788L1.43422 9.82811Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Connect</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">Connect</div>
+          </a>
+           
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 3.88431C0 3.08377 0.545006 2.40837 1.3057 2.20462L1.32368 2.19981L10.5518 0.212648C10.7019 0.175079 10.8523 0.157617 11 0.158478C11.927 0.163877 12.75 0.890772 12.75 1.89811V4.5H13.5C14.8807 4.5 16 5.61929 16 7V13.5C16 14.8807 14.8807 16 13.5 16H2.5C1.11929 16 0 14.8807 0 13.5V3.88431ZM10.9127 1.6686C11.1118 1.61666 11.25 1.75884 11.25 1.89811V4.5H2.5C2.14445 4.5 1.80623 4.57422 1.5 4.70802V3.88431C1.5 3.79247 1.5588 3.69527 1.68102 3.65725L10.8971 1.67268L10.9127 1.6686ZM1.5 7V13.5C1.5 14.0523 1.94772 14.5 2.5 14.5H13.5C14.0523 14.5 14.5 14.0523 14.5 13.5V7C14.5 6.44772 14.0523 6 13.5 6H2.5C1.94772 6 1.5 6.44772 1.5 7ZM13 10.25C13 10.9375 12.4375 11.5 11.75 11.5C11.0625 11.5 10.5 10.95 10.5 10.25C10.5 9.56248 11.0625 8.99998 11.75 8.99998C12.4375 8.99998 13 9.56248 13 10.25Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Payments</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">Payments</div>
+          </a>
+           
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 4.70007C4 4.28586 4.33579 3.95007 4.75 3.95007H7.25C7.66421 3.95007 8 4.28586 8 4.70007C8 5.11429 7.66421 5.45007 7.25 5.45007H4.75C4.33579 5.45007 4 5.11429 4 4.70007Z" fill="currentColor"/>
+                <path d="M4.75 6.95007C4.33579 6.95007 4 7.28586 4 7.70007C4 8.11429 4.33579 8.45007 4.75 8.45007H11.25C11.6642 8.45007 12 8.11429 12 7.70007C12 7.28586 11.6642 6.95007 11.25 6.95007H4.75Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M1.55279 15.2764C1.214 15.107 1 14.7607 1 14.382V2.5C1 1.11929 2.11929 0 3.5 0H12.5C13.8807 0 15 1.11929 15 2.5V12C15 12.3148 14.8518 12.6111 14.6 12.8L13.3 13.775C13.1222 13.9083 12.8778 13.9083 12.7 13.775L11.3163 12.7372C11.1309 12.5982 10.8743 12.6048 10.6962 12.7531L8.27282 14.7727C8.10945 14.9088 7.87783 14.9267 7.69548 14.8173L5.83475 13.7009C5.63802 13.5828 5.38619 13.6138 5.22395 13.776L3.25483 15.7452C3.10265 15.8974 2.87016 15.9351 2.67767 15.8388L1.55279 15.2764ZM2.5 14.0729V2.5C2.5 1.94772 2.94772 1.5 3.5 1.5H12.5C13.0523 1.5 13.5 1.94772 13.5 2.5V11.75L13 12.125L12.2163 11.5372C11.4747 10.9811 10.4481 11.0073 9.73596 11.6008L7.85818 13.1656L6.6065 12.4146C5.81955 11.9424 4.81223 12.0664 4.16329 12.7154L2.70382 14.1749L2.5 14.0729Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Billing</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">Billing</div>
+          </a>
+           
+                     <div class="workload-item-container">
+            <button class="workload-item expandable" data-section="reporting" type="button">
+              <div class="nav-item-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 1.875C14 1.39175 13.6082 1 13.125 1C12.6418 1 12.25 1.39175 12.25 1.875V10.625C12.25 11.1082 12.6418 11.5 13.125 11.5C13.6082 11.5 14 11.1082 14 10.625V1.875Z" fill="currentColor"/>
+                  <path d="M2.60073 1.875C2.60073 1.43317 2.24256 1.075 1.80073 1.075C1.3589 1.075 1.00073 1.43317 1.00073 1.875V13.2C1.00073 14.1941 1.80662 15 2.80073 15H14.6265C15.0683 15 15.4265 14.6418 15.4265 14.2C15.4265 13.7582 15.0683 13.4 14.6265 13.4H2.80073C2.69027 13.4 2.60073 13.3105 2.60073 13.2V1.875Z" fill="currentColor"/>
+                  <path d="M9.125 3.5C9.60825 3.5 10 3.89175 10 4.375V10.625C10 11.1082 9.60825 11.5 9.125 11.5C8.64175 11.5 8.25 11.1082 8.25 10.625V4.375C8.25 3.89175 8.64175 3.5 9.125 3.5Z" fill="currentColor"/>
+                  <path d="M6 6.875C6 6.39175 5.60825 6 5.125 6C4.64175 6 4.25 6.39175 4.25 6.875V10.625C4.25 11.1082 4.64175 11.5 5.125 11.5C5.60825 11.5 6 11.1082 6 10.625V6.875Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="nav-item-label">Reporting</span>
+              <div class="workload-caret-icon">
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="nav-item-tooltip">Reporting</div>
+            </button>
+            <div class="workload-submenu" data-section="reporting">
+              <a href="./financial-reports.html" class="workload-subitem">
+                <span class="nav-item-label">Reports</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Custom metrics</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Sigma</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Revenue Recognition</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Data management</span>
+              </a>
+            </div>
+          </div>
+           
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill="currentColor"/>
+                <path d="M13.5 9.5C14.3284 9.5 15 8.82843 15 8C15 7.17157 14.3284 6.5 13.5 6.5C12.6716 6.5 12 7.17157 12 8C12 8.82843 12.6716 9.5 13.5 9.5Z" fill="currentColor"/>
+                <path d="M2.5 9.5C3.32843 9.5 4 8.82843 4 8C4 7.17157 3.32843 6.5 2.5 6.5C1.67157 6.5 1 7.17157 1 8C1 8.82843 1.67157 9.5 2.5 9.5Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">More</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">More</div>
+          </a>
+
+         </div>
+         </div>
+       </div>
+       
+             <!-- Bottom Navigation -->
+      <div class="bottom-nav">
+        <a href="#" class="nav-item">
+          <div class="nav-item-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M13 2.5H3C2.17157 2.5 1.5 3.17157 1.5 4V12C1.5 12.8284 2.17157 13.5 3 13.5H13C13.8284 13.5 14.5 12.8284 14.5 12V4C14.5 3.17157 13.8284 2.5 13 2.5ZM3 1C1.34315 1 0 2.34315 0 4V12C0 13.6569 1.34315 15 3 15H13C14.6569 15 16 13.6569 16 12V4C16 2.34315 14.6569 1 13 1H3Z" fill="currentColor"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M3.43056 4.51191C3.70012 4.19741 4.1736 4.16099 4.48809 4.43056L7.98809 7.43056C8.15433 7.57304 8.25 7.78106 8.25 8C8.25 8.21894 8.15433 8.42696 7.98809 8.56944L4.48809 11.5694C4.1736 11.839 3.70012 11.8026 3.43056 11.4881C3.16099 11.1736 3.19741 10.7001 3.51191 10.4306L6.34756 8L3.51191 5.56944C3.19741 5.29988 3.16099 4.8264 3.43056 4.51191Z" fill="currentColor"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M8 10.75C8 10.3358 8.33579 10 8.75 10H12.25C12.6642 10 13 10.3358 13 10.75C13 11.1642 12.6642 11.5 12.25 11.5H8.75C8.33579 11.5 8 11.1642 8 10.75Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <span class="nav-item-label">Developers</span>
+          <div class="nav-item-tooltip">Developers</div>
+        </a>
+
+      </div>
+
+     </div>
+     
+         <!-- Floating Collapse Handle -->
+    <div class="collapse-handle">
+      <div class="collapse-line"></div>
+      <svg class="collapse-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <polyline stroke="var(--neutral-200)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" points="4,2 8,6 4,10"/>
+      </svg>
+      <div class="collapse-tooltip">Collapse</div>
+    </div>
+    
+         <!-- Content Panel -->
+     <div class="content-panel" id="contentPanel">
+       <!-- Content Header -->
+       <div class="content-header">
+         <!-- Dashboard Search -->
+         <div class="dashboard-search-container">
+           <div class="dashboard-search-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path fill-rule="evenodd" clip-rule="evenodd" d="M10.5788 11.8163C9.57969 12.5599 8.34124 13 7 13C3.68629 13 1 10.3137 1 7C1 3.68629 3.68629 1 7 1C10.3137 1 13 3.68629 13 7C13 8.34124 12.5599 9.57969 11.8163 10.5788L15.2437 14.0063C15.5854 14.348 15.5854 14.902 15.2437 15.2437C14.902 15.5854 14.348 15.5854 14.0063 15.2437L10.5788 11.8163ZM11.25 7C11.25 9.34721 9.34721 11.25 7 11.25C4.65279 11.25 2.75 9.34721 2.75 7C2.75 4.65279 4.65279 2.75 7 2.75C9.34721 2.75 11.25 4.65279 11.25 7Z" fill="currentColor"/>
+             </svg>
+           </div>
+           <input type="text" class="dashboard-search-input" placeholder="Search…">
+         </div>
+         
+         <!-- Header Actions -->
+         <div class="header-actions">
+           <div class="header-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16">
+               <circle cx="8" cy="8" r="8" fill="var(--neutral-50)"/>
+             </svg>
+           </div>
+           <div class="header-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16">
+               <circle cx="8" cy="8" r="8" fill="var(--neutral-50)"/>
+             </svg>
+           </div>
+           <div class="header-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16">
+               <circle cx="8" cy="8" r="8" fill="var(--neutral-50)"/>
+             </svg>
+           </div>
+           <div class="header-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16">
+               <circle cx="8" cy="8" r="8" fill="var(--neutral-50)"/>
+             </svg>
+           </div>
+         </div>
+       </div>
+       
+       <!-- Content Body -->
+       <div class="content-body" style="background: #ffffff; padding: 32px; gap: 24px;">
+         <!-- Page Header Section -->
+         <div style="display: flex; flex-direction: column; gap: 4px; padding: 6px 0;">
+           <!-- Breadcrumb Navigation -->
+           <div style="display: flex; align-items: center; gap: 8px;">
+             <a href="./settings.html" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: #533afd; letter-spacing: -0.024px; text-decoration: none; cursor: pointer;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Organization settings</a>
+             <div style="width: 8px; height: 8px; display: flex; align-items: center; justify-content: center;">
+               <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                 <path d="M2 1.5L5.5 4L2 6.5" stroke="#6c7688" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            
+           <!-- Page Title -->
+           <div style="display: flex; align-items: flex-start; justify-content: space-between; width: 100%;">
+             <div style="flex: 1;">
+               <h1 style="font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; font-size: 28px; line-height: 36px; color: #353a44; letter-spacing: 0.38px; margin: 0;">Account groups</h1>
+                </div>
+             <!-- Removed Add group button per design update -->
+              </div>
+            </div>
+         
+                             <!-- Table Toolbar -->
+         <div id="groups-page-subheader" style="
+           display: none;
+           align-items: center;
+           justify-content: space-between;
+           gap: 16px;
+           padding: 0 0 12px 0;
+           border-bottom: 1px solid #d8dee4;
+         ">
+            <!-- Table Filters (disabled account filter) -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="
+                display: flex;
+                align-items: center;
+                height: 24px;
+                padding: 0 6px 0 12px;
+                border: 1px solid #b6c0cd;
+                border-radius: 999px;
+                background: transparent;
+                cursor: default;
+              ">
+                <div style="margin-right: 6px; display: flex; align-items: center;">
+                  <div class="wireframe-bar short"></div>
+                </div>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="6" cy="6" r="5" stroke="#6c7688" stroke-width="1" fill="none"/>
+                  <path d="M6 3v6M3 6h6" stroke="#6c7688" stroke-width="1" stroke-linecap="round"/>
+                </svg>
+                </div>
+            </div>
+            
+            <!-- Table Actions (sort filter and add group button) -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <!-- Sort Filter -->
+              <div class="sort-filter-container" style="position: relative;">
+                <button id="sort-filter-trigger" onclick="toggleSortFilter()" style="
+                  display: flex;
+                  align-items: center;
+                  height: 24px;
+                  padding: 0 6px 0 12px;
+                  border: 1px solid #b6c0cd;
+                  border-radius: 999px;
+                  background: transparent;
+                  cursor: pointer;
+                  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+                  font-weight: 600;
+                  font-size: 12px;
+                  line-height: 16px;
+                  color: #596171;
+                  letter-spacing: -0.024px;
+                  margin-right: 6px;
+                  gap: 6px;
+                ">
+                  <span id="sort-filter-label">Last updated</span>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
+                  </svg>
+                </button>
+                
+                                <!-- Sort Filter Menu (matching kebab menu) -->
+                <div id="sort-filter-menu" class="kebab-menu">
+                  <button class="kebab-menu-item" onclick="setSortOption('lastUpdated')">
+                    Last updated
+                  </button>
+                  <button class="kebab-menu-item" onclick="setSortOption('aToZ')">
+                    A–Z
+                  </button>
+                  <button class="kebab-menu-item" onclick="setSortOption('zToA')">
+                    Z–A
+                  </button>
+                </div>
+              </div>
+              
+              <button onclick="showFigmaCreateGroupModalV3()" style="
+                background: #675dff;
+                border: 1px solid #675dff;
+                border-radius: 6px;
+                padding: 4px 8px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                cursor: pointer;
+                color: #ffffff;
+                font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+                font-weight: 600;
+                font-size: 12px;
+                line-height: 16px;
+                letter-spacing: -0.024px;
+                box-shadow: 0px 1px 1px 0px rgba(47,14,99,0.32);
+              ">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 2.5V9.5M2.5 6H9.5" stroke="#ffffff" stroke-width="1" stroke-linecap="round"/>
+                </svg>
+                  Create group
+                </button>
+              </div>
+            </div>
+            
+        <!-- Content Area -->
+        <div id="groups-container" style="width: 100%; box-sizing: border-box; padding: 0;"></div>
+        <!-- Bottom spacer to guarantee 24px page margin regardless of scrolling context -->
+        <div style="height: 24px; flex: 0 0 auto;"></div>
+       </div>
+     </div>
+  </div>
+
+  <!-- Include account switcher component -->
+  <script src="./shared/components/account-switcher.js"></script>
+  
+  <!-- UXR Data Management -->
+  <script src="./data/organizations.js"></script>
+  <script src="./components/group-creation-modal.js"></script>
+  <script src="./shared/components/modal.js"></script>
+  <script src="./shared/components/figma-group-creation-modal-v3.js"></script>
+  <script src="./components/prototype-control-panel.js"></script>
+  
+  <!-- Prototype Sharing -->
+  <script src="./shared/utils/share.js"></script>
+  <script src="../../api/share.js"></script>
+  <script type="module">
+    import { showPageSpinner, hidePageSpinner } from './shared/utils/helpers.js';
+    document.addEventListener('DOMContentLoaded', async () => {
+      showPageSpinner('Loading groups...');
+      try {
+        if (window.OrgDataManager) {
+          await window.OrgDataManager.waitForReady();
+        } else {
+          await new Promise(r => setTimeout(r, 300));
+        }
+      } finally {
+        hidePageSpinner();
+      }
+    });
+  </script>
+
+         <script type="module">
+    // Initialize UXR functionality
+          document.addEventListener('DOMContentLoaded', async function() {
+        // Wait for OrgDataManager to be ready
+        await window.OrgDataManager.waitForReady();
+        
+        // Initialize account switcher with SUB-ACCOUNT data
+        const switcherData = window.OrgDataManager.getAccountSwitcherData();
+        const navAccountSwitcher = new AccountSwitcher(
+        document.getElementById('nav-account-switcher'),
+        {
+          currentAccount: switcherData.currentAccount,
+          accounts: switcherData.accounts,
+          variant: '2-line',
+          onAccountChange: (account) => {
+            console.log('Sub-account switched to:', account.name);
+            switchToSubAccount(account.id);
+          }
+        }
+      );
+
+
+
+      // Set up navigation panel collapse (matching dash-chrome)
+      setupNavCollapse();
+      
+      // Clear any cached kebab menus from previous page loads
+      clearAllKebabMenus();
+      
+      // Initialize account groups page
+      loadAccountGroups();
+      
+      console.log('🚀 Account Groups Page ready!');
+    });
+
+    function switchToSubAccount(subAccountId) {
+      if (window.OrgDataManager.switchToSubAccount(subAccountId)) {
+        // No page reload needed - account switcher handles the transition
+      }
+    }
+
+    function setupNavCollapse() {
+      const navPanel = document.getElementById('navPanel');
+      const collapseHandle = document.querySelector('.collapse-handle');
+      const tooltip = document.querySelector('.collapse-tooltip');
+      
+      let isCollapsed = false;
+      let savedWorkloadStates = {}; // Store workload expansion states
+      
+      // Toggle navigation panel on handle click (matching dash-chrome)
+      collapseHandle.addEventListener('click', function() {
+        // Dismiss tooltip immediately and prevent hover
+        collapseHandle.classList.add('no-hover');
+        
+        isCollapsed = !isCollapsed;
+        
+        if (isCollapsed) {
+          // Save current workload states before collapsing
+          saveWorkloadStates();
+          collapseAllWorkloads();
+          
+          navPanel.classList.add('collapsed');
+          collapseHandle.classList.add('collapsed');
+          tooltip.textContent = 'Expand';
+          // Allow hover again once collapsed
+          collapseHandle.classList.remove('no-hover');
+        } else {
+          navPanel.classList.remove('collapsed');
+          collapseHandle.classList.remove('collapsed');
+          tooltip.textContent = 'Collapse';
+          
+          // Restore workload states after expanding
+          restoreWorkloadStates();
+          
+          // Allow hover again once expanded
+          collapseHandle.classList.remove('no-hover');
+        }
+      });
+      
+      // Save current expansion state of all workload sections
+      function saveWorkloadStates() {
+        const expandableItems = document.querySelectorAll('.workload-item.expandable');
+        savedWorkloadStates = {};
+        
+        expandableItems.forEach(item => {
+          const section = item.getAttribute('data-section');
+          savedWorkloadStates[section] = item.classList.contains('expanded');
+        });
+      }
+      
+      // Collapse all workload sections
+      function collapseAllWorkloads() {
+        const expandableItems = document.querySelectorAll('.workload-item.expandable');
+        
+        expandableItems.forEach(item => {
+          const section = item.getAttribute('data-section');
+          const submenu = document.querySelector(`.workload-submenu[data-section="${section}"]`);
+          
+          if (item.classList.contains('expanded')) {
+            item.classList.remove('expanded');
+            submenu.classList.remove('expanded');
+          }
+        });
+      }
+      
+      // Restore workload states to their previous state
+      function restoreWorkloadStates() {
+        const expandableItems = document.querySelectorAll('.workload-item.expandable');
+        
+        expandableItems.forEach(item => {
+          const section = item.getAttribute('data-section');
+          const submenu = document.querySelector(`.workload-submenu[data-section="${section}"]`);
+          
+          // Restore to saved state (default to collapsed if no saved state)
+          if (savedWorkloadStates[section] === true) {
+            item.classList.add('expanded');
+            submenu.classList.add('expanded');
+          } else {
+            item.classList.remove('expanded');
+            submenu.classList.remove('expanded');
+          }
+        });
+      }
+    }
+
+    function showCreateGroupModal() {
+      window.GroupCreationModal.show({
+        onComplete: (group) => {
+          loadAccountGroups(); // Refresh the groups display
+        }
+      });
+    }
+
+    function showFigmaCreateGroupModalV2() {
+      window.FigmaGroupCreationModalV2.show({
+        onComplete: (group) => {
+          console.log('Figma modal V2 - Group created:', group);
+          loadAccountGroups(); // Refresh the groups display
+        }
+      });
+    }
+    
+    function showFigmaCreateGroupModalV3() {
+        console.log('showFigmaCreateGroupModalV3 called');
+        console.log('Modal class available:', typeof window.Modal);
+        console.log('FigmaGroupCreationModalV3 available:', typeof window.FigmaGroupCreationModalV3);
+        
+        if (!window.Modal) {
+            console.error('Modal class not available');
+        return;
+      }
+      
+        if (!window.FigmaGroupCreationModalV3) {
+            console.error('FigmaGroupCreationModalV3 not available');
+            return;
+        }
+        
+        try {
+            console.log('About to call init()...');
+            window.FigmaGroupCreationModalV3.init();
+            console.log('Init() completed, about to call show()...');
+            window.FigmaGroupCreationModalV3.show({
+                onComplete: (group) => {
+                    console.log('Figma modal V3 - Group created:', group);
+                    loadAccountGroups();
+                }
+            });
+            console.log('Show() call completed');
+        } catch (error) {
+            console.error('Error showing modal:', error);
+            console.error('Error stack:', error.stack);
+        }
+    }
+    
+    // Make function globally accessible
+    window.showFigmaCreateGroupModalV3 = showFigmaCreateGroupModalV3;
+
+    // getSavedGroups function removed - now using OrgDataManager.getAccountGroups() for all group management
+
+    // Format created date according to specifications
+    function formatCreatedDate(createdAt) {
+      if (!createdAt) return '';
+      
+      const createdDate = new Date(createdAt);
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const createdYear = createdDate.getFullYear();
+      
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+      const month = monthNames[createdDate.getMonth()];
+      const day = createdDate.getDate();
+      
+      if (currentYear === createdYear) {
+        // Same year: "Jul 4"
+        return `${month} ${day}`;
+      } else {
+        // Different year: "Jul 4, 2023"
+        return `${month} ${day}, ${createdYear}`;
+      }
+    }
+
+    function createGroupCard(group, accounts, isSavedGroup, showLoading = false) {
+      const sanitizedGroupName = group.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+      const groupType = isSavedGroup ? 'saved' : 'managed';
+      const formattedCreatedDate = formatCreatedDate(group.createdAt);
+        
+        return `
+        <div 
+          id="group-card-${group.id}" 
+          class="account-group-card ${groupType}-group" 
+          data-group-id="${group.id}" 
+          data-group-name="${sanitizedGroupName}" 
+          data-group-type="${groupType}"
+          data-account-count="${accounts.length}"
+          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 0px rgba(0,0,0,0.12); box-sizing: border-box;">
+          <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 16px; width: 100%; min-height: 64px;">
+            <!-- Title + count container -->
+            <div class="group-card-title-count-container" style="display: flex; flex-direction: row; gap: 16px; align-items: flex-start; width: 240px;">
+              <!-- Title and Created Date -->
+              <div class="group-card-title-container" style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start; flex: 1;">
+                <div class="group-card-title" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #353a44; letter-spacing: -0.15px; margin: 0;">
+                  ${group.name}
+                </div>
+                ${formattedCreatedDate ? `
+                  <div class="group-card-created-date" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 500; font-size: 11px; line-height: 16px; color: var(--neutral-400, #8A96A4); letter-spacing: -0.006px; margin: 0;">
+                    Updated ${formattedCreatedDate}
+                </div>
+                ` : ''}
+              </div>
+
+              <!-- Info + Count container -->
+              <div class="group-card-info-count-container" style="display: flex; flex-direction: row; gap: 8px; align-items: center; flex-shrink: 0;">
+                ${group.description ? `
+                  <div class="info-icon-container" style="position: relative; display: inline-flex;">
+                    <img src="./shared/svgs/note.svg" alt="Note" class="group-card-info-icon" width="12" height="12" style="flex-shrink: 0; cursor: pointer;">
+                    <div class="info-tooltip">
+                      ${group.description}
+            </div>
+            </div>
+                ` : ''}
+                
+                <!-- Count pill -->
+                <div class="group-card-count" title="${accounts.length} accounts" style="height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: rgba(103,93,255,0.10); color: #675dff; display: inline-flex; align-items: center; justify-content: center; font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; flex-shrink: 0;">
+                  ${accounts.length}
+                </div>
+              </div>
+              </div>
+              
+            <!-- Divider -->
+            <div class="group-card-divider" style="width: 1px; height: 100%; background: rgba(0, 39, 77, 0.08);"></div>
+
+            <!-- Badges and +N more -->
+            <div class="group-card-accounts-container" data-group-id="${group.id}" style="flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; align-content: flex-start; overflow: visible;">
+              ${showLoading ? `
+                <div class="accounts-loading-spinner">
+                  <div class="spinner"></div>
+                </div>
+              ` : `
+                ${accounts.map((account, index) => `
+                  <div class="group-card-account-badge" data-account-id="${account.id}" data-account-index="${index}" style="background: #f5f6f8; display: flex; flex-direction: row; gap: 6px; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 4px;">
+                    <div class="group-card-account-name" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: #353a44; letter-spacing: -0.024px; margin: 0;">
+                    ${account.name}
+                    </div>
+                  </div>
+                `).join('')}
+                <span class="group-card-more-link" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: var(--brand-600); text-decoration: none; padding: 4px 0; display: none; cursor: pointer;">+ more</span>
+              `}
+                  </div>
+
+            <!-- Kebab menu -->
+            <button class="group-card-kebab" aria-label="More options" data-group-id="${group.id}" data-is-saved="${isSavedGroup}" style="background: transparent; border: none; padding: 4px; margin-left: 8px; cursor: pointer; border-radius: 6px;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="3" cy="8" r="1.25" fill="#596171"/>
+                <circle cx="8" cy="8" r="1.25" fill="#596171"/>
+                <circle cx="13" cy="8" r="1.25" fill="#596171"/>
+              </svg>
+
+            </button>
+              </div>
+            </div>
+      `;
+    }
+
+    // Sort filter functionality
+    let currentSortOption = 'lastUpdated'; // Default sort option
+
+    function getCurrentSortOption() {
+      return currentSortOption;
+    }
+
+    function applySortToGroups(groups, sortOption) {
+      switch (sortOption) {
+        case 'aToZ':
+          groups.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case 'zToA':
+          groups.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case 'lastUpdated':
+        default:
+          groups.sort((a, b) => {
+            const dateA = new Date(a.createdAt || 0);
+            const dateB = new Date(b.createdAt || 0);
+            return dateB - dateA; // Descending order (newest first)
+          });
+          break;
+      }
+    }
+
+    function toggleSortFilter() {
+      const menu = document.getElementById('sort-filter-menu');
+      const isVisible = menu.classList.contains('show');
+      
+      // Close all other menus first
+      closeAllKebabMenus();
+      closeSortMenu();
+      
+      if (!isVisible) {
+        menu.classList.add('show');
+        // Close when clicking outside
+        setTimeout(() => {
+          document.addEventListener('click', closeSortFilterOnClickOutside, { once: true });
+        }, 0);
+      }
+    }
+
+    function closeSortMenu() {
+      const menu = document.getElementById('sort-filter-menu');
+      if (menu) {
+        menu.classList.remove('show');
+      }
+    }
+
+    function closeSortFilterOnClickOutside(event) {
+      const menu = document.getElementById('sort-filter-menu');
+      const trigger = document.getElementById('sort-filter-trigger');
+      
+      if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+        closeSortMenu();
+      }
+    }
+
+    function setSortOption(option) {
+      const label = document.getElementById('sort-filter-label');
+      
+      // Update current sort option
+      currentSortOption = option;
+      
+      // Update label text
+      switch (option) {
+        case 'aToZ':
+          label.textContent = 'A–Z';
+          break;
+        case 'zToA':
+          label.textContent = 'Z–A';
+          break;
+        case 'lastUpdated':
+        default:
+          label.textContent = 'Last updated';
+          break;
+      }
+      
+      // Close menu
+      closeSortMenu();
+      
+      // Reload groups with new sort order
+      loadAccountGroups();
+    }
+
+    // Make functions globally accessible
+    window.toggleSortFilter = toggleSortFilter;
+    window.setSortOption = setSortOption;
+
+    function loadAccountGroups() {
+      // Use only OrgDataManager since it now handles organization-specific storage
+      const allGroups = window.OrgDataManager.getAccountGroups();
+      
+      // Sort groups based on current sort option
+      const currentSortOption = getCurrentSortOption();
+      applySortToGroups(allGroups, currentSortOption);
+      const container = document.getElementById('groups-container');
+      const tableToolbar = document.getElementById('groups-page-subheader');
+      
+      console.log('🔍 loadAccountGroups: Found', allGroups.length, 'groups');
+      console.log('🔍 tableToolbar element:', tableToolbar);
+      
+      // Show/hide table toolbar based on whether groups exist
+      if (allGroups.length === 0) {
+        // Hide table toolbar for first-time users
+        console.log('🔍 Hiding toolbar (no groups)');
+        if (tableToolbar) {
+          tableToolbar.style.display = 'none';
+        }
+      } else {
+        // Show table toolbar when groups exist
+        console.log('🔍 Showing toolbar (groups exist)');
+        if (tableToolbar) {
+          tableToolbar.style.display = 'flex';
+        }
+      }
+      
+      if (allGroups.length === 0) {
+        // Empty state: exact Figma match
+        container.className = '';
+        container.style.display = 'block';
+        container.style.width = '100%';
+        // Hug contents: no forced min-height
+        container.style.minHeight = 'auto';
+        container.style.padding = '0';
+        container.style.boxSizing = 'border-box';
+
+        container.innerHTML = `
+          <div style="
+            width: 100%;
+            background: #f5f6f8;
+            border-radius: 12px;
+            padding: 88px 72px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+          ">
+            <div style="
+              display: flex;
+              flex-direction: column;
+              gap: 35px;
+              text-align: left;
+              width: 100%;
+              max-width: 731px;
+            ">
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <h2 style="
+                  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+                  font-weight: 700;
+                  font-size: 40px;
+                  line-height: 48px;
+                  color: #353a44;
+                  letter-spacing: 0.37px;
+                  margin: 0;
+                ">Create an account group</h2>
+                <p style="
+                  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+                  font-weight: 400;
+                  font-size: 20px;
+                  line-height: 28px;
+                  color: #596171;
+                  letter-spacing: 0.3px;
+                  margin: 0;
+                ">Aggregate reports and manage roles for related accounts.</p>
+              </div>
+              <div style="display: flex; gap: 16px; align-items: center;">
+                <button onclick=\"showFigmaCreateGroupModalV3()\" style=\"
+                  background: #675dff;
+                  border: 1px solid #675dff;
+                  border-radius: 6px;
+                  padding: 8px 16px;
+                  height: 40px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  color: #ffffff;
+                  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+                  font-weight: 600;
+                  font-size: 16px;
+                  line-height: 24px;
+                  letter-spacing: -0.31px;
+                  box-shadow: 0px 1px 1px 0px rgba(47,14,99,0.32);
+                \">Create group</button>
+                <button style=\"
+                  background: #ffffff;
+                  border: 1px solid #d8dee4;
+                  border-radius: 6px;
+                  padding: 8px 16px;
+                  height: 40px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  color: #353a44;
+                  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+                  font-weight: 600;
+                  font-size: 16px;
+                  line-height: 24px;
+                  letter-spacing: -0.31px;
+                  box-shadow: 0px 1px 1px 0px rgba(33,37,44,0.16);
+                \" onclick=\"window.open('#','_blank')\">View docs</button>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Render groups using the new Figma-based card design with gradient background
+      container.className = 'figma-gradient-clean';
+      container.style.display = 'flex';
+      container.style.width = '100%';
+      // Hug contents: no min-height or flex growth
+      container.style.minHeight = 'auto';
+      container.style.flex = '0 0 auto';
+      container.style.padding = 'var(--Spacing-medium, 16px)';
+      container.style.flexDirection = 'column';
+      container.style.alignItems = 'flex-start';
+      container.style.gap = '16px';
+      container.style.overflow = 'visible';
+      container.style.boxSizing = 'border-box';
+      
+      // First render cards with loading spinners (or a single centered loader if no groups yet)
+      if (allGroups.length === 0) {
+        container.innerHTML = '<div style="width:100%;display:flex;justify-content:center;align-items:center;min-height:120px;"><span style="width:16px;height:16px;border:2px solid rgba(0,39,77,0.18);border-top-color:rgba(0,39,77,0.45);border-radius:50%;animation: agf_spin .6s linear infinite;"></span></div>';
+        return;
+      }
+
+      container.innerHTML = allGroups.map(group => {
+        let isSavedGroup = !!group.accountIds; // Convert to boolean: Saved groups have accountIds array
+        return createGroupCard(group, [], isSavedGroup, true); // Show loading spinner
+      }).join('');
+      
+      // Setup all event listeners immediately for the card structure
+      setupAllEventHandlers();
+      
+      // Then replace with real account data after a brief delay
+      setTimeout(() => {
+        allGroups.forEach((group, groupIndex) => {
+          // Handle both managed groups (from OrgDataManager) and saved groups (from localStorage)
+          let accounts = [];
+          let isSavedGroup = !!group.accountIds; // Convert to boolean: Saved groups have accountIds array
+          
+          if (isSavedGroup) {
+            // For saved groups, get account details by ID
+            accounts = group.accountIds.map(accountId => {
+              // Try to find account in current organization data
+              const orgAccounts = window.OrgDataManager?.getCurrentOrganization()?.accounts || [];
+              return orgAccounts.find(acc => acc.id === accountId) || { 
+                id: accountId, 
+                name: `Account ${accountId}`,
+                type: 'unknown'
+              };
+            });
+          } else {
+            // For managed groups, use existing logic
+            accounts = window.OrgDataManager.getAccountsInGroup(group.id);
+          }
+          
+          // Sort accounts alphabetically by name
+          accounts.sort((a, b) => a.name.localeCompare(b.name));
+          
+          // Replace spinner with actual account chips using the EXACT same structure as the original
+          const accountsContainer = container.querySelector(`.group-card-accounts-container[data-group-id="${group.id}"]`);
+          if (accountsContainer) {
+            // Ensure the container has the correct flex styling (in case it was lost)
+            accountsContainer.style.flex = '1';
+            accountsContainer.style.display = 'flex';
+            accountsContainer.style.flexWrap = 'wrap';
+            accountsContainer.style.gap = '6px';
+            accountsContainer.style.alignItems = 'flex-start';
+            accountsContainer.style.alignContent = 'flex-start';
+            accountsContainer.style.overflow = 'visible';
+            
+            // Generate the exact same HTML structure that was working before
+            const accountBadgesHtml = accounts.map((account, index) => `
+              <div class="group-card-account-badge" data-account-id="${account.id}" data-account-index="${index}" style="background: #f5f6f8; display: flex; flex-direction: row; gap: 6px; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 4px;">
+                <div class="group-card-account-name" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: #353a44; letter-spacing: -0.024px; margin: 0;">
+                  ${account.name}
+                </div>
+              </div>
+            `).join('');
+            
+            const moreLink = `<span class=\"group-card-more-link\" style=\"font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: var(--brand-600); text-decoration: none; padding: 4px 0; display: none; cursor: pointer;\">+ more</span>`;
+            
+            accountsContainer.innerHTML = accountBadgesHtml + moreLink;
+            
+            // Update the count pill and data attribute to match actual account count
+            const groupCard = container.querySelector(`#group-card-${group.id}`);
+            if (groupCard) {
+              groupCard.setAttribute('data-account-count', accounts.length);
+              const countPill = groupCard.querySelector('.group-card-count');
+              if (countPill) {
+                countPill.textContent = accounts.length;
+                countPill.setAttribute('title', `${accounts.length} accounts`);
+              }
+            }
+          }
+        });
+        
+        // Apply responsive badge truncation after rendering real content
+    applyResponsiveBadgeTruncation();
+    setupAllEventHandlers();
+        setupTooltipHover();
+      }, 300); // Show spinner for 300ms to simulate loading
+    }
+
+    // Make loadAccountGroups globally accessible for dynamic updates
+    window.loadAccountGroups = loadAccountGroups;
+
+    // Generate account groups for the filter component
+    function generateAccountGroups() {
+      try {
+        // Get all accounts from the current organization
+        const allOrgAccounts = window.OrgDataManager?.getCurrentOrganization()?.accounts || [];
+        
+        // Filter out aggregate views and convert to filter format
+        const accountData = allOrgAccounts
+          .filter(acc => !acc.isAggregate)
+          .map((acc, index) => ({
+            name: acc.name,
+            initials: generateInitials(acc.name),
+            color: convertHexToColorClass(acc.color) || (index % 2 === 0 ? 'blue' : 'green'),
+            backgroundColor: acc.color, // Store the original hex color for inline styles
+            checked: true,
+            id: acc.id,
+            type: acc.type || 'Account'
+          }));
+
+        // Start with just an empty groups object - no default groups
+        const groups = {};
+
+        // Add custom account groups created by users
+        const customGroups = window.OrgDataManager?.getAccountGroups() || [];
+
+        customGroups.forEach(group => {
+          // Get account IDs for this group
+          let accountIds = [];
+          if (group.accountIds) {
+            // Saved groups have accountIds array
+            accountIds = group.accountIds;
+          } else if (group.accounts) {
+            // Managed groups might have accounts array
+            accountIds = group.accounts.map(acc => acc.id);
+          }
+
+          // Filter accountData to only include accounts in this group
+          const groupAccounts = accountData.filter(acc => accountIds.includes(acc.id));
+          
+          if (groupAccounts.length > 0) {
+            // Create a safe key for the group (remove special characters)
+            const groupKey = group.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            groups[groupKey] = groupAccounts;
+          }
+        });
+
+        console.log('📋 Generated account groups for filter:', Object.keys(groups));
+        return groups;
+        
+      } catch (error) {
+        console.error('Error generating account groups:', error);
+        // Return empty object when no groups available
+        return {};
+      }
+    }
+
+    // Helper function to generate initials
+    function generateInitials(name) {
+      return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+    }
+
+    // Helper function to convert hex colors to color classes
+    function convertHexToColorClass(hexColor) {
+      if (!hexColor) return 'blue';
+      
+      // Simple mapping of hex colors to named colors
+      const colorMap = {
+        '#3b82f6': 'blue',
+        '#10b981': 'green', 
+        '#f59e0b': 'orange',
+        '#ef4444': 'red',
+        '#8b5cf6': 'purple',
+        '#06b6d4': 'cyan'
+      };
+      
+      return colorMap[hexColor] || 'blue';
+    }
+
+    // Make generateAccountGroups globally accessible
+    window.generateAccountGroups = generateAccountGroups;
+
+    // Function to refresh any existing account group filters on the page
+    function refreshAccountGroupFilters() {
+      // Check if there are any AccountGroupsFilter instances on the page
+      if (typeof window.accountGroupsFilters !== 'undefined' && Array.isArray(window.accountGroupsFilters)) {
+        console.log('🔄 Refreshing account group filters...');
+        window.accountGroupsFilters.forEach(filter => {
+          if (filter && typeof filter.refreshAccountGroups === 'function') {
+            filter.refreshAccountGroups();
+          }
+        });
+      }
+    }
+
+    // Make refreshAccountGroupFilters globally accessible
+    window.refreshAccountGroupFilters = refreshAccountGroupFilters;
+
+    // Test the generateAccountGroups function and refresh any existing filters
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🧪 Testing generateAccountGroups function...');
+      
+      // Show what groups are on the page
+      const managedGroups = window.OrgDataManager?.getAccountGroups() || [];
+      const savedGroups = getSavedGroups();
+      console.log('📄 Groups on page - Managed:', managedGroups);
+      console.log('📄 Groups on page - Saved:', savedGroups);
+      console.log('📄 Total groups on page:', managedGroups.length + savedGroups.length);
+      
+      // Show what the filter function generates
+      const testGroups = generateAccountGroups();
+      console.log('🧪 Generated groups for filter:', testGroups);
+      console.log('🧪 Available group keys:', Object.keys(testGroups));
+      
+      // Show custom groups specifically
+      const customGroups = [...managedGroups, ...savedGroups];
+      console.log('🎯 Custom groups found:', customGroups.map(g => ({name: g.name, id: g.id, accountIds: g.accountIds})));
+      
+      // Refresh any existing account group filters that might already be on pages
+      refreshAccountGroupFilters();
+    });
+
+    function applyResponsiveBadgeTruncation() {
+      const accountContainers = document.querySelectorAll('.group-card-accounts-container');
+
+      const GAP_PX = 6;          // matches inline style gap on container
+      const MAX_ROWS = 2;         // keep badges within two rows when collapsed
+      const MIN_SHOWN = 4;        // never show fewer than this when possible
+
+      const median = (arr) => {
+        if (!arr.length) return 0;
+        const sorted = [...arr].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+      };
+
+      const layoutContainer = (container) => {
+        const badges = Array.from(container.querySelectorAll('.group-card-account-badge'));
+        const moreLink = container.querySelector('.group-card-more-link');
+        if (!badges.length || !moreLink) return;
+
+        // Check if this container is in expanded state
+        const isExpanded = container.dataset.expanded === 'true';
+        
+        if (isExpanded) {
+          // When expanded, show all badges and "Show less" link
+          badges.forEach(b => { b.style.display = 'flex'; });
+          moreLink.style.display = 'inline-flex';
+          moreLink.textContent = 'Show less';
+          return;
+        }
+
+        // Reset visibility before measuring (collapsed state)
+        badges.forEach(b => { b.style.display = 'flex'; });
+        moreLink.style.display = 'none';
+
+        const containerWidth = Math.floor(container.getBoundingClientRect().width);
+        if (containerWidth <= 0) return; // nothing to do yet
+
+        // Estimate average badge width using median of first few samples
+        const sample = badges.slice(0, Math.min(8, badges.length));
+        const sampleWidths = sample.map(b => Math.ceil(b.getBoundingClientRect().width));
+        const estimatedBadge = Math.max(1, median(sampleWidths));
+
+        // Compute how many badges fit per row with gap
+        const perRow = Math.max(1, Math.floor((containerWidth + GAP_PX) / (estimatedBadge + GAP_PX)));
+        
+        // Start with all badges visible to measure actual layout
+        badges.forEach(b => { b.style.display = 'flex'; });
+        moreLink.style.display = 'none';
+        
+        // Get actual row heights after layout
+        const getBadgeRows = () => {
+          const visibleBadges = badges.filter(b => b.style.display !== 'none');
+          if (visibleBadges.length === 0) return 0;
+          const tops = visibleBadges.map(b => Math.round(b.getBoundingClientRect().top));
+          const uniqueTops = [...new Set(tops)].sort((a, b) => a - b);
+          return uniqueTops.length;
+        };
+        
+        let maxShown = badges.length;
+        let hiddenCount = 0;
+        
+        // Check if all badges fit within MAX_ROWS (2 rows)
+        if (getBadgeRows() > MAX_ROWS) {
+          // Too many rows - need to truncate
+          
+          // Start with estimated capacity for 2 rows, leaving room for +N more
+          maxShown = Math.max(MIN_SHOWN, Math.min(badges.length, (perRow * MAX_ROWS) - 1));
+          
+          // Hide excess badges and show +N more
+          badges.forEach((badge, idx) => {
+            badge.style.display = idx < maxShown ? 'flex' : 'none';
+          });
+          
+          hiddenCount = badges.length - maxShown;
+          moreLink.style.display = 'inline-flex';
+          moreLink.textContent = `+${hiddenCount} more`;
+          
+          // Fine-tune: if +N more causes overflow to 3rd row, reduce further
+          let tries = 5;
+          while (tries-- > 0 && getBadgeRows() > MAX_ROWS && maxShown > MIN_SHOWN) {
+            maxShown -= 1;
+            badges[maxShown].style.display = 'none';
+            hiddenCount = badges.length - maxShown;
+            moreLink.textContent = `+${hiddenCount} more`;
+          }
+        } else if (badges.length > (perRow * MAX_ROWS)) {
+          // All badges fit in <= 2 rows but we have more badges than 2 rows should hold
+          // This means the container is wide enough - try to fit more badges up to the estimated 2-row limit
+          
+          const estimatedCapacity = perRow * MAX_ROWS;
+          if (badges.length > estimatedCapacity) {
+            // Show as many as estimated to fit in 2 rows, with +N more
+            maxShown = Math.max(MIN_SHOWN, estimatedCapacity - 1);
+            
+            badges.forEach((badge, idx) => {
+              badge.style.display = idx < maxShown ? 'flex' : 'none';
+            });
+            
+            hiddenCount = badges.length - maxShown;
+            moreLink.style.display = 'inline-flex';
+            moreLink.textContent = `+${hiddenCount} more`;
+            
+            // Check if this causes overflow and adjust
+            let tries = 3;
+            while (tries-- > 0 && getBadgeRows() > MAX_ROWS && maxShown > MIN_SHOWN) {
+              maxShown -= 1;
+              badges[maxShown].style.display = 'none';
+              hiddenCount = badges.length - maxShown;
+              moreLink.textContent = `+${hiddenCount} more`;
+            }
+          }
+        }
+      };
+
+      accountContainers.forEach(container => {
+        layoutContainer(container);
+
+        // Attach a ResizeObserver per container for precise relayouts
+        if (!container.__badgesResizeObserver) {
+          const ro = new ResizeObserver(() => {
+            // Use rAF to coalesce rapid size changes
+            if (container.__layoutRaf) cancelAnimationFrame(container.__layoutRaf);
+            container.__layoutRaf = requestAnimationFrame(() => layoutContainer(container));
+          });
+          ro.observe(container);
+          container.__badgesResizeObserver = ro;
+        }
+      });
+    }
+
+    // Apply truncation on window resize
+    window.addEventListener('resize', () => {
+      applyResponsiveBadgeTruncation();
+    });
+
+    function setupTooltipHover() {
+      const infoContainers = document.querySelectorAll('.info-icon-container');
+
+      // Create single portal for descriptions
+      let descPortal = document.getElementById('desc-tooltip-portal');
+      if (!descPortal) {
+        descPortal = document.createElement('div');
+        descPortal.id = 'desc-tooltip-portal';
+        descPortal.className = 'info-tooltip portal';
+        descPortal.style.position = 'fixed';
+        descPortal.style.zIndex = '2147483647';
+        descPortal.style.opacity = '0';
+        descPortal.style.visibility = 'hidden';
+        descPortal.style.margin = '0';
+        document.body.appendChild(descPortal);
+      }
+
+      const positionDescPortal = (container) => {
+        const margin = 8;
+        const card = container.closest('.account-group-card');
+        const tooltip = container.querySelector('.info-tooltip');
+        if (!tooltip) return;
+        // Use the existing tooltip content
+        descPortal.innerHTML = tooltip.innerHTML;
+
+        // Show to measure
+        descPortal.style.opacity = '1';
+        descPortal.style.visibility = 'visible';
+
+        const rect = container.getBoundingClientRect();
+        const tipRect = descPortal.getBoundingClientRect();
+
+        // Center horizontally and clamp
+        const viewportWidth = window.innerWidth;
+        let left = rect.left + rect.width / 2 - tipRect.width / 2;
+        left = Math.max(margin, Math.min(left, viewportWidth - margin - tipRect.width));
+
+        // Prefer above; otherwise below
+        let top = rect.top - margin - tipRect.height;
+        let placeBelow = false;
+        if (top < margin) {
+          top = rect.bottom + margin;
+          placeBelow = true;
+        }
+
+        descPortal.style.left = `${Math.round(left)}px`;
+        descPortal.style.top = `${Math.round(top)}px`;
+        if (placeBelow) descPortal.classList.add('bottom'); else descPortal.classList.remove('bottom');
+
+        // Arrow alignment
+        const linkCenter = rect.left + rect.width / 2;
+        const arrowOffset = Math.max(margin + 6, Math.min(tipRect.width - (margin + 6), linkCenter - left));
+        descPortal.style.setProperty('--arrow-left', `${arrowOffset}px`);
+        descPortal.style.setProperty('--arrow-transform', 'translateX(-50%)');
+      };
+
+      const showDesc = (container) => positionDescPortal(container);
+      const hideDesc = () => {
+        descPortal.style.opacity = '0';
+        descPortal.style.visibility = 'hidden';
+      };
+
+      infoContainers.forEach(container => {
+        if (!container.__descTipBound) {
+          container.addEventListener('mouseenter', () => showDesc(container));
+          container.addEventListener('mouseleave', hideDesc);
+          container.__descTipBound = true;
+        }
+      });
+
+      let rafIdDesc;
+      const onReposition = () => {
+        if (rafIdDesc) cancelAnimationFrame(rafIdDesc);
+        rafIdDesc = requestAnimationFrame(() => {
+          if (getComputedStyle(descPortal).visibility === 'visible') {
+            const hovered = document.querySelector('.info-icon-container:hover');
+            if (hovered) positionDescPortal(hovered);
+          }
+        });
+      };
+      window.addEventListener('resize', onReposition);
+      window.addEventListener('scroll', onReposition, { passive: true });
+    }
+
+    // Tooltip for +N more showing hidden account names (portal to body to avoid clipping)
+    function setupMoreHoverTooltips() {
+      const moreLinks = document.querySelectorAll('.group-card-more-link');
+
+      // Create a single portal tooltip reused for all links
+      let portalTip = document.getElementById('more-tooltip-portal');
+      if (!portalTip) {
+        portalTip = document.createElement('div');
+        portalTip.id = 'more-tooltip-portal';
+        portalTip.className = 'info-tooltip portal';
+        portalTip.style.position = 'fixed';
+        portalTip.style.zIndex = '2147483647';
+        portalTip.style.opacity = '0';
+        portalTip.style.visibility = 'hidden';
+        portalTip.style.margin = '0';
+        document.body.appendChild(portalTip);
+      }
+
+      const positionPortal = (link) => {
+        const margin = 8;
+        const names = link.getAttribute('data-hidden-names') || '';
+        if (!names) return;
+        portalTip.textContent = names;
+
+        // Show to measure
+        portalTip.style.opacity = '1';
+        portalTip.style.visibility = 'visible';
+
+        const linkRect = link.getBoundingClientRect();
+        const tipRect = portalTip.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // Horizontal: center over link, then clamp
+        let left = linkRect.left + linkRect.width / 2 - tipRect.width / 2;
+        left = Math.max(margin, Math.min(left, viewportWidth - margin - tipRect.width));
+
+        // Vertical: prefer above; if not enough space, place below
+        let top = linkRect.top - margin - tipRect.height;
+        let placeBelow = false;
+        if (top < margin) {
+          top = linkRect.bottom + margin;
+          placeBelow = true;
+        }
+
+        // Apply position
+        portalTip.style.top = `${Math.round(top)}px`;
+        portalTip.style.left = `${Math.round(left)}px`;
+
+        // Flip arrow orientation without affecting fixed positioning
+        if (placeBelow) {
+          portalTip.classList.add('bottom');
+        } else {
+          portalTip.classList.remove('bottom');
+        }
+
+        // Arrow alignment within tooltip
+        const linkCenter = linkRect.left + linkRect.width / 2;
+        const arrowOffset = Math.max(margin + 6, Math.min(tipRect.width - (margin + 6), linkCenter - left));
+        portalTip.style.setProperty('--arrow-left', `${arrowOffset}px`);
+        portalTip.style.setProperty('--arrow-transform', 'translateX(-50%)');
+      };
+
+      const showPortal = (link) => {
+        positionPortal(link);
+      };
+
+      const hidePortal = () => {
+        portalTip.style.opacity = '0';
+        portalTip.style.visibility = 'hidden';
+      };
+
+      moreLinks.forEach(link => {
+        if (!link.__moreTipBound) {
+          link.addEventListener('mouseenter', () => showPortal(link));
+          link.addEventListener('mouseleave', hidePortal);
+          link.__moreTipBound = true;
+        }
+      });
+
+      // Reposition on scroll/resize while visible
+      let rafId;
+      const onReposition = () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          if (getComputedStyle(portalTip).visibility === 'visible') {
+            const hovered = document.querySelector('.group-card-more-link:hover');
+            if (hovered) positionPortal(hovered);
+          }
+        });
+      };
+      window.addEventListener('resize', onReposition);
+      window.addEventListener('scroll', onReposition, { passive: true });
+    }
+
+    function toggleKebabMenu(button, groupId, isSavedGroup) {
+      console.log('🔥 toggleKebabMenu called!', {button, groupId, isSavedGroup});
+      
+      // Close all other menus first
+      closeAllKebabMenus();
+      
+      let menu = button.querySelector('.kebab-menu');
+      console.log('📍 Found existing menu:', menu);
+      
+      // Always remove and recreate the menu to ensure no old onclick handlers
+      if (menu) {
+        console.log('🗑️ Removing existing menu to prevent old handlers');
+        // Remove any onclick handlers from the old menu
+        const oldMenuItems = menu.querySelectorAll('.kebab-menu-item');
+        oldMenuItems.forEach(item => {
+          item.onclick = null;
+          item.removeAttribute('onclick');
+        });
+        menu.remove();
+        menu = null;
+      }
+      
+      if (!menu) {
+        console.log('🆕 Creating new menu...');
+        // Create menu if it doesn't exist
+        console.log('🛠️ About to call createKebabMenu with:', groupId, isSavedGroup);
+        menu = createKebabMenu(groupId, isSavedGroup);
+        console.log('🛠️ createKebabMenu returned:', menu);
+        button.appendChild(menu);
+        console.log('✅ Menu created and appended:', menu);
+      }
+      
+      console.log('📐 Menu position before showing:', {
+        position: menu.style.position,
+        top: menu.style.top,
+        right: menu.style.right,
+        display: menu.style.display
+      });
+      
+      // Force show the menu
+      menu.style.display = 'block';
+      menu.style.opacity = '1';
+      menu.style.visibility = 'visible';
+      menu.style.transform = 'translateY(0)';
+      menu.style.pointerEvents = 'auto';
+      menu.style.position = 'absolute';
+      menu.style.top = '100%';
+      menu.style.right = '0';
+      menu.style.zIndex = '10001';
+      menu.classList.add('show');
+      
+      // Increase parent card z-index for browsers without :has() support
+      const card = button.closest('.account-group-card');
+      if (card) {
+        card.style.zIndex = '10000';
+      }
+      
+      console.log('🎯 Menu should be visible now:', {
+        display: menu.style.display,
+        opacity: menu.style.opacity,
+        visibility: menu.style.visibility,
+        position: menu.style.position,
+        classes: menu.className
+      });
+      
+      // Close menu when clicking outside
+      setTimeout(() => {
+        document.addEventListener('click', function closeMenu(e) {
+          if (!button.contains(e.target)) {
+            menu.classList.remove('show');
+            menu.style.display = 'none';
+            // Reset parent card z-index
+            const card = button.closest('.account-group-card');
+            if (card) {
+              card.style.zIndex = '';
+            }
+            document.removeEventListener('click', closeMenu);
+          }
+        });
+      }, 100);
+    }
+
+    function setupKebabEventListeners() {
+      console.log('🎯 Setting up kebab event listeners...');
+      const kebabButtons = document.querySelectorAll('.group-card-kebab');
+      console.log('🎯 Found kebab buttons:', kebabButtons.length);
+      
+      kebabButtons.forEach(button => {
+        const groupId = button.getAttribute('data-group-id');
+        const isSaved = button.getAttribute('data-is-saved') === 'true';
+        
+        console.log('🎯 Adding listener for button:', {groupId, isSaved});
+        
+        // Remove any existing listeners to prevent duplicates
+        button.removeEventListener('click', handleKebabClick);
+        
+        // Add new listener
+        button.addEventListener('click', handleKebabClick);
+        
+        function handleKebabClick(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('🎯 Kebab clicked!', {groupId, isSaved});
+          toggleKebabMenu(button, groupId, isSaved);
+        }
+      });
+    }
+
+    // Make function globally accessible
+    window.toggleKebabMenu = toggleKebabMenu;
+
+    // Set up expand/collapse functionality for badge containers
+    function setupExpandCollapseHandlers() {
+      const moreLinks = document.querySelectorAll('.group-card-more-link');
+      
+      moreLinks.forEach(moreLink => {
+        // Remove any existing listeners to prevent duplicates
+        const newMoreLink = moreLink.cloneNode(true);
+        moreLink.parentNode.replaceChild(newMoreLink, moreLink);
+        
+        newMoreLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const container = newMoreLink.closest('.group-card-accounts-container');
+          if (!container) return;
+          
+          const isExpanded = container.dataset.expanded === 'true';
+          
+          if (isExpanded) {
+            // Collapse: go back to truncated view
+            container.dataset.expanded = 'false';
+          } else {
+            // Expand: show all badges
+            container.dataset.expanded = 'true';
+          }
+          
+          // Re-layout the container
+          applyResponsiveBadgeTruncation();
+        });
+      });
+    }
+
+    // Call setup after cards are rendered
+    function setupAllEventHandlers() {
+      setupKebabEventListeners();
+      setupExpandCollapseHandlers();
+    }
+
+    function createKebabMenu(groupId, isSavedGroup) {
+      console.log('🔧 createKebabMenu called with:', groupId, isSavedGroup);
+      const menu = document.createElement('div');
+      menu.className = 'kebab-menu';
+      menu.innerHTML = `
+        <button class="kebab-menu-item" data-action="manage" data-group-id="${groupId}" data-is-saved="${isSavedGroup}">
+          Manage group
+        </button>
+        <button class="kebab-menu-item" data-action="copy" data-group-id="${groupId}">
+          Copy group ID
+        </button>
+        <button class="kebab-menu-item destructive" data-action="delete" data-group-id="${groupId}">
+          Delete group
+        </button>
+      `;
+      
+      // Add event listeners to each button
+      const buttons = menu.querySelectorAll('.kebab-menu-item');
+      buttons.forEach(button => {
+        // Remove any existing onclick handlers
+        button.onclick = null;
+        button.removeAttribute('onclick');
+        
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          event.stopImmediatePropagation(); // Stop other handlers from running
+          event.preventDefault(); // Prevent any default behavior
+          const action = button.dataset.action;
+          const groupIdFromData = button.dataset.groupId;
+          const isSavedFromData = button.dataset.isSaved === 'true';
+          
+          console.log('🎯 Kebab menu action:', action, 'groupId:', groupIdFromData);
+          
+          switch (action) {
+            case 'manage':
+              manageGroup(groupIdFromData, isSavedFromData);
+              break;
+            case 'copy':
+              copyGroupId(groupIdFromData);
+              break;
+            case 'delete':
+              deleteGroup(groupIdFromData);
+              break;
+          }
+        });
+      });
+      
+      return menu;
+    }
+
+    function closeAllKebabMenus() {
+      const openMenus = document.querySelectorAll('.kebab-menu');
+      console.log('🧹 Closing', openMenus.length, 'kebab menus');
+      openMenus.forEach(menu => {
+        menu.classList.remove('show');
+        menu.style.display = 'none';
+        menu.style.opacity = '0';
+        menu.style.visibility = 'hidden';
+        menu.style.pointerEvents = 'none';
+        
+        // Reset parent card z-index
+        const card = menu.closest('.account-group-card');
+        if (card) {
+          card.style.zIndex = '';
+        }
+      });
+    }
+
+    // Force clear any cached kebab menus on page load
+    function clearAllKebabMenus() {
+      const allMenus = document.querySelectorAll('.kebab-menu');
+      console.log('🧹 Force clearing', allMenus.length, 'cached kebab menus');
+      allMenus.forEach(menu => {
+        // Remove any onclick handlers from menu items before removing
+        const menuItems = menu.querySelectorAll('.kebab-menu-item');
+        menuItems.forEach(item => {
+          item.onclick = null;
+          item.removeAttribute('onclick');
+        });
+        
+        if (menu.parentNode) {
+          menu.parentNode.removeChild(menu);
+        }
+      });
+      
+      // Also clear any orphaned menu items that might be floating around
+      const orphanedItems = document.querySelectorAll('.kebab-menu-item');
+      console.log('🧹 Force clearing', orphanedItems.length, 'orphaned kebab menu items');
+      orphanedItems.forEach(item => {
+        item.onclick = null;
+        item.removeAttribute('onclick');
+        if (item.parentNode && !item.closest('.kebab-menu')) {
+          item.parentNode.removeChild(item);
+        }
+      });
+    }
+
+    function manageGroup(groupId, isSavedGroup) {
+      closeAllKebabMenus();
+      console.log('Manage group:', groupId, 'isSaved:', isSavedGroup);
+      
+      // Open the group creation modal in edit mode
+      if (window.figmaModalV3) {
+        window.figmaModalV3.show({
+          editMode: true,
+          editingGroupId: groupId,
+          onComplete: (updatedGroup) => {
+            console.log('Group updated:', updatedGroup);
+            // Refresh the page to show updated data
+            loadAccountGroups();
+            refreshAccountGroupFilters();
+          }
+        });
+      } else {
+        console.error('Group creation modal not available');
+        alert('Manage group functionality not available');
+      }
+    }
+
+    function copyGroupId(groupId) {
+      closeAllKebabMenus();
+      navigator.clipboard.writeText(groupId).then(() => {
+        // Show a temporary success indicator
+        const notification = document.createElement('div');
+        notification.textContent = 'Group ID copied to clipboard';
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #10b981;
+          color: white;
+          padding: 12px 16px;
+          border-radius: 6px;
+          font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          z-index: 10001;
+          box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
+        `;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.remove();
+        }, 2000);
+      }).catch(() => {
+        alert('Failed to copy group ID');
+      });
+    }
+
+    // Make functions globally accessible
+    window.closeAllKebabMenus = closeAllKebabMenus;
+    window.manageGroup = manageGroup;
+    window.copyGroupId = copyGroupId;
+    window.deleteGroup = deleteGroup;
+
+    function deleteGroup(groupId, isSavedGroup = false) {
+      closeAllKebabMenus();
+      
+      console.log('🗑️ deleteGroup called with groupId:', groupId);
+      
+      // Get the group name for the confirmation dialog
+      const group = window.OrgDataManager.getAccountGroups().find(g => g.id === groupId);
+      const groupName = group ? group.name : 'this group';
+      
+      console.log('🗑️ Found group for deletion:', group);
+      console.log('🗑️ About to show delete confirmation for:', groupName);
+      
+      showDeleteConfirmation(groupName, () => {
+        // Use OrgDataManager for all group deletions
+        if (window.OrgDataManager && window.OrgDataManager.deleteAccountGroup) {
+          console.log('🗑️ Deleting group:', groupId);
+          console.log('Groups before deletion:', window.OrgDataManager.getAccountGroups().map(g => ({id: g.id, name: g.name})));
+          
+        window.OrgDataManager.deleteAccountGroup(groupId);
+          
+          console.log('Groups after deletion:', window.OrgDataManager.getAccountGroups().map(g => ({id: g.id, name: g.name})));
+          console.log('🔄 Reloading account groups...');
+          
+        loadAccountGroups();
+          
+          // Refresh any existing account group filters on the page
+          refreshAccountGroupFilters();
+        } else {
+          console.error('OrgDataManager.deleteAccountGroup not available');
+          alert('Cannot delete account group - functionality not available');
+          return;
+        }
+      });
+    }
+
+    function showDeleteConfirmation(groupName, onConfirm) {
+      console.log('🚨 showDeleteConfirmation called for:', groupName);
+      console.log('🚨 onConfirm function:', onConfirm);
+      
+      // Create modal overlay
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      `;
+      
+      // Create modal content
+      modal.innerHTML = `
+        <div style="
+          background: white;
+          border-radius: 12px;
+          padding: 32px;
+          max-width: 480px;
+          width: 90%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          position: relative;
+          transform: scale(0.95);
+          transition: transform 0.2s ease;
+        ">
+          <button style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+          " onmouseover="this.style.backgroundColor='#f3f4f6'" onmouseout="this.style.backgroundColor='transparent'" onclick="this.closest('[style*=fixed]').remove()">
+            ×
+          </button>
+          
+          <h2 style="
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.2;
+          ">Delete ${groupName}?</h2>
+          
+          <p style="
+            margin: 0 0 32px 0;
+            color: #6b7280;
+            font-size: 16px;
+            line-height: 1.5;
+            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+          ">This action cannot be undone.</p>
+          
+          <div style="
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+          ">
+            <button id="cancel-delete-btn" style="
+              padding: 12px 24px;
+              border: 1px solid #d1d5db;
+              background: white;
+              color: #374151;
+              border-radius: 8px;
+              font-size: 16px;
+              font-weight: 500;
+              cursor: pointer;
+              font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+              transition: all 0.2s ease;
+            " onmouseover="this.style.backgroundColor='#f9fafb'; this.style.borderColor='#9ca3af'" onmouseout="this.style.backgroundColor='white'; this.style.borderColor='#d1d5db'">
+              Cancel
+            </button>
+            <button id="confirm-delete-btn" style="
+              padding: 12px 24px;
+              border: 1px solid #dc2626;
+              background: #dc2626;
+              color: white;
+              border-radius: 8px;
+              font-size: 16px;
+              font-weight: 500;
+              cursor: pointer;
+              font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+              transition: all 0.2s ease;
+            " onmouseover="this.style.backgroundColor='#b91c1c'; this.style.borderColor='#b91c1c'" onmouseout="this.style.backgroundColor='#dc2626'; this.style.borderColor='#dc2626'">
+              Delete
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // Add to page
+      document.body.appendChild(modal);
+      
+      // Add event listeners to buttons
+      const cancelBtn = modal.querySelector('#cancel-delete-btn');
+      const confirmBtn = modal.querySelector('#confirm-delete-btn');
+      
+      cancelBtn.addEventListener('click', () => {
+        console.log('🚫 Delete cancelled');
+        modal.remove();
+      });
+      
+      confirmBtn.addEventListener('click', () => {
+        console.log('✅ Delete confirmed, calling onConfirm function');
+        modal.remove();
+        onConfirm(); // Call the function directly (no string conversion!)
+      });
+      
+      // Animate in
+      requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        modal.querySelector('div').style.transform = 'scale(1)';
+      });
+      
+      // Close on backdrop click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      });
+      
+      // Close on escape key
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          modal.remove();
+          document.removeEventListener('keydown', handleEscape);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+      
+      // Clean up event listener when modal is removed
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.removedNodes.forEach((node) => {
+            if (node === modal) {
+              document.removeEventListener('keydown', handleEscape);
+              observer.disconnect();
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true });
+    }
+
+    // Initialize expandable workload items
+    function initExpandableWorkloads() {
+      const expandableItems = document.querySelectorAll('.workload-item.expandable');
+      
+      expandableItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const section = this.getAttribute('data-section');
+          const submenu = document.querySelector(`.workload-submenu[data-section="${section}"]`);
+          const isExpanded = this.classList.contains('expanded');
+          
+          if (isExpanded) {
+            // Collapse
+            this.classList.remove('expanded');
+            submenu.classList.remove('expanded');
+          } else {
+            // Expand
+            this.classList.add('expanded');
+            submenu.classList.add('expanded');
+          }
+        });
+      });
+    }
+
+    // Initialize on DOM content loaded
+    initExpandableWorkloads();
+   </script>
+
+    // Update workload active states based on active subitems
+    function updateWorkloadActiveStates() {
+      const workloadContainers = document.querySelectorAll('.workload-item-container');
+      
+      workloadContainers.forEach(container => {
+        const workloadItem = container.querySelector('.workload-item');
+        const activeSubitem = container.querySelector('.workload-subitem.active');
+        
+        if (workloadItem) {
+          if (activeSubitem) {
+            workloadItem.classList.add('has-active-subitem');
+          } else {
+            workloadItem.classList.remove('has-active-subitem');
+          }
+        }
+      });
+    }
+
+    // Initialize workload active states
+    updateWorkloadActiveStates();
+
+    // Debug script to check if everything loaded properly
+    console.log('=== DEBUG INFO ===');
+    console.log('Modal available:', typeof window.Modal);
+    console.log('FigmaGroupCreationModalV3 available:', typeof window.FigmaGroupCreationModalV3);
+    console.log('figmaModalV3 alias available:', typeof window.figmaModalV3);
+    console.log('showFigmaCreateGroupModalV3 function available (local):', typeof showFigmaCreateGroupModalV3);
+    console.log('showFigmaCreateGroupModalV3 function available (global):', typeof window.showFigmaCreateGroupModalV3);
+    
+    // Test if we can access the button
+    const button = document.querySelector('button[onclick="showFigmaCreateGroupModalV3()"]');
+    console.log('Create group button found:', !!button);
+    if (button) {
+        console.log('Button onclick:', button.getAttribute('onclick'));
+    }
+    
+    // Add helper function to clear all groups for testing
+    window.clearAllAccountGroups = function() {
+      if (window.OrgDataManager && window.OrgDataManager.clearAllAccountGroups) {
+        window.OrgDataManager.clearAllAccountGroups();
+        loadAccountGroups();
+        console.log('✅ All account groups cleared');
+      } else {
+        // Fallback: clear localStorage keys
+        const currentOrg = window.OrgDataManager.getCurrentOrganization();
+        if (currentOrg) {
+          localStorage.removeItem(`account-groups-${currentOrg.id}`);
+          loadAccountGroups();
+          console.log('✅ All account groups cleared (fallback method)');
+        }
+      }
+    };
+    console.log('🔧 Helper function added: window.clearAllAccountGroups()');
+    
+    console.log('=== END DEBUG ===');
+
+</body>
+</html> 
