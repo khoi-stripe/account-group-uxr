@@ -92,102 +92,135 @@ class PrototypeControlPanel {
         <button class="close-button" onclick="window.prototypePanel.hide()">×</button>
       </div>
       
+      <div class="panel-tabs">
+        <button class="tab-button active" onclick="window.prototypePanel.switchTab('main')" data-tab="main">
+          Main Settings
+        </button>
+        <button class="tab-button" onclick="window.prototypePanel.switchTab('share')" data-tab="share">
+          Share Prototype
+        </button>
+      </div>
+      
       <div class="panel-content">
-        <div class="section">
-          <div class="section-content">
-            <div class="org-controls">
-              <label class="organization-label" for="panel-org-selector">choose organization</label>
-              <select id="panel-org-selector" class="org-selector">
-                <option value="">Select an organization...</option>
-              </select>
+        <!-- Main Settings Tab -->
+        <div id="main-tab" class="tab-content active">
+          <div class="section">
+            <div class="section-content">
+              <div class="org-controls">
+                <label class="organization-label" for="panel-org-selector">choose organization</label>
+                <select id="panel-org-selector" class="org-selector">
+                  <option value="">Select an organization...</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="section">
-          <div class="section-content">
-            <div class="upload-actions">
-              <h4 class="upload-title collapsible-header" onclick="window.prototypePanel.toggleModule('upload')">
-                <svg class="module-caret" width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1.5 2.5L4 5L6.5 2.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Upload
-              </h4>
-              <div class="module-content" id="upload-content">
-                <input type="file" id="panel-csv-input" accept=".csv" style="display: none;">
-                <div class="upload-buttons">
-                  <button class="btn btn-secondary" onclick="document.getElementById('panel-csv-input').click()">
-                    Upload CSV File
-                  </button>
-                  <button class="btn btn-text" onclick="window.prototypePanel.downloadSample()">
-                    Download Sample
-                  </button>
+          <div class="section">
+            <div class="section-content">
+              <div class="upload-actions">
+                <h4 class="upload-title collapsible-header" onclick="window.prototypePanel.toggleModule('upload')">
+                  <svg class="module-caret" width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.5 2.5L4 5L6.5 2.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Upload
+                </h4>
+                <div class="module-content" id="upload-content">
+                  <input type="file" id="panel-csv-input" accept=".csv" style="display: none;">
+                  <div class="upload-buttons">
+                    <button class="btn btn-secondary" onclick="document.getElementById('panel-csv-input').click()">
+                      Upload CSV File
+                    </button>
+                    <button class="btn btn-text" onclick="window.prototypePanel.downloadSample()">
+                      Download Sample
+                    </button>
+                  </div>
+                  <p class="help-text">
+                    Upload a CSV with format: <strong>Organization, Account Name</strong>
+                  </p>
                 </div>
-                <p class="help-text">
-                  Upload a CSV with format: <strong>Organization, Account Name</strong>
-                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-content">
+              <div class="generate-module">
+                <h4 class="generate-title collapsible-header" onclick="window.prototypePanel.toggleModule('generate')">
+                  <svg class="module-caret" width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.5 2.5L4 5L6.5 2.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Generate
+                </h4>
+                <div class="module-content" id="generate-content">
+                  <div class="form-group">
+                    <label class="form-label" for="panel-org-name">Organization Name</label>
+                    <input type="text" id="panel-org-name" class="form-input" placeholder="e.g., Acme Technologies">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" for="panel-account-count">Number of Accounts</label>
+                    <input type="number" id="panel-account-count" class="form-input" min="1" max="20" value="5">
+                  </div>
+                  
+                  <div id="generated-preview" class="generated-preview" style="display: none;">
+                    <div id="preview-content"></div>
+                  </div>
+                  
+                  <div id="initial-generate-container" class="generate-button-container">
+                    <button class="btn btn-secondary" onclick="window.prototypePanel.generateOrganization()">
+                      Generate
+                    </button>
+                  </div>
+                  
+                  <div id="generated-actions-container" class="generated-actions" style="display: none;">
+                    <button class="btn btn-text refresh-btn" onclick="window.prototypePanel.refreshGeneration()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4V9H4.58152M4.58152 9C5.24429 7.2752 6.43205 5.80686 8.00236 4.8227C9.57267 3.83854 11.4295 3.39938 13.2725 3.56374C15.1154 3.72811 16.8505 4.48947 18.2048 5.73769C19.5591 6.98591 20.4574 8.64973 20.7573 10.4653C21.0572 12.2808 20.7434 14.1397 19.8615 15.7756C18.9795 17.4115 17.5759 18.7361 15.8847 19.5397C14.1935 20.3434 12.2992 20.5902 10.4674 20.2464C8.63555 19.9027 6.95663 19.0832 5.68213 17.9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4.58152 9H9V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      Refresh
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.prototypePanel.saveGeneratedOrganization()">
+                      Save
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="section">
-          <div class="section-content">
-            <div class="generate-module">
-              <h4 class="generate-title collapsible-header" onclick="window.prototypePanel.toggleModule('generate')">
-                <svg class="module-caret" width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1.5 2.5L4 5L6.5 2.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                Generate
-              </h4>
-              <div class="module-content" id="generate-content">
-                <div class="form-group">
-                  <label class="form-label" for="panel-org-name">Organization Name</label>
-                  <input type="text" id="panel-org-name" class="form-input" placeholder="e.g., Acme Technologies">
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label" for="panel-account-count">Number of Accounts</label>
-                  <input type="number" id="panel-account-count" class="form-input" min="1" max="20" value="5">
-                </div>
-                
-                <div id="generated-preview" class="generated-preview" style="display: none;">
-                  <div id="preview-content"></div>
-                </div>
-                
-                <div id="initial-generate-container" class="generate-button-container">
-                  <button class="btn btn-secondary" onclick="window.prototypePanel.generateOrganization()">
-                    Generate
-                  </button>
-                </div>
-                
-                <div id="generated-actions-container" class="generated-actions" style="display: none;">
-                  <button class="btn btn-text refresh-btn" onclick="window.prototypePanel.refreshGeneration()">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4 4V9H4.58152M4.58152 9C5.24429 7.2752 6.43205 5.80686 8.00236 4.8227C9.57267 3.83854 11.4295 3.39938 13.2725 3.56374C15.1154 3.72811 16.8505 4.48947 18.2048 5.73769C19.5591 6.98591 20.4574 8.64973 20.7573 10.4653C21.0572 12.2808 20.7434 14.1397 19.8615 15.7756C18.9795 17.4115 17.5759 18.7361 15.8847 19.5397C14.1935 20.3434 12.2992 20.5902 10.4674 20.2464C8.63555 19.9027 6.95663 19.0832 5.68213 17.9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M4.58152 9H9V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        
+        <!-- Share Prototype Tab -->
+        <div id="share-tab" class="tab-content">
+          <div class="section">
+            <div class="section-content">
+              <div class="form-group">
+                <label class="form-label" for="share-org-selector">Organization to Share</label>
+                <select id="share-org-selector" class="form-input">
+                  <option value="">Select an organization...</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="share-link-field">Shareable Link</label>
+                <div class="share-link-container">
+                  <input type="text" id="share-link-field" class="form-input" readonly placeholder="Select an organization to generate link...">
+                  <button class="btn btn-secondary copy-btn" onclick="window.prototypePanel.copyShareLink()" title="Copy to clipboard">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4.5 2.5H2.5C2.23478 2.5 1.98043 2.60536 1.79289 2.79289C1.60536 2.98043 1.5 3.23478 1.5 3.5V11.5C1.5 11.7652 1.60536 12.0196 1.79289 12.2071C1.98043 12.3946 2.23478 12.5 2.5 12.5H10.5C10.7652 12.5 11.0196 12.3946 11.2071 12.2071C11.3946 12.0196 11.5 11.7652 11.5 11.5V9.5M8.5 1.5H11.5C11.7652 1.5 12.0196 1.60536 12.2071 1.79289C12.3946 1.98043 12.5 2.23478 12.5 2.5V5.5M8.5 1.5L12.5 5.5M8.5 1.5V5.5H12.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    Refresh
-                  </button>
-                  <button class="btn btn-secondary" onclick="window.prototypePanel.saveGeneratedOrganization()">
-                    Save
                   </button>
                 </div>
+                <p class="help-text">This link includes all data for the selected organization and any account groups you've created.</p>
               </div>
+              
+              <div id="share-status" class="share-status" style="display: none;"></div>
             </div>
           </div>
         </div>
       </div>
       
       <div class="panel-footer">
-        <div class="footer-left">
-          <button class="btn btn-text share-btn" onclick="window.prototypePanel.sharePrototype()" title="Generate shareable URL with current data">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10.5 4.5C11.6046 4.5 12.5 3.60457 12.5 2.5C12.5 1.39543 11.6046 0.5 10.5 0.5C9.39543 0.5 8.5 1.39543 8.5 2.5C8.5 2.83289 8.58289 3.14675 8.72842 3.42264L5.77158 5.32736C5.39806 4.88364 4.82608 4.6 4.2 4.6C3.14772 4.6 2.3 5.44772 2.3 6.5C2.3 7.55228 3.14772 8.4 4.2 8.4C4.82608 8.4 5.39806 8.11636 5.77158 7.67264L8.72842 9.57736C8.58289 9.85325 8.5 10.1671 8.5 10.5C8.5 11.6046 9.39543 12.5 10.5 12.5C11.6046 12.5 12.5 11.6046 12.5 10.5C12.5 9.39543 11.6046 8.5 10.5 8.5C9.87392 8.5 9.30194 8.78364 8.92842 9.22736L5.97158 7.32264C6.11711 7.04675 6.2 6.73289 6.2 6.4C6.2 6.2 6.17158 6.00736 6.12842 5.82264L9.07158 3.92736C9.44806 4.36364 10.0201 4.6 10.5 4.5Z" fill="currentColor"/>
-            </svg>
-            Share prototype
-          </button>
-        </div>
         <div class="footer-actions">
           <button class="btn btn-destructive" onclick="window.prototypePanel.resetAllData()">
             Reset Data
@@ -255,6 +288,43 @@ class PrototypeControlPanel {
       
       .close-button:hover {
         background: var(--neutral-100);
+      }
+      
+      .panel-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--neutral-200);
+        flex-shrink: 0;
+      }
+      
+      .tab-button {
+        background: none;
+        border: none;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--neutral-600);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.15s ease;
+      }
+      
+      .tab-button:hover {
+        color: var(--neutral-800);
+        background: var(--neutral-50);
+      }
+      
+      .tab-button.active {
+        color: var(--brand-600);
+        border-bottom-color: var(--brand-600);
+        background: white;
+      }
+      
+      .tab-content {
+        display: none;
+      }
+      
+      .tab-content.active {
+        display: block;
       }
       
       .panel-content {
@@ -427,6 +497,50 @@ class PrototypeControlPanel {
       .form-input:focus {
         outline: none;
         border-color: var(--brand-600);
+      }
+      
+      .share-link-container {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      
+      .share-link-container .form-input {
+        flex: 1;
+      }
+      
+      .copy-btn {
+        flex-shrink: 0;
+        padding: 6px 12px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      
+      .share-status {
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+      
+      .share-status.success {
+        background: var(--green-50);
+        color: var(--green-700);
+        border: 1px solid var(--green-200);
+      }
+      
+      .share-status.error {
+        background: var(--red-50);
+        color: var(--red-700);
+        border: 1px solid var(--red-200);
+      }
+      
+      .share-status.loading {
+        background: var(--neutral-50);
+        color: var(--neutral-700);
+        border: 1px solid var(--neutral-200);
       }
       
       .generated-preview {
@@ -1280,142 +1394,7 @@ class PrototypeControlPanel {
     }
   }
 
-  async sharePrototype() {
-    try {
-      // Show loading state
-      const shareBtn = this.panel.querySelector('.share-btn');
-      const originalText = shareBtn.innerHTML;
-      shareBtn.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1" fill="none" opacity="0.3"/>
-          <path d="M7 1v6l3-3m-3 3L4 4" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
-        </svg>
-        Generating...
-      `;
-      shareBtn.disabled = true;
-      
-      this.showStatus('🔗 Generating shareable URL...', 'loading');
-      
-      // Initialize share utility if not already done
-      if (!window.prototypeShare) {
-        window.prototypeShare = new window.PrototypeShare();
-      }
-      
-      // Generate shareable URL
-      const result = await window.prototypeShare.sharePrototype();
-      
-      if (result.success) {
-        // Copy to clipboard
-        await navigator.clipboard.writeText(result.shareUrl);
-        
-        this.showStatus('✅ Shareable URL copied to clipboard!', 'success');
-        
-        // Show URL in a nice modal/alert
-        this.showShareUrlModal(result.shareUrl, result.shareId);
-        
-      } else {
-        throw new Error(result.error || 'Failed to generate share URL');
-      }
-      
-    } catch (error) {
-      console.error('Share failed:', error);
-      this.showStatus(`❌ Failed to share: ${error.message}`, 'error');
-    } finally {
-      // Restore button state
-      const shareBtn = this.panel.querySelector('.share-btn');
-      shareBtn.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10.5 4.5C11.6046 4.5 12.5 3.60457 12.5 2.5C12.5 1.39543 11.6046 0.5 10.5 0.5C9.39543 0.5 8.5 1.39543 8.5 2.5C8.5 2.83289 8.58289 3.14675 8.72842 3.42264L5.77158 5.32736C5.39806 4.88364 4.82608 4.6 4.2 4.6C3.14772 4.6 2.3 5.44772 2.3 6.5C2.3 7.55228 3.14772 8.4 4.2 8.4C4.82608 8.4 5.39806 8.11636 5.77158 7.67264L8.72842 9.57736C8.58289 9.85325 8.5 10.1671 8.5 10.5C8.5 11.6046 9.39543 12.5 10.5 12.5C11.6046 12.5 12.5 11.6046 12.5 10.5C12.5 9.39543 11.6046 8.5 10.5 8.5C9.87392 8.5 9.30194 8.78364 8.92842 9.22736L5.97158 7.32264C6.11711 7.04675 6.2 6.73289 6.2 6.4C6.2 6.2 6.17158 6.00736 6.12842 5.82264L9.07158 3.92736C9.44806 4.36364 10.0201 4.6 10.5 4.5Z" fill="currentColor"/>
-        </svg>
-        Share prototype
-      `;
-      shareBtn.disabled = false;
-    }
-  }
 
-  showShareUrlModal(shareUrl, shareId) {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    `;
-    
-    modal.innerHTML = `
-      <div style="
-        background: white;
-        padding: 24px;
-        border-radius: 12px;
-        max-width: 500px;
-        width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
-      ">
-        <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 18px; font-weight: 600;">
-          🔗 Prototype Ready to Share
-        </h3>
-        <p style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px; line-height: 1.5;">
-          Anyone with this URL will see your current prototype data (organizations, accounts, and groups).
-        </p>
-        <div style="
-          background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          padding: 12px;
-          margin: 16px 0;
-          font-family: monospace;
-          font-size: 13px;
-          word-break: break-all;
-          color: #374151;
-        ">${shareUrl}</div>
-        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px;">
-          <button onclick="this.closest('[style*=fixed]').remove()" style="
-            padding: 8px 16px;
-            border: 1px solid #d1d5db;
-            background: white;
-            color: #374151;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-          ">Close</button>
-          <button onclick="navigator.clipboard.writeText('${shareUrl}'); this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy URL', 2000)" style="
-            padding: 8px 16px;
-            border: 1px solid #675dff;
-            background: #675dff;
-            color: white;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-          ">Copy URL</button>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Animate in
-    requestAnimationFrame(() => {
-      modal.style.opacity = '1';
-      modal.querySelector('div').style.transform = 'scale(1)';
-    });
-    
-    // Click outside to close
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.remove();
-      }
-    });
-  }
 
   showStatus(message, type) {
     const statusDiv = document.getElementById('panel-status');
@@ -1477,6 +1456,186 @@ class PrototypeControlPanel {
         // The modal will naturally resize based on content due to flex: 1 1 auto
       });
     }
+  }
+
+  // Tab functionality
+  switchTab(tabName) {
+    // Update tab buttons
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.tab === tabName) {
+        btn.classList.add('active');
+      }
+    });
+    
+    // Update tab content
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => {
+      content.classList.remove('active');
+    });
+    
+    const targetTab = document.getElementById(`${tabName}-tab`);
+    if (targetTab) {
+      targetTab.classList.add('active');
+    }
+    
+    // Initialize share tab if switching to it
+    if (tabName === 'share') {
+      this.initializeShareTab();
+    }
+  }
+
+  // Initialize share tab
+  initializeShareTab() {
+    const shareOrgSelector = document.getElementById('share-org-selector');
+    if (!shareOrgSelector) return;
+    
+    // Populate organization selector
+    this.populateShareOrgSelector();
+    
+    // Add event listener for org selection change
+    shareOrgSelector.addEventListener('change', () => {
+      this.generateShareLink();
+    });
+    
+    // Generate initial link if an org is already selected or set current org
+    const currentOrg = window.OrgDataManager?.getCurrentOrganization();
+    if (currentOrg) {
+      shareOrgSelector.value = currentOrg.name;
+      this.generateShareLink();
+    }
+  }
+
+  // Populate the share organization selector
+  populateShareOrgSelector() {
+    const shareOrgSelector = document.getElementById('share-org-selector');
+    if (!shareOrgSelector) return;
+    
+    // Clear existing options except the first one
+    while (shareOrgSelector.children.length > 1) {
+      shareOrgSelector.removeChild(shareOrgSelector.lastChild);
+    }
+    
+    // Get all organizations
+    const organizations = window.OrgDataManager?.organizations || [];
+    
+    organizations.forEach(org => {
+      const option = document.createElement('option');
+      option.value = org.name;
+      option.textContent = org.name;
+      shareOrgSelector.appendChild(option);
+    });
+  }
+
+  // Generate share link for selected organization
+  async generateShareLink() {
+    const shareOrgSelector = document.getElementById('share-org-selector');
+    const shareLinkField = document.getElementById('share-link-field');
+    const shareStatus = document.getElementById('share-status');
+    
+    if (!shareOrgSelector || !shareLinkField) return;
+    
+    const selectedOrgName = shareOrgSelector.value;
+    
+    if (!selectedOrgName) {
+      shareLinkField.value = '';
+      shareLinkField.placeholder = 'Select an organization to generate link...';
+      this.hideShareStatus();
+      return;
+    }
+    
+    try {
+      this.showShareStatus('Generating share link...', 'loading');
+      
+      // Temporarily switch to the selected organization to export its data
+      const originalOrg = window.OrgDataManager?.getCurrentOrganization();
+      const targetOrg = window.OrgDataManager?.getOrganizationByName(selectedOrgName);
+      
+      if (!targetOrg) {
+        throw new Error('Organization not found');
+      }
+      
+      // Temporarily switch to target org
+      window.OrgDataManager.setCurrentOrganization(targetOrg);
+      
+      // Generate share link using existing share functionality
+      const share = new window.PrototypeShare();
+      const result = await share.sharePrototype();
+      
+      // Restore original organization
+      if (originalOrg) {
+        window.OrgDataManager.setCurrentOrganization(originalOrg);
+      }
+      
+      if (result.success) {
+        shareLinkField.value = result.shareUrl;
+        shareLinkField.placeholder = '';
+        this.showShareStatus('✅ Share link generated successfully!', 'success');
+      } else {
+        throw new Error(result.error || 'Failed to generate share link');
+      }
+      
+    } catch (error) {
+      console.error('Failed to generate share link:', error);
+      shareLinkField.value = '';
+      shareLinkField.placeholder = 'Error generating link...';
+      this.showShareStatus(`❌ ${error.message}`, 'error');
+    }
+  }
+
+  // Copy share link to clipboard
+  async copyShareLink() {
+    const shareLinkField = document.getElementById('share-link-field');
+    
+    if (!shareLinkField || !shareLinkField.value) {
+      this.showShareStatus('❌ No link to copy', 'error');
+      return;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(shareLinkField.value);
+      this.showShareStatus('✅ Link copied to clipboard!', 'success');
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        this.hideShareStatus();
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      
+      // Fallback: select the text
+      shareLinkField.select();
+      shareLinkField.setSelectionRange(0, 99999);
+      
+      try {
+        document.execCommand('copy');
+        this.showShareStatus('✅ Link copied to clipboard!', 'success');
+        setTimeout(() => {
+          this.hideShareStatus();
+        }, 3000);
+      } catch (fallbackError) {
+        this.showShareStatus('❌ Failed to copy link', 'error');
+      }
+    }
+  }
+
+  // Show share status message
+  showShareStatus(message, type) {
+    const shareStatus = document.getElementById('share-status');
+    if (!shareStatus) return;
+    
+    shareStatus.textContent = message;
+    shareStatus.className = `share-status ${type}`;
+    shareStatus.style.display = 'block';
+  }
+
+  // Hide share status message
+  hideShareStatus() {
+    const shareStatus = document.getElementById('share-status');
+    if (!shareStatus) return;
+    
+    shareStatus.style.display = 'none';
   }
 }
 
