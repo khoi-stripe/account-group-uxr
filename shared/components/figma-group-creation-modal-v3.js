@@ -572,6 +572,7 @@ class FigmaGroupCreationModalV3 {
         `).join('');
         this.updatePreview();
         this.updateAccountsListOverflowShadow();
+        this.updateSelectAllState();
     }
     
     bindStep2Events() {
