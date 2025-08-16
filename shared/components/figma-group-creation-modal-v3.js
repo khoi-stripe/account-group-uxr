@@ -41,15 +41,15 @@ class FigmaGroupCreationModalV3 {
     }
 
     show(options = {}) {
-        console.log('FigmaGroupCreationModalV3.show() called with options:', options);
+
         this.onComplete = options.onComplete;
         this.isEditMode = !!options.editMode;
         this.editingGroupId = options.editingGroupId || null;
         
-        console.log('About to call init()...');
+
         this.init(); // Initialize accounts from the current organization
         
-        console.log('About to call reset()...');
+
         this.reset();
         
         // If editing mode, load existing group data
@@ -57,9 +57,9 @@ class FigmaGroupCreationModalV3 {
             this.loadGroupDataForEditing(this.editingGroupId);
         }
         
-        console.log('Reset completed, about to call showStep1()...');
+
         this.showStep1();
-        console.log('showStep1() completed');
+
     }
     
     reset() {
@@ -95,11 +95,11 @@ class FigmaGroupCreationModalV3 {
             });
         }
 
-        console.log('Loaded group data for editing:', this.groupData, 'Selected accounts:', Array.from(this.selectedAccounts));
+
     }
 
     showStep1() {
-        console.log('showStep1() called');
+
         const content = `
             <style>
                 .step1-content { padding: 32px 32px 0 32px; }
@@ -146,8 +146,8 @@ class FigmaGroupCreationModalV3 {
         `;
 
         if (!this.modal) {
-            console.log('Creating new modal...');
-            console.log('Modal class:', window.Modal);
+
+
             this.modal = new Modal({
                 title: ' ', // Use a space to ensure header is visible
                 content: content,
@@ -163,18 +163,18 @@ class FigmaGroupCreationModalV3 {
                     this.groupData = {};
                 }
             });
-            console.log('Modal created:', this.modal);
-            console.log('About to call modal.show()...');
+
+
             this.modal.show();
-            console.log('modal.show() completed');
+
         } else {
-            console.log('Reusing existing modal...');
+
             this.modal.setTitle('');
             this.modal.setContent(content);
             this.modal.setFooterActions([]);
-            console.log('About to call modal.show() on existing modal...');
+
             this.modal.show();
-            console.log('modal.show() completed on existing modal');
+
         }
         
         // Use the same width as Step 2 to avoid any perceived resize/transition
@@ -612,11 +612,11 @@ class FigmaGroupCreationModalV3 {
         
         // Add close button event listener
         const closeButton = document.getElementById('step2-close-button');
-        console.log('Looking for step2-close-button:', closeButton);
+
         if (closeButton) {
-            console.log('Found step2-close-button, adding event listener');
+
             closeButton.addEventListener('click', () => {
-                console.log('Step2 close button clicked, calling this.close()');
+
                 this.close();
             });
         } else {
@@ -770,22 +770,6 @@ class FigmaGroupCreationModalV3 {
         }
     }
     
-    filterAccountsBySearch(searchTerm) {
-        const accountItems = document.querySelectorAll('#accountsList-v3 .account-item');
-        
-        accountItems.forEach(item => {
-            const label = item.querySelector('.account-name');
-            if (label) {
-                const accountName = label.textContent.toLowerCase();
-                const shouldShow = !searchTerm || accountName.includes(searchTerm.toLowerCase());
-                item.style.display = shouldShow ? 'flex' : 'none';
-            }
-        });
-        
-        this.updateSelectionCount();
-        this.updateSelectAllState();
-    }
-    
     updatePreview() {
         const previewContainer = this.modal.getElement().querySelector('.group-preview');
         const selectedContainer = this.modal.getElement().querySelector('#selectedAccountsList-v3');
@@ -882,7 +866,7 @@ class FigmaGroupCreationModalV3 {
             // Prefer OrgDataManager as single source of truth
             if (window.OrgDataManager && typeof window.OrgDataManager.createAccountGroup === 'function') {
                 const created = window.OrgDataManager.createAccountGroup(groupData);
-                console.log('Group saved via OrgDataManager:', created);
+
                 return;
             }
 
@@ -897,7 +881,7 @@ class FigmaGroupCreationModalV3 {
             const existingGroups = JSON.parse(localStorage.getItem(storageKey) || '[]');
             existingGroups.push(groupData);
             localStorage.setItem(storageKey, JSON.stringify(existingGroups));
-            console.log('Group saved (fallback) for organization:', currentOrg.name, groupData);
+
         } catch (error) {
             console.error('Failed to save group:', error);
             alert('Failed to save group. Please try again.');
