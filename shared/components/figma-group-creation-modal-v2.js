@@ -774,7 +774,7 @@ class FigmaGroupCreationModalV2 {
     }
 
     toggleSelectAll(checked) {
-        const searchTerm = document.getElementById('figmaAccountSearch').value.toLowerCase();
+        const searchTerm = document.getElementById('figmaAccountSearch-v2').value.toLowerCase();
         const visibleAccounts = this.accounts.filter(account => 
             account.name.toLowerCase().includes(searchTerm)
         );
