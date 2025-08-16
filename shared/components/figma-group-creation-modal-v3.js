@@ -178,26 +178,22 @@ class FigmaGroupCreationModalV3 {
         }
         
         // Use the same width as Step 2 to avoid any perceived resize/transition
-        this.modal.getElement().style.width = '940px';
-        this.modal.getElement().style.maxWidth = '940px';
-        this.modal.getElement().style.height = 'auto';
-        this.modal.getElement().style.maxHeight = 'none';
+        this.modal.getElement().className = this.modal.getElement().className.replace(/modal-step\d-size/g, '') + ' modal-step1-size';
         
         // Restore normal modal styling for Step 1
         const modalContent = this.modal.getElement().querySelector('.modal-content');
         if (modalContent) {
-            modalContent.style.padding = '0';
-            modalContent.style.overflow = 'visible';
+            modalContent.className = modalContent.className.replace(/modal-content-\w+/g, '') + ' modal-content-minimal';
         }
         
         const modalHeader = this.modal.getElement().querySelector('.modal-header');
         if (modalHeader) {
-            modalHeader.style.display = 'none';
+            modalHeader.classList.add('modal-element-hidden');
         }
         
         const modalFooter = this.modal.getElement().querySelector('.modal-footer');
         if (modalFooter) {
-            modalFooter.style.display = 'none';
+            modalFooter.classList.add('modal-element-hidden');
         }
         
         // Add close button
@@ -211,18 +207,7 @@ class FigmaGroupCreationModalV3 {
                     <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             `;
-            closeButton.style.cssText = `
-                position: absolute;
-                top: 24px;
-                right: 24px;
-                background: none;
-                border: none;
-                cursor: pointer;
-                color: #6c7688;
-                padding: 8px;
-                margin: -8px;
-                z-index: 1000;
-            `;
+            closeButton.className = 'modal-close-button';
             closeButton.onclick = () => this.modal.hide();
             modalElement.appendChild(closeButton);
         }
@@ -280,10 +265,7 @@ class FigmaGroupCreationModalV3 {
         this.modal.setFooterActions([]);
 
         // Maintain same size used in step 1 to avoid visual size change
-        this.modal.getElement().style.width = '940px';
-        this.modal.getElement().style.maxWidth = '940px';
-        this.modal.getElement().style.height = '640px';
-        this.modal.getElement().style.maxHeight = '640px';
+        this.modal.getElement().className = this.modal.getElement().className.replace(/modal-step\d-size/g, '') + ' modal-step2-size';
 
         this.renderAccounts();
         
@@ -295,24 +277,19 @@ class FigmaGroupCreationModalV3 {
         // Adjust modal content padding for Step 2 custom layout  
         const modalContent = this.modal.getElement().querySelector('.modal-content');
         if (modalContent) {
-            modalContent.style.padding = '0';
-            modalContent.style.paddingBottom = '0';
-            modalContent.style.overflow = 'visible';
-            modalContent.style.display = 'flex';
-            modalContent.style.flexDirection = 'column';
-            modalContent.style.flex = '1';
+            modalContent.className = modalContent.className.replace(/modal-content-\w+/g, '') + ' modal-content-flexible';
         }
         
         // Hide the default modal header for Step 2
         const modalHeader = this.modal.getElement().querySelector('.modal-header');
         if (modalHeader) {
-            modalHeader.style.display = 'none';
+            modalHeader.classList.add('modal-element-hidden');
         }
         
         // Hide the default modal footer for Step 2 (we use custom footer)
         const modalFooter = this.modal.getElement().querySelector('.modal-footer');
         if (modalFooter) {
-            modalFooter.style.display = 'none';
+            modalFooter.classList.add('modal-element-hidden');
         }
         
         // Add custom footer directly to modal element (outside modal-content)
@@ -326,8 +303,7 @@ class FigmaGroupCreationModalV3 {
         }
         
         // Set up flexbox layout for the entire modal
-        modalElement.style.display = 'flex';
-        modalElement.style.flexDirection = 'column';
+        modalElement.classList.add('modal-flex-column');
         
 
     }

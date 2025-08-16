@@ -333,4 +333,61 @@
   .modal-footer {
     padding: 8px 16px;
   }
+}
+
+/* Group Creation Modal V3 Specific Classes */
+
+/* Close button for steps */
+.modal-close-button {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6c7688;
+  padding: 8px;
+  margin: -8px;
+  z-index: 1000;
+}
+
+/* Modal sizing variants */
+.modal-step1-size {
+  width: 940px !important;
+  max-width: 940px !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.modal-step2-size {
+  width: 940px !important;
+  max-width: 940px !important;
+  height: 640px !important;
+  max-height: 640px !important;
+}
+
+/* Modal content variants */
+.modal-content-minimal {
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.modal-content-flexible {
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: visible !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+}
+
+/* Hide modal elements */
+.modal-element-hidden {
+  display: none !important;
+}
+
+/* Modal flexbox layout */
+.modal-flex-column {
+  display: flex !important;
+  flex-direction: column !important;
 } 
