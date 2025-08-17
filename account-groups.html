@@ -1857,7 +1857,9 @@
       const tableToolbar = document.getElementById('groups-page-subheader');
       
       console.log('🔍 loadAccountGroups: Found', allGroups.length, 'groups');
+      console.log('🔍 allGroups:', allGroups);
       console.log('🔍 tableToolbar element:', tableToolbar);
+      console.log('🔍 OrgDataManager:', window.OrgDataManager);
       
       // Show/hide table toolbar based on whether groups exist
       if (allGroups.length === 0) {
