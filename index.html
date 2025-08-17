@@ -1275,11 +1275,55 @@ document.addEventListener('DOMContentLoaded', function() {
                  <button class="account-groups-trigger" id="dashboardFilterTrigger">
                    <span class="trigger-show">Accounts</span>
                    <span class="trigger-separator">|</span>
-                   <span class="trigger-option" id="dashboardFilterOption">All accounts</span>
+                   <span class="trigger-option" id="dashboardFilterOption">
+                     <span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(0,39,77,0.18);border-top-color:rgba(0,39,77,0.45);border-radius:50%;animation:agf_spin .6s linear infinite;vertical-align:-1px;"></span>
+                   </span>
                    <svg class="trigger-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                      <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
                    </svg>
                  </button>
+
+                 <!-- Popover (reports markup) -->
+                 <div class="account-groups-popover" id="dashboardFilterPopover" style="display: none;">
+                   <!-- Column 1 - Groups -->
+                   <div class="groups-section">
+                     <div class="groups-header">
+                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px; flex-shrink: 0;">
+                         <path fill-rule="evenodd" clip-rule="evenodd" d="M16 7.82679C16 7.94141 15.9803 8.05518 15.9417 8.16312L13.974 13.6727C13.6898 14.4687 12.9358 15 12.0906 15H2C0.895431 15 0 14.1046 0 13V3C0 1.89543 0.89543 1 2 1H4.58579C4.851 1 5.10536 1.10536 5.29289 1.29289L6 2H11C12.1046 2 13 2.89543 13 4V5H14C15.1046 5 16 5.89543 16 7V7.82679ZM3.75 6.5C3.33579 6.5 3 6.16421 3 5.75C3 5.33579 3.33579 5 3.75 5H11.5V4C11.5 3.72386 11.2761 3.5 11 3.5H6C5.60218 3.5 5.22064 3.34196 4.93934 3.06066L4.37868 2.5H2C1.72386 2.5 1.5 2.72386 1.5 3V13C1.5 13.2761 1.72386 13.5 2 13.5H12.0906C12.3019 13.5 12.4904 13.3672 12.5614 13.1682L14.5 7.74018V7C14.5 6.72386 14.2761 6.5 14 6.5H3.75Z" fill="currentColor"/>
+                       </svg>
+                       Groups
+                     </div>
+                     <button class="group-item active" data-group="all">All accounts</button>
+                     <button class="group-item" data-group="connected">Connected accounts</button>
+                     <button class="group-item" data-group="express">Express accounts</button>
+                     <button class="group-item" data-group="standard">Standard accounts</button>
+                     <button class="group-item" data-group="custom">Custom accounts</button>
+                   </div>
+
+                   <!-- Column 2 - Accounts Section -->
+                   <div class="accounts-section">
+                     <div class="filter-search-container">
+                       <svg class="filter-search-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                         <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                         <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                       </svg>
+                       <input type="text" class="filter-search-input" placeholder="Search accounts" id="dashboardSearchInput">
+                     </div>
+
+                     <!-- Pinned Select All Row -->
+                     <div class="select-all-container" id="dashboardSelectAllContainer"></div>
+
+                     <div class="accounts-list" id="dashboardAccountsList"></div>
+
+                     <!-- Footer inside accounts-section (Column 2) -->
+                     <div class="popover-footer">
+                       <div class="footer-buttons">
+                         <button class="btn-cancel" onclick="window.dashboardFilter?.close()">Cancel</button>
+                         <button class="btn-apply" onclick="window.dashboardFilter?.applySelection()">Apply</button>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
                </div>
              </div>
              
@@ -1391,6 +1435,8 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="./data/organizations.js"></script>
   <script src="./components/group-creation-modal.js"></script>
   <script src="./components/prototype-control-panel.js"></script>
+  <!-- Account Groups Filter component (for dashboard filter) -->
+  <script src="./shared/components/account-groups-filter.js"></script>
   
   <!-- Prototype Sharing -->
   <script src="./shared/utils/share.js"></script>
@@ -1489,11 +1535,75 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Dashboard functionality
     function initializeDashboard() {
-      console.log('🏠 Initializing dashboard with exact filter components...');
-      console.log('✅ Dashboard initialized with:');
-      console.log('  - Account Groups Filter (from reporting)');
-      console.log('  - Sort Filter (from account groups page)');
-      console.log('  - Date Control Filter (from reporting)');
+      console.log('🏠 Initializing dashboard with account groups filter...');
+
+      // Initialize Account Groups Filter (same as reporting, different IDs)
+      try {
+        const getAccountGroups = () => {
+          if (window.generateCustomAccountGroups) {
+            return window.generateCustomAccountGroups();
+          }
+          // Basic local generator: group by size for preview
+          return (typeof generateAccountGroups === 'function') ? generateAccountGroups() : {};
+        };
+
+        const dashboardFilter = new AccountGroupsFilter({
+          triggerId: 'dashboardFilterTrigger',
+          popoverId: 'dashboardFilterPopover',
+          searchInputId: 'dashboardSearchInput',
+          selectAllContainerId: 'dashboardSelectAllContainer',
+          accountsListId: 'dashboardAccountsList',
+          triggerOptionId: 'dashboardFilterOption',
+          namespace: 'dashboard',
+          generateAccountGroups: getAccountGroups
+        });
+
+        // Expose globally for Cancel/Apply handlers in markup
+        window.dashboardFilter = dashboardFilter;
+
+        // Customize apply behavior to update dashboard metrics
+        dashboardFilter.applySelection = function() {
+          const selectedIds = [];
+          document.querySelectorAll('#dashboardAccountsList .account-item input[type="checkbox"]:checked')
+            .forEach(cb => {
+              const item = cb.closest('.account-item');
+              const label = item?.querySelector('label');
+              if (!label) return;
+              const accounts = window.OrgDataManager?.getAllSubAccounts?.() || [];
+              const match = accounts.find(a => a.name === label.textContent);
+              if (match) selectedIds.push(match.id);
+            });
+
+          // Update trigger label to reflect selection count
+          const labelEl = document.getElementById('dashboardFilterOption');
+          if (labelEl) {
+            if (selectedIds.length > 0) {
+              labelEl.textContent = `${selectedIds.length} selected`;
+            } else {
+              labelEl.textContent = 'All accounts';
+            }
+          }
+
+          // Update dashboard data preview (simple scale based on count)
+          const baseGross = 110600;
+          const baseYesterday = 92040;
+          const multiplier = selectedIds.length > 0 ? Math.max(1, selectedIds.length) / 10 : 1;
+          const grossVolume = `$${Math.round(baseGross * multiplier).toLocaleString()}`;
+          const yesterday = `$${Math.round(baseYesterday * multiplier).toLocaleString()}`;
+
+          const grossVolumeEl = document.getElementById('grossVolumeMetric');
+          const yesterdayEl = document.getElementById('yesterdayMetric');
+          if (grossVolumeEl) grossVolumeEl.textContent = grossVolume;
+          if (yesterdayEl) yesterdayEl.textContent = yesterday;
+
+          this.close();
+        };
+
+        // Initial refresh to load groups
+        setTimeout(() => dashboardFilter.refresh?.(), 100);
+      } catch (e) {
+        console.error('Failed to initialize Account Groups Filter on dashboard:', e);
+      }
     }
 
 
