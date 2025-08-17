@@ -1770,14 +1770,18 @@
       
       // Close all other menus first
       closeAllKebabMenus();
-      closeSortMenu();
       
       if (!isVisible) {
+        // Only close sort menu if we're opening it (to clear state)
+        closeSortMenu();
         menu.classList.add('show');
         // Close when clicking outside
         setTimeout(() => {
           document.addEventListener('click', closeSortFilterOnClickOutside, { once: true });
         }, 0);
+      } else {
+        // Close the menu if it's currently open
+        closeSortMenu();
       }
     }
 
