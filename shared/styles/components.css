@@ -14,7 +14,7 @@
 .wireframe-filter__bar {
   background: #E8EAED;
   border-radius: 8px;
-  height: 10px;
+  height: 8px;
 }
 
 .wireframe-filter__bar--wide { width: 140px; }
