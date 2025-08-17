@@ -432,7 +432,11 @@ class OrganizationDataManager {
   updateAccountGroup(groupId, updates) {
     const index = this.accountGroups.findIndex(g => g.id === groupId);
     if (index !== -1) {
-      this.accountGroups[index] = { ...this.accountGroups[index], ...updates };
+      this.accountGroups[index] = { 
+        ...this.accountGroups[index], 
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
       this.saveAccountGroups();
       return this.accountGroups[index];
     }
