@@ -114,6 +114,29 @@
       white-space: nowrap;
     }
 
+    /* Wireframe bars (visual placeholders) */
+    .wireframe-bar {
+      background: #E8EAED;
+      border-radius: 8px;
+      height: 8px;
+    }
+
+    .wireframe-bar.short { width: 24px; }
+    .wireframe-bar.medium { width: 96px; }
+
+    /* Wireframe plus icon inside small circular chip */
+    .wireframe-plus {
+      width: 20px;
+      height: 20px;
+      border: 1px solid #b6c0cd;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #596171;
+      background: transparent;
+    }
+
     /* Dashboard Hero Section */
     .dashboard-hero {
       background: white;
@@ -1327,12 +1350,12 @@ document.addEventListener('DOMContentLoaded', function() {
                </div>
              </div>
              
-             <!-- Sort Filter (from account groups page) -->
+             <!-- Sort Filter (wireframe) -->
              <div class="filter-item">
                <div class="date-range-display" aria-hidden="true">
                  <div class="wireframe-bar medium"></div>
                  <span class="date-range-divider">|</span>
-                 <div class="wireframe-bar short"></div>
+                 <div class="wireframe-plus" aria-hidden="true">+</div>
                </div>
              </div>
              
