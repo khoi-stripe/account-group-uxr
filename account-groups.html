@@ -1871,11 +1871,13 @@
     });
 
     function loadAccountGroups() {
+      console.log('🔄 loadAccountGroups() called from:', new Error().stack.split('\n')[2]);
       // Use only OrgDataManager since it now handles organization-specific storage
       const allGroups = window.OrgDataManager.getAccountGroups();
       
       // Sort groups based on current sort option
       const currentSortOption = getCurrentSortOption();
+      console.log('🔄 Using sort option:', currentSortOption);
       applySortToGroups(allGroups, currentSortOption);
       const container = document.getElementById('groups-container');
       const tableToolbar = document.getElementById('groups-page-subheader');
@@ -2012,6 +2014,9 @@
         return;
       }
 
+      console.log('🔧 About to render DOM. Groups order:');
+      allGroups.forEach((g, i) => console.log(`  ${i + 1}. "${g.name}" (${g.id})`));
+      
       container.innerHTML = allGroups.map(group => {
         let isSavedGroup = !!group.accountIds; // Convert to boolean: Saved groups have accountIds array
         return createGroupCard(group, [], isSavedGroup, true); // Show loading spinner
