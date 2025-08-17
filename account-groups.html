@@ -2734,7 +2734,7 @@
 
     // Force clear any cached kebab menus on page load
     function clearAllKebabMenus() {
-      const allMenus = document.querySelectorAll('.kebab-menu');
+      const allMenus = document.querySelectorAll('.kebab-menu:not(#sort-filter-menu)');
       console.log('🧹 Force clearing', allMenus.length, 'cached kebab menus');
       allMenus.forEach(menu => {
         // Remove any onclick handlers from menu items before removing
