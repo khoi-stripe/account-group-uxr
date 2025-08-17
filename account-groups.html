@@ -1803,7 +1803,15 @@
         menu.style.pointerEvents = '';
         menu.classList.add('show');
         console.log('🔧 Added show class, menu classes after:', menu.className);
-        console.log('🔧 Menu after clearing styles:', menu.outerHTML.substring(0, 200));
+        console.log('🔧 Menu after clearing styles:');
+        console.log(menu.outerHTML);
+        
+        // Test onclick handlers manually
+        const menuItems = menu.querySelectorAll('.kebab-menu-item');
+        console.log('🔧 Found menu items:', menuItems.length);
+        menuItems.forEach((item, i) => {
+          console.log(`🔧 Item ${i + 1}: "${item.textContent.trim()}" - onclick:`, item.getAttribute('onclick'));
+        });
         // Close when clicking outside
         setTimeout(() => {
           document.addEventListener('click', closeSortFilterOnClickOutside, { once: true });
@@ -1833,22 +1841,27 @@
 
     function setSortOption(option) {
       console.log('🎯 setSortOption called with:', option);
+      console.log('🎯 Event details:', event);
       const label = document.getElementById('sort-filter-label');
       
       // Update current sort option
       currentSortOption = option;
       
       // Update label text
+      console.log('🎯 Updating label element:', label);
       switch (option) {
         case 'aToZ':
           label.textContent = 'A–Z';
+          console.log('🎯 Set label to: A–Z');
           break;
         case 'zToA':
           label.textContent = 'Z–A';
+          console.log('🎯 Set label to: Z–A');
           break;
         case 'lastUpdated':
         default:
           label.textContent = 'Last updated';
+          console.log('🎯 Set label to: Last updated');
           break;
       }
       
