@@ -1366,10 +1366,14 @@ document.addEventListener('DOMContentLoaded', function() {
              
              <!-- Sort Filter (wireframe) -->
              <div class="filter-item">
-               <div class="wireframe-filter" aria-hidden="true">
-                 <div class="wireframe-filter__bar wireframe-filter__bar--wide"></div>
-                 <span class="wireframe-filter__divider">|</span>
-                 <div class="wireframe-filter__plus" aria-hidden="true">+</div>
+               <div class="wireframe-filter" aria-hidden="true" style="height: 24px; padding: 0 6px 0 12px; border: 1px solid #b6c0cd; border-radius: 999px; background: transparent;">
+                 <div style="margin-right: 6px; display: flex; align-items: center;">
+                   <div class="wireframe-filter__bar wireframe-filter__bar--medium"></div>
+                 </div>
+                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <circle cx="6" cy="6" r="5" stroke="#6c7688" stroke-width="1" fill="none"/>
+                   <path d="M6 3v6M3 6h6" stroke="#6c7688" stroke-width="1" stroke-linecap="round"/>
+                 </svg>
                </div>
              </div>
              
