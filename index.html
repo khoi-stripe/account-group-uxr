@@ -1582,7 +1582,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Expose globally for Cancel/Apply handlers in markup
         window.dashboardFilter = dashboardFilter;
 
-        // Customize apply behavior to update dashboard metrics
+        // Customize apply behavior to update dashboard metrics but keep trigger/menu behavior identical to reporting
         dashboardFilter.applySelection = function() {
           const selectedIds = [];
           document.querySelectorAll('#dashboardAccountsList .account-item input[type="checkbox"]:checked')
@@ -1594,16 +1594,6 @@ document.addEventListener('DOMContentLoaded', function() {
               const match = accounts.find(a => a.name === label.textContent);
               if (match) selectedIds.push(match.id);
             });
-
-          // Update trigger label to reflect selection count
-          const labelEl = document.getElementById('dashboardFilterOption');
-          if (labelEl) {
-            if (selectedIds.length > 0) {
-              labelEl.textContent = `${selectedIds.length} selected`;
-            } else {
-              labelEl.textContent = 'All accounts';
-            }
-          }
 
           // Update dashboard data preview (simple scale based on count)
           const baseGross = 110600;
@@ -1617,7 +1607,10 @@ document.addEventListener('DOMContentLoaded', function() {
           if (grossVolumeEl) grossVolumeEl.textContent = grossVolume;
           if (yesterdayEl) yesterdayEl.textContent = yesterday;
 
-          this.close();
+          // Match reporting behavior: update trigger label using component logic
+          this.updateTriggerBasedOnSelection();
+          // Close like reporting (without restoring selection)
+          this.togglePopover();
         };
 
         // Initial refresh to load groups
