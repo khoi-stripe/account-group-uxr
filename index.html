@@ -153,6 +153,7 @@
 
     /* Dashboard Hero Section */
     .dashboard-hero {
+      position: relative;
       background: white;
       border-radius: 12px;
       border: 1px solid #eaecf0;
@@ -160,9 +161,19 @@
       overflow: hidden;
     }
 
+    /* Overlay metrics on top of the hero container */
     .dashboard-metrics {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 2;
       display: flex;
-      border-bottom: 1px solid #eaecf0;
+      gap: 0;
+      background: white;
+      border: 1px solid #eaecf0;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
     }
 
     .metric-card {
@@ -205,7 +216,7 @@
 
     /* Chart Container */
     .chart-container {
-      padding: 24px;
+      padding: 120px 24px 24px; /* room for overlay metrics */
     }
 
     .chart-header {
@@ -234,7 +245,8 @@
 
     .line-chart {
       width: 100%;
-      height: 100%;
+      height: 300px;
+      display: block;
     }
 
     /* Dashboard Grid */
