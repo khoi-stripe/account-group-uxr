@@ -28,6 +28,231 @@
       width: 100vw;
     }
 
+    /* Dashboard Styles */
+    .content-body {
+      padding: 24px;
+      overflow-y: auto;
+      background: #fafbfc;
+    }
+
+    /* Dashboard Filters */
+    .dashboard-filters {
+      margin-bottom: 24px;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .filter-item {
+      position: relative;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid #d0d5dd;
+      border-radius: 6px;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1d2939;
+      min-width: 140px;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .filter-select:hover {
+      border-color: #635bff;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: #635bff;
+      box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.1);
+    }
+
+    /* Dashboard Hero Section */
+    .dashboard-hero {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #eaecf0;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .dashboard-metrics {
+      display: flex;
+      border-bottom: 1px solid #eaecf0;
+    }
+
+    .metric-card {
+      flex: 1;
+      padding: 24px;
+      border-right: 1px solid #eaecf0;
+    }
+
+    .metric-card:last-child {
+      border-right: none;
+    }
+
+    .metric-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #667085;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 36px;
+      font-weight: 600;
+      color: #1d2939;
+      margin-bottom: 8px;
+      line-height: 1.1;
+    }
+
+    .metric-change {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .metric-change.positive {
+      color: #027a48;
+    }
+
+    .metric-change.negative {
+      color: #d92d20;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      padding: 24px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1d2939;
+      margin: 0;
+    }
+
+    .chart-period {
+      font-size: 14px;
+      color: #667085;
+    }
+
+    .chart-area {
+      height: 300px;
+      position: relative;
+    }
+
+    .line-chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #eaecf0;
+      overflow: hidden;
+    }
+
+    .dashboard-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #eaecf0;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1d2939;
+      margin: 0;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: none;
+      color: #667085;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background: #f9fafb;
+      color: #1d2939;
+    }
+
+    .btn-secondary {
+      padding: 8px 14px;
+      border: 1px solid #d0d5dd;
+      background: white;
+      color: #344054;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+      border-color: #b2ddff;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .card-content {
+      padding: 24px;
+    }
+
+    .placeholder-content {
+      color: #667085;
+      font-size: 14px;
+      text-align: center;
+      padding: 40px 20px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px dashed #d0d5dd;
+    }
+
          /* Navigation Panel */
      .nav-panel {
        width: 240px;
@@ -1075,15 +1300,137 @@ document.addEventListener('DOMContentLoaded', function() {
        
        <!-- Content Body -->
        <div class="content-body">
-         <div class="content-placeholder">
-           <div class="content-placeholder-inner">
-              <div class="account-context">
-                <h2 id="account-context-title" class="account-title">
-                  <span id="acct-title-spinner" style="display:inline-block;width:12px;height:12px;border:2px solid rgba(0,39,77,0.18);border-top-color:rgba(0,39,77,0.45);border-radius:50%;animation: agf_spin .6s linear infinite;vertical-align:-1px;margin-right:6px;"></span>
-                  Loading
-                </h2>
-                <p id="account-context-subtitle" class="account-subtitle">Please wait while we load your account information</p>
-              </div>
+         <!-- Dashboard Filters -->
+         <div class="dashboard-filters">
+           <div class="filter-group">
+             <div class="filter-item">
+               <select class="filter-select" id="dateRangeFilter">
+                 <option value="7d">Last 7 days</option>
+                 <option value="30d" selected>Last 30 days</option>
+                 <option value="90d">Last 3 months</option>
+                 <option value="1y">Last year</option>
+               </select>
+             </div>
+             <div class="filter-item">
+               <select class="filter-select" id="accountFilter">
+                 <option value="all">All accounts</option>
+                 <!-- Populated dynamically -->
+               </select>
+             </div>
+             <div class="filter-item">
+               <select class="filter-select" id="accountGroupFilter">
+                 <option value="all">All account groups</option>
+                 <!-- Populated dynamically -->
+               </select>
+             </div>
+           </div>
+         </div>
+
+         <!-- Hero Dashboard Section -->
+         <div class="dashboard-hero">
+           <div class="dashboard-metrics">
+             <div class="metric-card">
+               <div class="metric-label">Gross volume</div>
+               <div class="metric-value" id="grossVolumeMetric">$110,600</div>
+               <div class="metric-change positive">+12.3% from last period</div>
+             </div>
+             <div class="metric-card">
+               <div class="metric-label">Yesterday</div>
+               <div class="metric-value" id="yesterdayMetric">$92,040</div>
+               <div class="metric-change negative">-5.2% from previous day</div>
+             </div>
+           </div>
+           
+           <!-- Payment Volume Chart -->
+           <div class="chart-container">
+             <div class="chart-header">
+               <h3 class="chart-title">Payment volume</h3>
+               <div class="chart-period" id="chartPeriod">Last 30 days</div>
+             </div>
+             <div class="chart-area" id="paymentVolumeChart">
+               <!-- Chart will be rendered here -->
+               <svg viewBox="0 0 800 300" class="line-chart">
+                 <defs>
+                   <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                     <stop offset="0%" style="stop-color:#635BFF;stop-opacity:0.1"/>
+                     <stop offset="100%" style="stop-color:#635BFF;stop-opacity:0"/>
+                   </linearGradient>
+                 </defs>
+                 <!-- Chart line -->
+                 <polyline fill="none" stroke="#635BFF" stroke-width="2" 
+                   points="50,250 100,200 150,180 200,220 250,160 300,140 350,170 400,120 450,100 500,130 550,90 600,110 650,80 700,120 750,100"/>
+                 <!-- Chart fill -->
+                 <polygon fill="url(#chartGradient)" 
+                   points="50,250 100,200 150,180 200,220 250,160 300,140 350,170 400,120 450,100 500,130 550,90 600,110 650,80 700,120 750,100 750,280 50,280"/>
+               </svg>
+             </div>
+           </div>
+         </div>
+
+         <!-- Dashboard Content Grid -->
+         <div class="dashboard-grid">
+           <div class="dashboard-card">
+             <div class="card-header">
+               <h3 class="card-title">Performance</h3>
+               <div class="card-actions">
+                 <button class="btn-icon">
+                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                     <circle cx="8" cy="3" r="1"/>
+                     <circle cx="8" cy="8" r="1"/>
+                     <circle cx="8" cy="13" r="1"/>
+                   </svg>
+                 </button>
+               </div>
+             </div>
+             <div class="card-content">
+               <div class="placeholder-content">Performance metrics and charts will appear here</div>
+             </div>
+           </div>
+
+           <div class="dashboard-card">
+             <div class="card-header">
+               <h3 class="card-title">Recent Activity</h3>
+               <div class="card-actions">
+                 <button class="btn-icon">
+                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                     <circle cx="8" cy="3" r="1"/>
+                     <circle cx="8" cy="8" r="1"/>
+                     <circle cx="8" cy="13" r="1"/>
+                   </svg>
+                 </button>
+               </div>
+             </div>
+             <div class="card-content">
+               <div class="placeholder-content">Recent transactions and activity will appear here</div>
+             </div>
+           </div>
+
+           <div class="dashboard-card">
+             <div class="card-header">
+               <h3 class="card-title">Account Groups</h3>
+               <div class="card-actions">
+                 <button class="btn-icon" onclick="window.location.href='./account-groups.html'">
+                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                     <path d="M8.75 4.25V7.25H11.75C12.1642 7.25 12.5 7.58579 12.5 8C12.5 8.41421 12.1642 8.75 11.75 8.75H8.75V11.75C8.75 12.1642 8.41421 12.5 8 12.5C7.58579 12.5 7.25 12.1642 7.25 11.75V8.75H4.25C3.83579 8.75 3.5 8.41421 3.5 8C3.5 7.58579 3.83579 7.25 4.25 7.25H7.25V4.25C7.25 3.83579 7.58579 3.5 8 3.5C8.41421 3.5 8.75 3.83579 8.75 4.25Z"/>
+                   </svg>
+                 </button>
+               </div>
+             </div>
+             <div class="card-content" id="accountGroupsPreview">
+               <div class="placeholder-content">Account groups overview will appear here</div>
+             </div>
+           </div>
+
+           <div class="dashboard-card wide">
+             <div class="card-header">
+               <h3 class="card-title">Transactions</h3>
+               <div class="card-actions">
+                 <button class="btn-secondary btn-sm">View all</button>
+               </div>
+             </div>
+             <div class="card-content">
+               <div class="placeholder-content">Transaction history and details will appear here</div>
+             </div>
            </div>
          </div>
        </div>
@@ -1145,6 +1492,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       );
       
+      // Initialize dashboard
+      initializeDashboard();
+      
       // Update content placeholder with account context
           updateAccountContext();
           // Remove spinner once context is set
@@ -1188,6 +1538,209 @@ document.addEventListener('DOMContentLoaded', function() {
         titleElement.textContent = currentAccount.name;
         subtitleElement.textContent = `Account in ${currentAccount.type}`;
       }
+    }
+    
+    // Dashboard functionality
+    function initializeDashboard() {
+      console.log('🏠 Initializing dashboard...');
+      
+      // Populate account filter
+      populateAccountFilter();
+      
+      // Populate account groups filter
+      populateAccountGroupsFilter();
+      
+      // Populate account groups preview
+      updateAccountGroupsPreview();
+      
+      // Add filter event listeners
+      setupFilterListeners();
+      
+      console.log('✅ Dashboard initialized');
+    }
+    
+    function populateAccountFilter() {
+      const accountFilter = document.getElementById('accountFilter');
+      if (!accountFilter) return;
+      
+      const currentOrg = window.OrgDataManager.getCurrentOrganization();
+      if (!currentOrg || !currentOrg.accounts) return;
+      
+      // Clear existing options (except "All accounts")
+      accountFilter.innerHTML = '<option value="all">All accounts</option>';
+      
+      // Add each account
+      currentOrg.accounts.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account.id;
+        option.textContent = account.name;
+        accountFilter.appendChild(option);
+      });
+      
+      console.log(`📊 Populated account filter with ${currentOrg.accounts.length} accounts`);
+    }
+    
+    function populateAccountGroupsFilter() {
+      const groupFilter = document.getElementById('accountGroupFilter');
+      if (!groupFilter) return;
+      
+      const accountGroups = window.OrgDataManager.getAccountGroups();
+      
+      // Clear existing options (except "All account groups")
+      groupFilter.innerHTML = '<option value="all">All account groups</option>';
+      
+      // Add each account group
+      accountGroups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = group.name;
+        groupFilter.appendChild(option);
+      });
+      
+      console.log(`📊 Populated account groups filter with ${accountGroups.length} groups`);
+    }
+    
+    function updateAccountGroupsPreview() {
+      const preview = document.getElementById('accountGroupsPreview');
+      if (!preview) return;
+      
+      const accountGroups = window.OrgDataManager.getAccountGroups();
+      
+      if (accountGroups.length === 0) {
+        preview.innerHTML = `
+          <div class="placeholder-content">
+            <div style="margin-bottom: 12px;">No account groups yet</div>
+            <button class="btn-secondary btn-sm" onclick="window.location.href='./account-groups.html'">
+              Create your first group
+            </button>
+          </div>
+        `;
+        return;
+      }
+      
+      const previewContent = accountGroups.slice(0, 3).map(group => {
+        const accountCount = group.accountIds ? group.accountIds.length : 0;
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eaecf0;">
+            <div>
+              <div style="font-weight: 500; color: #1d2939; font-size: 14px;">${group.name}</div>
+              <div style="color: #667085; font-size: 12px;">${accountCount} account${accountCount !== 1 ? 's' : ''}</div>
+            </div>
+            <button class="btn-icon" onclick="applyAccountGroupFilter('${group.id}')" title="Filter by this group">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M2 3.5A1.5 1.5 0 013.5 2h9A1.5 1.5 0 0114 3.5v2.086a1.5 1.5 0 01-.44 1.06L10 10.207V13.5a.5.5 0 01-.223.416l-2 1.334A.5.5 0 017 15V10.207L3.44 6.646A1.5 1.5 0 013 5.586V3.5z"/>
+              </svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+      
+      const hasMore = accountGroups.length > 3;
+      const moreText = hasMore ? `<div style="text-align: center; padding: 12px 0;"><a href="./account-groups.html" style="color: #635bff; font-size: 13px; text-decoration: none;">View all ${accountGroups.length} groups →</a></div>` : '';
+      
+      preview.innerHTML = `
+        <div style="padding: 0;">
+          ${previewContent}
+          ${moreText}
+        </div>
+      `;
+    }
+    
+    function setupFilterListeners() {
+      const dateFilter = document.getElementById('dateRangeFilter');
+      const accountFilter = document.getElementById('accountFilter');
+      const groupFilter = document.getElementById('accountGroupFilter');
+      
+      [dateFilter, accountFilter, groupFilter].forEach(filter => {
+        if (filter) {
+          filter.addEventListener('change', handleFilterChange);
+        }
+      });
+    }
+    
+    function handleFilterChange(event) {
+      const filterType = event.target.id;
+      const value = event.target.value;
+      
+      console.log(`🔄 Filter changed: ${filterType} = ${value}`);
+      
+      // Update chart period display
+      if (filterType === 'dateRangeFilter') {
+        updateChartPeriod(value);
+      }
+      
+      // Update metrics based on filters
+      updateDashboardData();
+    }
+    
+    function applyAccountGroupFilter(groupId) {
+      const groupFilter = document.getElementById('accountGroupFilter');
+      if (groupFilter) {
+        groupFilter.value = groupId;
+        handleFilterChange({ target: groupFilter });
+      }
+    }
+    
+    function updateChartPeriod(period) {
+      const chartPeriod = document.getElementById('chartPeriod');
+      if (!chartPeriod) return;
+      
+      const periodMap = {
+        '7d': 'Last 7 days',
+        '30d': 'Last 30 days',
+        '90d': 'Last 3 months',
+        '1y': 'Last year'
+      };
+      
+      chartPeriod.textContent = periodMap[period] || 'Last 30 days';
+    }
+    
+    function updateDashboardData() {
+      // Get current filter values
+      const dateRange = document.getElementById('dateRangeFilter')?.value || '30d';
+      const accountId = document.getElementById('accountFilter')?.value || 'all';
+      const groupId = document.getElementById('accountGroupFilter')?.value || 'all';
+      
+      console.log(`📊 Updating dashboard data: ${dateRange}, account: ${accountId}, group: ${groupId}`);
+      
+      // Simulate different data based on filters
+      let grossVolume = '$110,600';
+      let yesterday = '$92,040';
+      let grossChange = '+12.3% from last period';
+      let yesterdayChange = '-5.2% from previous day';
+      
+      // Adjust data based on account group filter
+      if (groupId !== 'all') {
+        const group = window.OrgDataManager.getAccountGroups().find(g => g.id === groupId);
+        if (group) {
+          const accountCount = group.accountIds ? group.accountIds.length : 1;
+          // Simulate data scaling based on group size
+          const multiplier = accountCount / 10; // Rough scaling
+          grossVolume = `$${Math.round(110600 * multiplier).toLocaleString()}`;
+          yesterday = `$${Math.round(92040 * multiplier).toLocaleString()}`;
+        }
+      }
+      
+      // Adjust data based on account filter
+      if (accountId !== 'all') {
+        // Simulate individual account data (smaller numbers)
+        grossVolume = '$45,200';
+        yesterday = '$38,100';
+        grossChange = '+8.7% from last period';
+        yesterdayChange = '-2.1% from previous day';
+      }
+      
+      // Update metrics
+      const grossVolumeEl = document.getElementById('grossVolumeMetric');
+      const yesterdayEl = document.getElementById('yesterdayMetric');
+      
+      if (grossVolumeEl) grossVolumeEl.textContent = grossVolume;
+      if (yesterdayEl) yesterdayEl.textContent = yesterday;
+      
+      // Update metric changes
+      const metricChanges = document.querySelectorAll('.metric-change');
+      if (metricChanges[0]) metricChanges[0].textContent = grossChange;
+      if (metricChanges[1]) metricChanges[1].textContent = yesterdayChange;
     }
 
 
