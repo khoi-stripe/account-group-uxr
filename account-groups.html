@@ -1793,6 +1793,11 @@
       if (!isVisible) {
         // Only close sort menu if we're opening it (to clear state)
         closeSortMenu();
+        // Clear any inline styles that might hide the menu
+        menu.style.display = '';
+        menu.style.opacity = '';
+        menu.style.visibility = '';
+        menu.style.pointerEvents = '';
         menu.classList.add('show');
         console.log('🔧 Added show class, menu classes after:', menu.className);
         // Close when clicking outside
@@ -2720,7 +2725,7 @@
     }
 
     function closeAllKebabMenus() {
-      const openMenus = document.querySelectorAll('.kebab-menu');
+      const openMenus = document.querySelectorAll('.kebab-menu:not(#sort-filter-menu)');
       console.log('🧹 Closing', openMenus.length, 'kebab menus');
       openMenus.forEach(menu => {
         menu.classList.remove('show');
