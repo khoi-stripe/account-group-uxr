@@ -1747,7 +1747,8 @@
 
     function applySortToGroups(groups, sortOption) {
       console.log('🔄 applySortToGroups called with:', sortOption);
-      console.log('🔄 Groups before sorting:', groups.map(g => ({name: g.name, createdAt: g.createdAt, updatedAt: g.updatedAt})));
+      console.log('🔄 Groups before sorting:');
+      groups.forEach((g, i) => console.log(`  ${i + 1}. "${g.name}" (${g.id})`));
       
       switch (sortOption) {
         case 'aToZ':
@@ -1766,7 +1767,8 @@
           break;
       }
       
-      console.log('🔄 Groups after sorting:', groups.map(g => ({name: g.name, createdAt: g.createdAt, updatedAt: g.updatedAt})));
+      console.log('🔄 Groups after sorting:');
+      groups.forEach((g, i) => console.log(`  ${i + 1}. "${g.name}" (${g.id})`));
     }
 
     function toggleSortFilter() {
