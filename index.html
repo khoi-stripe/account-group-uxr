@@ -1543,8 +1543,9 @@ document.addEventListener('DOMContentLoaded', function() {
           if (window.generateCustomAccountGroups) {
             return window.generateCustomAccountGroups();
           }
-          // Basic local generator: group by size for preview
-          return (typeof generateAccountGroups === 'function') ? generateAccountGroups() : {};
+          // Fallback to local generator similar to reporting
+          if (typeof generateAccountGroups === 'function') return generateAccountGroups();
+          return getFallbackAccountGroups();
         };
 
         const dashboardFilter = new AccountGroupsFilter({
@@ -1604,6 +1605,25 @@ document.addEventListener('DOMContentLoaded', function() {
       } catch (e) {
         console.error('Failed to initialize Account Groups Filter on dashboard:', e);
       }
+    }
+
+    // Fallback account groups if OrgDataManager/generator is not available
+    function getFallbackAccountGroups() {
+      const fallbackAccounts = [
+        { name: 'Mobile App', initials: 'MA', color: 'blue', checked: true },
+        { name: 'Web Platform', initials: 'WP', color: 'green', checked: true },
+        { name: 'API Services', initials: 'AS', color: 'blue', checked: true },
+        { name: 'Analytics Dashboard', initials: 'AD', color: 'green', checked: true },
+        { name: 'Payment Processing', initials: 'PP', color: 'blue', checked: true },
+        { name: 'Personal Banking', initials: 'PB', color: 'green', checked: true }
+      ];
+      return {
+        'all': fallbackAccounts,
+        'connected': [fallbackAccounts[0], fallbackAccounts[1], fallbackAccounts[2]],
+        'express': [fallbackAccounts[1], fallbackAccounts[3]],
+        'standard': [fallbackAccounts[4], fallbackAccounts[5]],
+        'custom': []
+      };
     }
 
 
