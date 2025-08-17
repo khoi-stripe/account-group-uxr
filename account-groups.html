@@ -1806,11 +1806,26 @@
         console.log('🔧 Menu after clearing styles:');
         console.log(menu.outerHTML);
         
-        // Test onclick handlers manually
+        // Test onclick handlers manually and add event listeners
         const menuItems = menu.querySelectorAll('.kebab-menu-item');
         console.log('🔧 Found menu items:', menuItems.length);
         menuItems.forEach((item, i) => {
-          console.log(`🔧 Item ${i + 1}: "${item.textContent.trim()}" - onclick:`, item.getAttribute('onclick'));
+          const text = item.textContent.trim();
+          console.log(`🔧 Item ${i + 1}: "${text}" - onclick:`, item.getAttribute('onclick'));
+          
+          // Add event listeners since onclick attributes are being stripped
+          item.removeEventListener('click', item._sortHandler); // Remove old listener if exists
+          
+          let sortOption;
+          if (text === 'Last updated') sortOption = 'lastUpdated';
+          else if (text === 'A–Z') sortOption = 'aToZ';
+          else if (text === 'Z–A') sortOption = 'zToA';
+          
+          if (sortOption) {
+            item._sortHandler = () => setSortOption(sortOption);
+            item.addEventListener('click', item._sortHandler);
+            console.log(`🔧 Added event listener for ${text} -> ${sortOption}`);
+          }
         });
         // Close when clicking outside
         setTimeout(() => {
