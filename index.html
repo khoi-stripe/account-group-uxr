@@ -1329,30 +1329,10 @@ document.addEventListener('DOMContentLoaded', function() {
              
              <!-- Sort Filter (from account groups page) -->
              <div class="filter-item">
-               <div class="sort-filter-container" style="position: relative;">
-                 <button id="dashboard-sort-filter-trigger" style="
-                   display: flex;
-                   align-items: center;
-                   height: 24px;
-                   padding: 0 6px 0 12px;
-                   border: 1px solid #b6c0cd;
-                   border-radius: 999px;
-                   background: transparent;
-                   cursor: pointer;
-                   font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
-                   font-weight: 600;
-                   font-size: 12px;
-                   line-height: 16px;
-                   color: #596171;
-                   letter-spacing: -0.024px;
-                   margin-right: 6px;
-                   gap: 6px;
-                 ">
-                   <span id="dashboard-sort-filter-label">Last updated</span>
-                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                     <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
-                   </svg>
-                 </button>
+               <div class="date-range-display" aria-hidden="true">
+                 <div class="wireframe-bar medium"></div>
+                 <span class="date-range-divider">|</span>
+                 <div class="wireframe-bar short"></div>
                </div>
              </div>
              
