@@ -1768,9 +1768,13 @@
       console.log('🔧 toggleSortFilter called');
       const menu = document.getElementById('sort-filter-menu');
       console.log('🔧 menu element:', menu);
+      console.log('🔧 All elements with sort-filter in ID:', document.querySelectorAll('[id*="sort-filter"]'));
+      console.log('🔧 Toolbar element:', document.getElementById('groups-page-subheader'));
       
       if (!menu) {
         console.error('❌ sort-filter-menu element not found!');
+        console.log('🔧 Checking DOM for similar elements...');
+        console.log('🔧 All divs:', document.querySelectorAll('div[id]'));
         return;
       }
       
