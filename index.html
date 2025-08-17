@@ -73,6 +73,14 @@
       box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.1);
     }
 
+    .wireframe-filter {
+      background: var(--neutral-50);
+      border-radius: 6px;
+      height: 36px;
+      width: 140px;
+      border: 1px solid #d0d5dd;
+    }
+
     /* Dashboard Hero Section */
     .dashboard-hero {
       background: white;
@@ -1229,24 +1237,16 @@ document.addEventListener('DOMContentLoaded', function() {
          <div class="dashboard-filters">
            <div class="filter-group">
              <div class="filter-item">
-               <select class="filter-select" id="dateRangeFilter">
-                 <option value="7d">Last 7 days</option>
-                 <option value="30d" selected>Last 30 days</option>
-                 <option value="90d">Last 3 months</option>
-                 <option value="1y">Last year</option>
-               </select>
-             </div>
-             <div class="filter-item">
-               <select class="filter-select" id="accountFilter">
-                 <option value="all">All accounts</option>
-                 <!-- Populated dynamically -->
-               </select>
-             </div>
-             <div class="filter-item">
                <select class="filter-select" id="accountGroupFilter">
                  <option value="all">All account groups</option>
                  <!-- Populated dynamically -->
                </select>
+             </div>
+             <div class="filter-item">
+               <div class="wireframe-filter"></div>
+             </div>
+             <div class="filter-item">
+               <div class="wireframe-filter"></div>
              </div>
            </div>
          </div>
@@ -1410,9 +1410,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializeDashboard() {
       console.log('🏠 Initializing dashboard...');
       
-      // Populate account filter
-      populateAccountFilter();
-      
       // Populate account groups filter
       populateAccountGroupsFilter();
       
@@ -1424,26 +1421,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('✅ Dashboard initialized');
     }
     
-    function populateAccountFilter() {
-      const accountFilter = document.getElementById('accountFilter');
-      if (!accountFilter) return;
-      
-      const currentOrg = window.OrgDataManager.getCurrentOrganization();
-      if (!currentOrg || !currentOrg.accounts) return;
-      
-      // Clear existing options (except "All accounts")
-      accountFilter.innerHTML = '<option value="all">All accounts</option>';
-      
-      // Add each account
-      currentOrg.accounts.forEach(account => {
-        const option = document.createElement('option');
-        option.value = account.id;
-        option.textContent = account.name;
-        accountFilter.appendChild(option);
-      });
-      
-      console.log(`📊 Populated account filter with ${currentOrg.accounts.length} accounts`);
-    }
+
     
     function populateAccountGroupsFilter() {
       const groupFilter = document.getElementById('accountGroupFilter');
@@ -1468,15 +1446,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     function setupFilterListeners() {
-      const dateFilter = document.getElementById('dateRangeFilter');
-      const accountFilter = document.getElementById('accountFilter');
       const groupFilter = document.getElementById('accountGroupFilter');
       
-      [dateFilter, accountFilter, groupFilter].forEach(filter => {
-        if (filter) {
-          filter.addEventListener('change', handleFilterChange);
-        }
-      });
+      if (groupFilter) {
+        groupFilter.addEventListener('change', handleFilterChange);
+      }
     }
     
     function handleFilterChange(event) {
@@ -1485,38 +1459,19 @@ document.addEventListener('DOMContentLoaded', function() {
       
       console.log(`🔄 Filter changed: ${filterType} = ${value}`);
       
-      // Update chart period display
-      if (filterType === 'dateRangeFilter') {
-        updateChartPeriod(value);
-      }
-      
       // Update metrics based on filters
       updateDashboardData();
     }
     
 
     
-    function updateChartPeriod(period) {
-      const chartPeriod = document.getElementById('chartPeriod');
-      if (!chartPeriod) return;
-      
-      const periodMap = {
-        '7d': 'Last 7 days',
-        '30d': 'Last 30 days',
-        '90d': 'Last 3 months',
-        '1y': 'Last year'
-      };
-      
-      chartPeriod.textContent = periodMap[period] || 'Last 30 days';
-    }
+
     
     function updateDashboardData() {
       // Get current filter values
-      const dateRange = document.getElementById('dateRangeFilter')?.value || '30d';
-      const accountId = document.getElementById('accountFilter')?.value || 'all';
       const groupId = document.getElementById('accountGroupFilter')?.value || 'all';
       
-      console.log(`📊 Updating dashboard data: ${dateRange}, account: ${accountId}, group: ${groupId}`);
+      console.log(`📊 Updating dashboard data: group: ${groupId}`);
       
       // Simulate different data based on filters
       let grossVolume = '$110,600';
@@ -1534,15 +1489,6 @@ document.addEventListener('DOMContentLoaded', function() {
           grossVolume = `$${Math.round(110600 * multiplier).toLocaleString()}`;
           yesterday = `$${Math.round(92040 * multiplier).toLocaleString()}`;
         }
-      }
-      
-      // Adjust data based on account filter
-      if (accountId !== 'all') {
-        // Simulate individual account data (smaller numbers)
-        grossVolume = '$45,200';
-        yesterday = '$38,100';
-        grossChange = '+8.7% from last period';
-        yesterdayChange = '-2.1% from previous day';
       }
       
       // Update metrics
