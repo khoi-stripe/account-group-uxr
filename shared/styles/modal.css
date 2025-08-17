@@ -353,8 +353,8 @@
 
 /* Modal sizing variants */
 .modal-step1-size {
-  width: 940px !important;
-  max-width: 940px !important;
+  width: 640px !important;
+  max-width: 640px !important;
   height: auto !important;
   max-height: none !important;
 }
