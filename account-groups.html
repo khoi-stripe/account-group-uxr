@@ -1765,8 +1765,18 @@
     }
 
     function toggleSortFilter() {
+      console.log('🔧 toggleSortFilter called');
       const menu = document.getElementById('sort-filter-menu');
+      console.log('🔧 menu element:', menu);
+      
+      if (!menu) {
+        console.error('❌ sort-filter-menu element not found!');
+        return;
+      }
+      
       const isVisible = menu.classList.contains('show');
+      console.log('🔧 isVisible:', isVisible);
+      console.log('🔧 menu classes before:', menu.className);
       
       // Close all other menus first
       closeAllKebabMenus();
@@ -1775,12 +1785,14 @@
         // Only close sort menu if we're opening it (to clear state)
         closeSortMenu();
         menu.classList.add('show');
+        console.log('🔧 Added show class, menu classes after:', menu.className);
         // Close when clicking outside
         setTimeout(() => {
           document.addEventListener('click', closeSortFilterOnClickOutside, { once: true });
         }, 0);
       } else {
         // Close the menu if it's currently open
+        console.log('🔧 Closing menu');
         closeSortMenu();
       }
     }
@@ -1802,6 +1814,7 @@
     }
 
     function setSortOption(option) {
+      console.log('🎯 setSortOption called with:', option);
       const label = document.getElementById('sort-filter-label');
       
       // Update current sort option
@@ -1825,6 +1838,7 @@
       closeSortMenu();
       
       // Reload groups with new sort order
+      console.log('🎯 Reloading groups with sort:', option);
       loadAccountGroups();
     }
 
