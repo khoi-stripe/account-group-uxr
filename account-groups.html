@@ -1746,6 +1746,9 @@
     }
 
     function applySortToGroups(groups, sortOption) {
+      console.log('🔄 applySortToGroups called with:', sortOption);
+      console.log('🔄 Groups before sorting:', groups.map(g => ({name: g.name, createdAt: g.createdAt, updatedAt: g.updatedAt})));
+      
       switch (sortOption) {
         case 'aToZ':
           groups.sort((a, b) => a.name.localeCompare(b.name));
@@ -1762,6 +1765,8 @@
           });
           break;
       }
+      
+      console.log('🔄 Groups after sorting:', groups.map(g => ({name: g.name, createdAt: g.createdAt, updatedAt: g.updatedAt})));
     }
 
     function toggleSortFilter() {
