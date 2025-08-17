@@ -1845,6 +1845,12 @@
     // Make functions globally accessible
     window.toggleSortFilter = toggleSortFilter;
     window.setSortOption = setSortOption;
+    
+    // Debug: Check if functions are accessible
+    console.log('🔧 Global functions set:', {
+      toggleSortFilter: typeof window.toggleSortFilter,
+      setSortOption: typeof window.setSortOption
+    });
 
     function loadAccountGroups() {
       // Use only OrgDataManager since it now handles organization-specific storage
@@ -2173,7 +2179,7 @@
       
       // Show what groups are on the page
       const managedGroups = window.OrgDataManager?.getAccountGroups() || [];
-      const savedGroups = getSavedGroups();
+      const savedGroups = window.OrgDataManager.getAccountGroups();
       console.log('📄 Groups on page - Managed:', managedGroups);
       console.log('📄 Groups on page - Saved:', savedGroups);
       console.log('📄 Total groups on page:', managedGroups.length + savedGroups.length);
