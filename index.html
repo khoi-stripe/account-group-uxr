@@ -1404,23 +1404,10 @@ document.addEventListener('DOMContentLoaded', function() {
            
                      <!-- Payment Volume Chart -->
           <div class="chart-container">
-            <div class="chart-area" id="paymentVolumeChart">
-               <!-- Chart will be rendered here -->
-               <svg viewBox="0 0 800 300" class="line-chart">
-                 <defs>
-                   <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                     <stop offset="0%" style="stop-color:#635BFF;stop-opacity:0.1"/>
-                     <stop offset="100%" style="stop-color:#635BFF;stop-opacity:0"/>
-                   </linearGradient>
-                 </defs>
-                 <!-- Chart line -->
-                 <polyline fill="none" stroke="#635BFF" stroke-width="2" 
-                   points="50,250 100,200 150,180 200,220 250,160 300,140 350,170 400,120 450,100 500,130 550,90 600,110 650,80 700,120 750,100"/>
-                 <!-- Chart fill -->
-                 <polygon fill="url(#chartGradient)" 
-                   points="50,250 100,200 150,180 200,220 250,160 300,140 350,170 400,120 450,100 500,130 550,90 600,110 650,80 700,120 750,100 750,280 50,280"/>
-               </svg>
-             </div>
+                        <div class="chart-area" id="paymentVolumeChart">
+              <!-- Chart will be rendered here -->
+              <canvas id="paymentChart" width="800" height="300"></canvas>
+            </div>
            </div>
          </div>
 
@@ -1435,6 +1422,9 @@ document.addEventListener('DOMContentLoaded', function() {
      </div>
   </div>
 
+  <!-- Chart.js for live charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <!-- Include account switcher component -->
   <script src="./shared/components/account-switcher.js"></script>
   
@@ -1542,9 +1532,123 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
+    // Chart data generation
+    function generateChartData(accountCount = 10) {
+      const days = 30;
+      const labels = [];
+      const data = [];
+      
+      // Generate last 30 days
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        // Generate realistic payment volume data with some variance
+        const baseValue = 3000 + (accountCount * 500);
+        const variance = baseValue * 0.3;
+        const trend = Math.sin((days - i) / 10) * variance * 0.5;
+        const dailyVariance = (Math.random() - 0.5) * variance;
+        const value = Math.max(0, baseValue + trend + dailyVariance);
+        
+        data.push(Math.round(value));
+      }
+      
+      return { labels, data };
+    }
+
+    let paymentChart;
+
+    function initializeChart() {
+      const ctx = document.getElementById('paymentChart');
+      if (!ctx) return;
+
+      const chartData = generateChartData();
+      
+      paymentChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartData.labels,
+          datasets: [{
+            data: chartData.data,
+            borderColor: '#635BFF',
+            backgroundColor: 'rgba(99, 91, 255, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            pointBackgroundColor: '#635BFF',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              borderColor: '#635BFF',
+              borderWidth: 1,
+              displayColors: false,
+              callbacks: {
+                title: function(context) {
+                  return context[0].label;
+                },
+                label: function(context) {
+                  return '$' + context.parsed.y.toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: false,
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              display: false,
+              grid: {
+                display: false
+              }
+            }
+          },
+          elements: {
+            point: {
+              hoverRadius: 6
+            }
+          }
+        }
+      });
+    }
+
+    function updateChartData(selectedAccountCount) {
+      if (!paymentChart) return;
+      
+      const chartData = generateChartData(selectedAccountCount);
+      paymentChart.data.labels = chartData.labels;
+      paymentChart.data.datasets[0].data = chartData.data;
+      paymentChart.update('none'); // No animation for smooth updates
+    }
+
     // Dashboard functionality
     function initializeDashboard() {
       console.log('🏠 Initializing dashboard with account groups filter...');
+
+      // Initialize Chart
+      initializeChart();
 
       // Initialize Account Groups Filter (same as reporting, different IDs)
       try {
@@ -1584,10 +1688,14 @@ document.addEventListener('DOMContentLoaded', function() {
               if (match) selectedIds.push(match.id);
             });
 
-          // Update dashboard data preview (simple scale based on count)
+          const selectedCount = selectedIds.length;
+          const totalAccounts = window.OrgDataManager?.getAllSubAccounts?.()?.length || 10;
+          const accountCount = selectedCount > 0 ? selectedCount : totalAccounts;
+
+          // Update dashboard data preview (realistic scale based on account count)
           const baseGross = 110600;
           const baseYesterday = 92040;
-          const multiplier = selectedIds.length > 0 ? Math.max(1, selectedIds.length) / 10 : 1;
+          const multiplier = accountCount / totalAccounts;
           const grossVolume = `$${Math.round(baseGross * multiplier).toLocaleString()}`;
           const yesterday = `$${Math.round(baseYesterday * multiplier).toLocaleString()}`;
 
@@ -1595,6 +1703,9 @@ document.addEventListener('DOMContentLoaded', function() {
           const yesterdayEl = document.getElementById('yesterdayMetric');
           if (grossVolumeEl) grossVolumeEl.textContent = grossVolume;
           if (yesterdayEl) yesterdayEl.textContent = yesterday;
+
+          // Update chart data to reflect selected accounts
+          updateChartData(accountCount);
 
           // Match reporting behavior: update trigger label using component logic
           this.updateTriggerBasedOnSelection();
