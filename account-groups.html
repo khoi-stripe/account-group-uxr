@@ -1801,6 +1801,7 @@
         menu.style.pointerEvents = '';
         menu.classList.add('show');
         console.log('🔧 Added show class, menu classes after:', menu.className);
+        console.log('🔧 Menu after clearing styles:', menu.outerHTML.substring(0, 200));
         // Close when clicking outside
         setTimeout(() => {
           document.addEventListener('click', closeSortFilterOnClickOutside, { once: true });
