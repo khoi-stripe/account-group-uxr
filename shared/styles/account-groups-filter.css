@@ -55,7 +55,8 @@
   background: #FFF;
   box-shadow: 0 15px 35px 0 rgba(48, 49, 61, 0.08), 0 5px 15px 0 rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  height: 364px; /* Fixed total height */
+  min-height: 360px; /* Minimum height */
+  max-height: calc(100vh - 48px); /* Expand to viewport height with 24px margin on top and bottom */
   width: 532px; /* Fixed total width */
   display: flex;
   flex-direction: row; /* Two-column layout */
@@ -70,7 +71,7 @@
 /* Column 1 - Groups (Full height) */
 .account-groups-popover .groups-section {
   width: 200px;
-  height: 364px; /* Full popover height */
+  height: 100%; /* Use full available height */
   flex-shrink: 0; /* Prevent shrinking */
   background: white;
   border-right: 1px solid var(--neutral-50);
@@ -150,7 +151,7 @@
 /* Column 2 - Accounts Section (Full height with Search + Select All + List + Footer) */
 .account-groups-popover .accounts-section {
   flex: 1;
-  height: 364px; /* Full popover height */
+  height: 100%; /* Use full available height */
   width: 332px; /* Remaining width after 200px groups section */
   display: flex;
   flex-direction: column;
