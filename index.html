@@ -256,7 +256,7 @@
     }
 
     .stacked-revenue-chart {
-      height: 120px;
+      height: 80px;
       position: relative;
       display: flex;
       align-items: end;
@@ -283,19 +283,7 @@
       cursor: pointer;
     }
 
-    .account-bar::after {
-      content: attr(data-account);
-      position: absolute;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 10px;
-      color: var(--neutral-600);
-      white-space: nowrap;
-      max-width: 60px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+
 
 
 
@@ -1714,11 +1702,16 @@ document.addEventListener('DOMContentLoaded', function() {
         ? allAccounts.filter(account => accountIds.includes(account.id))
         : allAccounts;
       
-      return filteredAccounts.map(account => ({
+      const accountsWithRevenue = filteredAccounts.map(account => ({
         id: account.id,
         name: account.name,
         revenue: Math.floor(Math.random() * 50000) + 10000 // Random revenue between 10k-60k
       }));
+      
+      // Sort by revenue descending and take top 10
+      return accountsWithRevenue
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 10);
     }
 
     function updateRevenueChart(selectedAccountIds = []) {
