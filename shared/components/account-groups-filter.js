@@ -303,10 +303,8 @@ class AccountGroupsFilter {
     const viewportHeight = window.innerHeight;
     const margin = 24; // 24px margin from viewport edges (matching account switcher)
     
-    // Calculate dynamic height based on viewport and content
-    const minHeight = 360; // Minimum height
-    const maxAvailableHeight = viewportHeight - (margin * 2); // 24px margin top and bottom
-    const idealHeight = Math.max(minHeight, Math.min(maxAvailableHeight, 600)); // Cap at reasonable max
+    // Calculate dynamic height based on content and viewport
+    const { height: optimalHeight, canPositionBelow } = this.calculateOptimalHeight(triggerRect, viewportHeight, margin);
     
     // Calculate position based on locked alignment mode but current trigger size
     let left;
@@ -320,68 +318,87 @@ class AccountGroupsFilter {
         break;
     }
     
-    // Calculate vertical position with smart positioning
-    const spaceBelow = viewportHeight - triggerRect.bottom - margin;
-    const spaceAbove = triggerRect.top - margin;
-    
+    // Calculate vertical position based on optimal height and available space
     let top;
-    let finalHeight = idealHeight;
-    
-    // Prefer positioning below trigger if there's enough space
-    if (spaceBelow >= idealHeight + 4) {
+    if (canPositionBelow) {
       top = currentTriggerHeight + 4; // 4px below trigger
-    }
-    // If not enough space below, try above
-    else if (spaceAbove >= idealHeight + 4) {
-      top = -idealHeight - 4; // 4px above trigger
-    }
-    // If neither position works perfectly, use the position with more space
-    // and adjust height to fit
-    else if (spaceBelow >= spaceAbove) {
-      top = currentTriggerHeight + 4; // Position below
-      finalHeight = Math.max(minHeight, spaceBelow - 4);
     } else {
-      // Position above with adjusted height
-      finalHeight = Math.max(minHeight, spaceAbove - 4);
-      top = -finalHeight - 4;
+      top = -optimalHeight - 4; // Position above trigger
     }
     
-    // Final safety check: ensure popover doesn't go beyond viewport bounds
-    const finalPopoverTop = triggerRect.top + top;
-    const finalPopoverBottom = finalPopoverTop + finalHeight;
+    // Final safety check - ensure popover doesn't go off screen
+    const finalTop = triggerRect.top + top;
+    const finalBottom = finalTop + optimalHeight;
     
-    // If popover would be cut off at the bottom, position it at the bottom with margin
-    if (finalPopoverBottom > viewportHeight - margin) {
-      finalHeight = Math.max(minHeight, viewportHeight - finalPopoverTop - margin);
-    }
-    
-    // If popover would be cut off at the top, position it at the top with margin  
-    if (finalPopoverTop < margin) {
+    if (finalTop < margin) {
       top = margin - triggerRect.top;
-      finalHeight = Math.max(minHeight, viewportHeight - margin - triggerRect.top - top);
+    } else if (finalBottom > viewportHeight - margin) {
+      top = (viewportHeight - margin - optimalHeight) - triggerRect.top;
     }
     
-    // Apply positioning (relative to trigger)
+    // Apply positioning and height (relative to trigger)
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
-    
-    // Apply dynamic height
-    popover.style.height = `${finalHeight}px`;
-    
-    // Update column heights to match
-    const groupsSection = popover.querySelector('.groups-section');
-    const accountsSection = popover.querySelector('.accounts-section');
-    
-    if (groupsSection) {
-      groupsSection.style.height = `${finalHeight}px`;
-    }
-    
-    if (accountsSection) {
-      accountsSection.style.height = `${finalHeight}px`;
-    }
+    popover.style.height = `${optimalHeight}px`;
     
     // Reset repositioning flag
     this.isRepositioning = false;
+  }
+  
+  calculateOptimalHeight(triggerRect, viewportHeight, margin) {
+    // Calculate available space above and below trigger
+    const spaceBelow = viewportHeight - triggerRect.bottom - margin;
+    const spaceAbove = triggerRect.top - margin;
+    
+    // Calculate content-based height estimate
+    const accountsListContainer = this.container.querySelector('.accounts-list');
+    const accountItems = accountsListContainer ? accountsListContainer.querySelectorAll('.account-item') : [];
+    const selectAllContainer = this.container.querySelector('.select-all-container');
+    
+    // Fixed height components
+    const searchContainerHeight = 56; // search container + padding
+    const selectAllHeight = selectAllContainer ? 48 : 0; // select all row height
+    const footerHeight = 64; // footer with buttons
+    const groupsSectionPadding = 8; // margins and padding
+    
+    // Variable height: account items (40px each + spacing)
+    const accountItemHeight = 40;
+    const visibleAccountCount = Array.from(accountItems).filter(item => 
+      item.style.display !== 'none'
+    ).length;
+    const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
+    
+    // Calculate ideal height based on content
+    const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
+    
+    // Apply constraints
+    const minHeight = 364; // Minimum height for usability
+    const maxViewportHeight = viewportHeight - (margin * 2); // Max height considering viewport margins
+    const idealHeight = Math.max(minHeight, Math.min(contentBasedHeight, maxViewportHeight));
+    
+    // Determine if we can position below trigger
+    const canPositionBelow = spaceBelow >= idealHeight + 4; // 4px gap
+    const canPositionAbove = spaceAbove >= idealHeight + 4;
+    
+    let finalHeight = idealHeight;
+    let canPositionBelowFinal = canPositionBelow;
+    
+    // If ideal height doesn't fit in either position, use the position with more space
+    // and adjust height to fit
+    if (!canPositionBelow && !canPositionAbove) {
+      if (spaceBelow >= spaceAbove) {
+        finalHeight = Math.max(minHeight, spaceBelow - 4);
+        canPositionBelowFinal = true;
+      } else {
+        finalHeight = Math.max(minHeight, spaceAbove - 4);
+        canPositionBelowFinal = false;
+      }
+    }
+    
+    return {
+      height: Math.round(finalHeight),
+      canPositionBelow: canPositionBelowFinal
+    };
   }
   
   togglePopover() {
@@ -661,6 +678,12 @@ class AccountGroupsFilter {
     this.updateSelectionCount();
     this.updateSelectAllState();
     this.checkAccountsListOverflow();
+    
+    // Reposition popover after filtering to adjust height based on visible items
+    const popover = document.getElementById(this.options.popoverId);
+    if (popover && popover.style.display === 'flex') {
+      this.positionPopover();
+    }
   }
   
   updateSelectionCount() {
