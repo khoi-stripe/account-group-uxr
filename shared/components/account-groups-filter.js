@@ -344,9 +344,34 @@ class AccountGroupsFilter {
       top = Math.max(-triggerRect.top + margin, -popoverHeight - 4);
     }
     
+    // Final safety check: ensure popover doesn't go beyond viewport bounds
+    const finalPopoverTop = triggerRect.top + top;
+    const finalPopoverBottom = finalPopoverTop + popoverHeight;
+    
+    // If popover would be cut off at the bottom, position it at the bottom with margin
+    if (finalPopoverBottom > viewportHeight - margin) {
+      top = (viewportHeight - margin - popoverHeight) - triggerRect.top;
+    }
+    
+    // If popover would be cut off at the top, position it at the top with margin  
+    if (finalPopoverTop < margin) {
+      top = margin - triggerRect.top;
+    }
+    
     // Apply positioning (relative to trigger)
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
+    
+    // Debug positioning (can be removed later)
+    console.log('Popover positioning:', {
+      viewportHeight,
+      triggerRect: { top: triggerRect.top, bottom: triggerRect.bottom },
+      spaceBelow,
+      spaceAbove,
+      popoverHeight,
+      calculatedTop: top,
+      positioning: spaceBelow >= popoverHeight + 4 ? 'below' : spaceAbove >= popoverHeight + 4 ? 'above' : spaceBelow >= spaceAbove ? 'below-constrained' : 'above-constrained'
+    });
     
     // Reset repositioning flag
     this.isRepositioning = false;
