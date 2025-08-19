@@ -208,40 +208,78 @@
       color: #d92d20;
     }
 
-    /* Chart Container */
-    .chart-container {
-      padding: 0;
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+      border-radius: 16px;
+      padding: 24px;
+      background: var(--neutral-50);
     }
 
-    .chart-header {
+    /* Metric Card Classes */
+    .metric-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .metric-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
 
-    .chart-title {
-      font-size: 18px;
+    .metric-title {
+      margin: 0;
+      font-size: 16px;
       font-weight: 600;
-      color: #1d2939;
+      color: var(--neutral-900);
+    }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--neutral-900);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .metric-subtitle {
+      font-size: 14px;
+      color: var(--neutral-600);
       margin: 0;
     }
 
-    .chart-period {
-      font-size: 14px;
-      color: #667085;
+    .metric-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
     }
 
-    .chart-area {
-      height: 300px;
-      position: relative;
+    .metric-badge--positive {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
     }
 
-    .line-chart {
-      width: 100%;
-      height: 300px;
-      display: block;
+    .metric-badge--info {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
     }
+
+    .metric-badge--neutral {
+      background: rgba(107, 114, 128, 0.1);
+      color: #6b7280;
+    }
+
+
 
     /* Dashboard Grid */
     .dashboard-grid {
@@ -1402,13 +1440,53 @@ document.addEventListener('DOMContentLoaded', function() {
              </div>
            </div>
            
-                     <!-- Payment Volume Chart -->
-          <div class="chart-container">
-                        <div class="chart-area" id="paymentVolumeChart">
-              <!-- Chart will be rendered here -->
-              <canvas id="paymentChart" width="800" height="300"></canvas>
+                               <!-- Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card revenue-card">
+              <div class="metric-header">
+                <h3 class="metric-title">Total Revenue</h3>
+                <div class="metric-badge metric-badge--positive">
+                  +12.5%
+                </div>
+              </div>
+              <div class="metric-value" id="total-revenue">
+                $142,580
+              </div>
+              <div class="metric-subtitle">
+                Last 30 days
+              </div>
             </div>
-           </div>
+
+            <div class="metric-card transactions-card">
+              <div class="metric-header">
+                <h3 class="metric-title">Transactions</h3>
+                <div class="metric-badge metric-badge--info">
+                  +8.2%
+                </div>
+              </div>
+              <div class="metric-value" id="total-transactions">
+                2,847
+              </div>
+              <div class="metric-subtitle">
+                Last 30 days
+              </div>
+            </div>
+
+            <div class="metric-card accounts-card">
+              <div class="metric-header">
+                <h3 class="metric-title">Accounts</h3>
+                <div class="metric-badge metric-badge--neutral" id="filtered-accounts-badge" style="display: none;">
+                  <span id="filtered-accounts-count"></span>
+                </div>
+              </div>
+              <div class="metric-value" id="active-accounts">
+                5
+              </div>
+              <div class="metric-subtitle">
+                Current organization
+              </div>
+            </div>
+          </div>
          </div>
 
          <!-- Dashboard Content Grid -->
@@ -1422,9 +1500,6 @@ document.addEventListener('DOMContentLoaded', function() {
      </div>
   </div>
 
-  <!-- Chart.js for live charts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
   <!-- Include account switcher component -->
   <script src="./shared/components/account-switcher.js"></script>
   
@@ -1532,123 +1607,94 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Chart data generation
-    function generateChartData(accountCount = 10) {
-      const days = 30;
-      const labels = [];
-      const data = [];
+    // Metrics data generation
+    function generateMetricsData(accountIds = []) {
+      const allAccounts = window.OrgDataManager?.getAllSubAccounts?.() || [];
+      const filteredAccounts = accountIds.length > 0 
+        ? allAccounts.filter(account => accountIds.includes(account.id))
+        : allAccounts;
       
-      // Generate last 30 days
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        
-        // Generate realistic payment volume data with some variance
-        const baseValue = 3000 + (accountCount * 500);
-        const variance = baseValue * 0.3;
-        const trend = Math.sin((days - i) / 10) * variance * 0.5;
-        const dailyVariance = (Math.random() - 0.5) * variance;
-        const value = Math.max(0, baseValue + trend + dailyVariance);
-        
-        data.push(Math.round(value));
+      // Generate realistic metrics based on filtered accounts
+      const accountCount = filteredAccounts.length;
+      const baseRevenue = 28500; // Base revenue per account
+      const baseTransactions = 570; // Base transactions per account
+      
+      const totalRevenue = accountCount * baseRevenue + Math.floor(Math.random() * 10000);
+      const totalTransactions = accountCount * baseTransactions + Math.floor(Math.random() * 200);
+      
+      // Generate realistic growth rates
+      const revenueGrowth = (Math.random() * 20 - 5).toFixed(1); // -5% to +15%
+      const transactionGrowth = (Math.random() * 15 - 3).toFixed(1); // -3% to +12%
+      
+      return {
+        totalRevenue,
+        totalTransactions,
+        activeAccounts: accountCount,
+        revenueGrowth: parseFloat(revenueGrowth),
+        transactionGrowth: parseFloat(transactionGrowth)
+      };
+    }
+
+    function updateMetricCard(elementId, value, growth) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.textContent = value;
       }
       
-      return { labels, data };
-    }
-
-    let paymentChart;
-
-    function initializeChart() {
-      const ctx = document.getElementById('paymentChart');
-      if (!ctx) return;
-
-      const chartData = generateChartData();
-      
-      paymentChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: chartData.labels,
-          datasets: [{
-            data: chartData.data,
-            borderColor: '#6c7688',
-            backgroundColor: 'rgba(108, 118, 136, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0,
-            pointRadius: 0,
-            pointHoverRadius: 4,
-            pointBackgroundColor: '#6c7688',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          },
-          plugins: {
-            legend: {
-              display: false
-            },
-            tooltip: {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              titleColor: '#ffffff',
-              bodyColor: '#ffffff',
-              borderColor: '#6c7688',
-              borderWidth: 1,
-              displayColors: false,
-              callbacks: {
-                title: function(context) {
-                  return context[0].label;
-                },
-                label: function(context) {
-                  return '$' + context.parsed.y.toLocaleString();
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              display: false,
-              grid: {
-                display: false
-              }
-            },
-            y: {
-              display: false,
-              grid: {
-                display: false
-              }
-            }
-          },
-          elements: {
-            point: {
-              hoverRadius: 6
-            }
-          }
+      // Update growth badge if it exists
+      const card = element?.closest('.metric-card');
+      const badge = card?.querySelector('.metric-badge');
+      if (badge && growth !== undefined) {
+        const growthNum = parseFloat(growth);
+        badge.textContent = `${growthNum >= 0 ? '+' : ''}${growth}%`;
+        
+        // Update badge style based on growth
+        badge.className = 'metric-badge';
+        if (growthNum > 5) {
+          badge.classList.add('metric-badge--positive');
+        } else if (growthNum < -2) {
+          badge.classList.add('metric-badge--neutral');
+        } else {
+          badge.classList.add('metric-badge--info');
         }
-      });
+      }
     }
 
-    function updateChartData(selectedAccountCount) {
-      if (!paymentChart) return;
+    function updateActiveAccountsCard(count, isFiltered) {
+      const element = document.getElementById('active-accounts');
+      const badgeContainer = document.getElementById('filtered-accounts-badge');
+      const badgeElement = document.getElementById('filtered-accounts-count');
       
-      const chartData = generateChartData(selectedAccountCount);
-      paymentChart.data.labels = chartData.labels;
-      paymentChart.data.datasets[0].data = chartData.data;
-      paymentChart.update('none'); // No animation for smooth updates
+      if (element) {
+        element.textContent = count.toString();
+      }
+      
+      if (badgeElement && badgeContainer) {
+        if (isFiltered) {
+          badgeElement.textContent = 'Filtered';
+          badgeContainer.style.display = 'inline-flex';
+        } else {
+          badgeElement.textContent = '';
+          badgeContainer.style.display = 'none';
+        }
+      }
+    }
+
+    function updateMetricsGrid(selectedAccountIds = []) {
+      const metrics = generateMetricsData(selectedAccountIds);
+      
+      // Update metrics cards
+      updateMetricCard('total-revenue', `$${metrics.totalRevenue.toLocaleString()}`, metrics.revenueGrowth);
+      updateMetricCard('total-transactions', metrics.totalTransactions.toLocaleString(), metrics.transactionGrowth);
+      updateActiveAccountsCard(metrics.activeAccounts, selectedAccountIds.length > 0);
     }
 
     // Dashboard functionality
     function initializeDashboard() {
       console.log('🏠 Initializing dashboard with account groups filter...');
 
-      // Initialize Chart
-      initializeChart();
+      // Initialize metrics grid with default data
+      updateMetricsGrid();
 
       // Initialize Account Groups Filter (same as reporting, different IDs)
       try {
@@ -1688,14 +1734,17 @@ document.addEventListener('DOMContentLoaded', function() {
               if (match) selectedIds.push(match.id);
             });
 
+          // Update metrics grid to reflect selected accounts
+          updateMetricsGrid(selectedIds);
+
+          // Also update the dashboard header metrics for consistency
           const selectedCount = selectedIds.length;
           const totalAccounts = window.OrgDataManager?.getAllSubAccounts?.()?.length || 10;
           const accountCount = selectedCount > 0 ? selectedCount : totalAccounts;
-
-          // Update dashboard data preview (realistic scale based on account count)
+          const multiplier = accountCount / totalAccounts;
+          
           const baseGross = 110600;
           const baseYesterday = 92040;
-          const multiplier = accountCount / totalAccounts;
           const grossVolume = `$${Math.round(baseGross * multiplier).toLocaleString()}`;
           const yesterday = `$${Math.round(baseYesterday * multiplier).toLocaleString()}`;
 
@@ -1703,9 +1752,6 @@ document.addEventListener('DOMContentLoaded', function() {
           const yesterdayEl = document.getElementById('yesterdayMetric');
           if (grossVolumeEl) grossVolumeEl.textContent = grossVolume;
           if (yesterdayEl) yesterdayEl.textContent = yesterday;
-
-          // Update chart data to reflect selected accounts
-          updateChartData(accountCount);
 
           // Match reporting behavior: update trigger label using component logic
           this.updateTriggerBasedOnSelection();
