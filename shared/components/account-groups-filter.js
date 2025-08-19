@@ -361,6 +361,11 @@ class AccountGroupsFilter {
       item.style.display !== 'none'
     ).length;
     
+    const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
+    
+    // Calculate ideal height based on content
+    const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
+    
     // Debug: Account count calculated
     console.log('🔍 Height Debug:', {
       visibleAccountCount,
@@ -372,11 +377,6 @@ class AccountGroupsFilter {
       groupsSectionPadding,
       contentBasedHeight
     });
-    
-    const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
-    
-    // Calculate ideal height based on content
-    const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
     
     // Content calculation complete
     
