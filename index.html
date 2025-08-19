@@ -161,6 +161,7 @@
       border-radius: 12px;
       padding: 16px;
       background: var(--neutral-50);
+      overflow: visible; /* Allow tooltips to show outside container */
     }
 
     /* Metrics Cards Container */
@@ -236,6 +237,8 @@
       background: white;
       border-radius: 8px;
       padding: 16px;
+      overflow: visible; /* Allow tooltips to show outside container */
+      position: relative;
     }
 
     .chart-header {
@@ -255,33 +258,45 @@
       margin: 0;
     }
 
-    .stacked-revenue-chart {
-      height: 80px;
+    .stacked-area-chart {
+      height: 160px;
       position: relative;
-      display: flex;
-      align-items: end;
-      gap: 4px;
       padding: 8px 0;
+      overflow: visible; /* Allow tooltips to show outside container */
     }
 
-    .account-bar {
-      flex: 1;
-      background: linear-gradient(to top, 
-        #635BFF 0%, 
-        #7C3AED 25%, 
-        #059669 50%, 
-        #DC2626 75%, 
-        #EA580C 100%);
-      border-radius: 2px 2px 0 0;
-      min-height: 8px;
-      position: relative;
-      transition: opacity 0.2s ease;
+    .stacked-area-chart canvas {
+      width: 100% !important;
+      height: 100% !important;
     }
 
-    .account-bar:hover {
-      opacity: 0.8;
-      cursor: pointer;
+    /* Chart Loading Spinner */
+    .chart-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100%;
+      gap: 12px;
+      color: #6c7688;
+      font-size: 14px;
+      font-weight: 500;
     }
+
+    .chart-spinner .spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+
 
 
 
@@ -1110,6 +1125,9 @@ document.addEventListener('DOMContentLoaded', function() {
   /* color intentionally omitted to allow label override */
 }
 </style>
+
+<!-- Chart.js for stacked area chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="layout-container">
@@ -1379,13 +1397,13 @@ document.addEventListener('DOMContentLoaded', function() {
                          <path fill-rule="evenodd" clip-rule="evenodd" d="M16 7.82679C16 7.94141 15.9803 8.05518 15.9417 8.16312L13.974 13.6727C13.6898 14.4687 12.9358 15 12.0906 15H2C0.895431 15 0 14.1046 0 13V3C0 1.89543 0.89543 1 2 1H4.58579C4.851 1 5.10536 1.10536 5.29289 1.29289L6 2H11C12.1046 2 13 2.89543 13 4V5H14C15.1046 5 16 5.89543 16 7V7.82679ZM3.75 6.5C3.33579 6.5 3 6.16421 3 5.75C3 5.33579 3.33579 5 3.75 5H11.5V4C11.5 3.72386 11.2761 3.5 11 3.5H6C5.60218 3.5 5.22064 3.34196 4.93934 3.06066L4.37868 2.5H2C1.72386 2.5 1.5 2.72386 1.5 3V13C1.5 13.2761 1.72386 13.5 2 13.5H12.0906C12.3019 13.5 12.4904 13.3672 12.5614 13.1682L14.5 7.74018V7C14.5 6.72386 14.2761 6.5 14 6.5H3.75Z" fill="currentColor"/>
                        </svg>
                        Groups
-                     </div>
+              </div>
                      <button class="group-item active" data-group="all">All accounts</button>
                      <button class="group-item" data-group="connected">Connected accounts</button>
                      <button class="group-item" data-group="express">Express accounts</button>
                      <button class="group-item" data-group="standard">Standard accounts</button>
                      <button class="group-item" data-group="custom">Custom accounts</button>
-                   </div>
+           </div>
 
                    <!-- Column 2 - Accounts Section -->
                    <div class="accounts-section">
@@ -1481,16 +1499,22 @@ document.addEventListener('DOMContentLoaded', function() {
              </div>
            </div>
 
-           <!-- Revenue Breakdown Chart -->
-           <div class="revenue-breakdown">
-             <div class="chart-header">
-               <h3 class="chart-title">Revenue by Account</h3>
-               <div class="chart-subtitle">Last 30 days</div>
-             </div>
-             <div class="stacked-revenue-chart" id="revenueChart">
-               <!-- Stacked line chart will be rendered here -->
-             </div>
-           </div>
+                     <!-- Revenue Breakdown Chart -->
+          <div class="revenue-breakdown">
+            <div class="chart-header">
+              <h3 class="chart-title">Revenue by Account</h3>
+            </div>
+            <div class="stacked-area-chart">
+              <div class="chart-spinner" id="chartSpinner">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="spinner">
+                  <circle cx="12" cy="12" r="10" stroke="#e5e7eb" stroke-width="2"/>
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="#635bff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>Loading chart...</span>
+              </div>
+              <canvas id="revenueAreaChart" width="800" height="160" style="display: none;"></canvas>
+            </div>
+          </div>
          </div>
 
          <!-- Dashboard Content Grid -->
@@ -1584,9 +1608,13 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
     function switchToSubAccount(subAccountId) {
+      console.log('🔄 switchToSubAccount called with ID:', subAccountId);
       if (window.OrgDataManager.switchToSubAccount(subAccountId)) {
+        console.log('✅ OrgDataManager.switchToSubAccount succeeded');
         // No page reload needed - account switcher handles the transition
         updateAccountContext();
+      } else {
+        console.warn('❌ OrgDataManager.switchToSubAccount failed');
       }
     }
     
@@ -1594,29 +1622,138 @@ document.addEventListener('DOMContentLoaded', function() {
       const switcherData = window.OrgDataManager.getAccountSwitcherData();
       const currentAccount = switcherData.currentAccount;
       
-      if (!currentAccount) return;
+      console.log('🔍 updateAccountContext called');
+      console.log('📊 switcherData:', switcherData);
+      console.log('👤 currentAccount:', currentAccount);
+      console.log('🏢 isAggregate:', currentAccount?.isAggregate);
+      
+      if (!currentAccount) {
+        console.warn('❌ No current account found');
+        return;
+      }
       
       const titleElement = document.getElementById('account-context-title');
       const subtitleElement = document.getElementById('account-context-subtitle');
       
-      if (currentAccount.isAggregate) {
+      // Check if we have title elements (they might not exist on this page)
+      if (titleElement && subtitleElement) {
+        // Determine if this is aggregate view - check for explicit true value or 'all_accounts' ID
+        const isAggregateView = currentAccount.isAggregate === true || currentAccount.id === 'all_accounts';
+        
+        if (isAggregateView) {
         // For aggregate view, show organization name and account count
-        const accountCount = switcherData.accounts.filter(acc => !acc.isAggregate).length;
+          const accountCount = switcherData.accounts.filter(acc => acc.isAggregate !== true && acc.id !== 'all_accounts').length;
         titleElement.textContent = currentAccount.name;
         subtitleElement.textContent = `Viewing ${accountCount} account${accountCount !== 1 ? 's' : ''} in this organization`;
+          
+          console.log('🏢 Showing aggregate view');
+          // Show aggregate view: accounts card, filters, and all account data
+          showAggregateView();
       } else {
         // For individual accounts, show account name and organization
         titleElement.textContent = currentAccount.name;
         subtitleElement.textContent = `Account in ${currentAccount.type}`;
+          
+          console.log('👤 Showing individual account view for:', currentAccount.name);
+          // Show individual account view: hide accounts card, filters, show only this account's data
+          showIndividualAccountView(currentAccount);
+        }
+      } else {
+        // If title elements don't exist, just handle the view switching
+        console.log('⚠️ Title elements not found, just switching view mode');
+        
+        // Determine if this is aggregate view - check for explicit true value or 'all_accounts' ID
+        const isAggregateView = currentAccount.isAggregate === true || currentAccount.id === 'all_accounts';
+        
+        if (isAggregateView) {
+          console.log('🏢 Showing aggregate view');
+          showAggregateView();
+        } else {
+          console.log('👤 Showing individual account view for:', currentAccount.name);
+          showIndividualAccountView(currentAccount);
+        }
       }
+    }
+    
+    function showAggregateView() {
+      console.log('🏢 showAggregateView() executing');
+      
+      // Show the accounts card
+      const accountsCard = document.querySelector('.accounts-card');
+      if (accountsCard) {
+        accountsCard.style.display = '';
+        console.log('✅ Showed accounts card');
+      }
+      
+      // Show the dashboard filters
+      const dashboardFilters = document.querySelector('.dashboard-filters');
+      if (dashboardFilters) {
+        dashboardFilters.style.display = '';
+        console.log('✅ Showed dashboard filters');
+      }
+      
+      // Restore metrics grid layout for 3 cards
+      const metricsCards = document.querySelector('.metrics-cards');
+      if (metricsCards) {
+        metricsCards.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        console.log('✅ Set grid to 3 columns');
+      }
+      
+      // Restore chart title for aggregate view
+      const chartTitle = document.querySelector('.chart-title');
+      if (chartTitle) {
+        chartTitle.textContent = 'Revenue by Account';
+        console.log('✅ Set chart title to "Revenue by Account"');
+      }
+      
+      // Update metrics for all accounts (existing behavior)
+      updateMetricsGrid([]);
+    }
+    
+    function showIndividualAccountView(currentAccount) {
+      console.log('👤 showIndividualAccountView() executing for:', currentAccount.name);
+      
+      // Hide the accounts card - not relevant for individual account view
+      const accountsCard = document.querySelector('.accounts-card');
+      if (accountsCard) {
+        accountsCard.style.display = 'none';
+        console.log('✅ Hidden accounts card');
+      }
+      
+      // Hide the dashboard filters - not relevant for individual account view
+      const dashboardFilters = document.querySelector('.dashboard-filters');
+      if (dashboardFilters) {
+        dashboardFilters.style.display = 'none';
+        console.log('✅ Hidden dashboard filters');
+      }
+      
+      // Adjust metrics grid layout for 2 cards instead of 3
+      const metricsCards = document.querySelector('.metrics-cards');
+      if (metricsCards) {
+        metricsCards.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        console.log('✅ Set grid to 2 columns');
+      }
+      
+      // Update chart title for individual account
+      const chartTitle = document.querySelector('.chart-title');
+      if (chartTitle) {
+        chartTitle.textContent = 'Account Revenue';
+        console.log('✅ Set chart title to "Account Revenue"');
+      }
+      
+      // Update metrics for just this account
+      console.log('📊 Updating metrics for account ID:', currentAccount.id);
+      updateMetricsGrid([currentAccount.id]);
     }
     
     // Metrics data generation
     function generateMetricsData(accountIds = []) {
       const allAccounts = window.OrgDataManager?.getAllSubAccounts?.() || [];
+      // Filter out aggregate accounts (like 'all') from counting
+      const realAccounts = allAccounts.filter(acc => !acc.isAggregate);
       const filteredAccounts = accountIds.length > 0 
-        ? allAccounts.filter(account => accountIds.includes(account.id))
-        : allAccounts;
+        ? realAccounts.filter(account => accountIds.includes(account.id))
+        : realAccounts;
       
       // Generate realistic metrics based on filtered accounts
       const accountCount = filteredAccounts.length;
@@ -1674,7 +1811,19 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       if (badgeElement && badgeContainer) {
-        if (isFiltered) {
+        // Check if we're in a filtered state (similar to reporting page logic)
+        const currentGroup = window.dashboardFilter?.currentGroup;
+        const isAllGroup = !currentGroup || currentGroup === 'all';
+        
+        // Get total account count (excluding aggregates) to check if all are selected
+        const allRealAccounts = window.OrgDataManager?.getAllSubAccounts?.().filter(acc => !acc.isAggregate) || [];
+        const allAccountsSelected = count === allRealAccounts.length;
+        
+        // Only show filtered badge if:
+        // 1. We have a filter applied (isFiltered = true)
+        // 2. We're not in the 'all' group
+        // 3. Not all accounts are selected
+        if (isFiltered && !isAllGroup && !allAccountsSelected) {
           badgeElement.textContent = 'Filtered';
           badgeContainer.style.display = 'inline-flex';
         } else {
@@ -1696,11 +1845,15 @@ document.addEventListener('DOMContentLoaded', function() {
       updateRevenueChart(selectedAccountIds);
     }
 
+    let revenueAreaChart = null;
+
     function generateAccountRevenueData(accountIds = []) {
       const allAccounts = window.OrgDataManager?.getAllSubAccounts?.() || [];
+      // Filter out aggregate accounts (like 'all') from revenue data
+      const realAccounts = allAccounts.filter(acc => !acc.isAggregate);
       const filteredAccounts = accountIds.length > 0 
-        ? allAccounts.filter(account => accountIds.includes(account.id))
-        : allAccounts;
+        ? realAccounts.filter(account => accountIds.includes(account.id))
+        : realAccounts;
       
       const accountsWithRevenue = filteredAccounts.map(account => ({
         id: account.id,
@@ -1714,31 +1867,141 @@ document.addEventListener('DOMContentLoaded', function() {
         .slice(0, 10);
     }
 
-    function updateRevenueChart(selectedAccountIds = []) {
-      const chartContainer = document.getElementById('revenueChart');
-      if (!chartContainer) return;
+    function generateTimeSeriesData(accounts) {
+      // Generate 30 days of data
+      const days = 30;
+      const labels = [];
+      const today = new Date();
       
-      const accountData = generateAccountRevenueData(selectedAccountIds);
-      const maxRevenue = Math.max(...accountData.map(a => a.revenue));
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      }
       
-      // Clear existing chart
-      chartContainer.innerHTML = '';
-      
-      // Generate bars for each account
-      accountData.forEach(account => {
-        const bar = document.createElement('div');
-        bar.className = 'account-bar';
-        bar.setAttribute('data-account', account.name);
+      // Generate datasets for each account
+      const datasets = accounts.map((account, index) => {
+        const baseRevenue = account.revenue / days;
+        const data = [];
         
-        // Calculate height as percentage of max revenue
-        const heightPercent = (account.revenue / maxRevenue) * 100;
-        bar.style.height = `${Math.max(heightPercent, 8)}%`;
+        // Generate daily revenue data with some variance
+        for (let i = 0; i < days; i++) {
+          const variance = (Math.random() - 0.5) * 0.4; // ±20% variance
+          const dailyRevenue = Math.max(0, baseRevenue * (1 + variance));
+          data.push(dailyRevenue);
+        }
         
-        // Add tooltip
-        bar.title = `${account.name}: $${account.revenue.toLocaleString()}`;
+        const colors = [
+          '#635BFF', '#7C3AED', '#059669', '#DC2626', '#EA580C',
+          '#0891B2', '#7C2D12', '#BE185D', '#1F2937', '#374151'
+        ];
         
-        chartContainer.appendChild(bar);
+        return {
+          label: account.name,
+          data: data,
+          backgroundColor: colors[index % colors.length] + '40', // 25% opacity
+          borderColor: colors[index % colors.length],
+          borderWidth: 1,
+          fill: true,
+          tension: 0.1
+        };
       });
+      
+      return { labels, datasets };
+    }
+
+    function showChartSpinner() {
+      const spinner = document.getElementById('chartSpinner');
+      const canvas = document.getElementById('revenueAreaChart');
+      
+      if (spinner) {
+        spinner.style.display = 'flex';
+      }
+      if (canvas) {
+        canvas.style.display = 'none';
+      }
+    }
+
+    function hideChartSpinner() {
+      const spinner = document.getElementById('chartSpinner');
+      const canvas = document.getElementById('revenueAreaChart');
+      
+      if (spinner) {
+        spinner.style.display = 'none';
+      }
+      if (canvas) {
+        canvas.style.display = 'block';
+      }
+    }
+
+    function updateRevenueChart(selectedAccountIds = []) {
+      const canvas = document.getElementById('revenueAreaChart');
+      if (!canvas) return;
+      
+      // Show spinner while loading
+      showChartSpinner();
+      
+      // Simulate loading delay for better UX
+      setTimeout(() => {
+        const accountData = generateAccountRevenueData(selectedAccountIds);
+        const chartData = generateTimeSeriesData(accountData);
+        
+        // Destroy existing chart if it exists
+        if (revenueAreaChart) {
+          revenueAreaChart.destroy();
+        }
+        
+        // Create new stacked area chart
+        const ctx = canvas.getContext('2d');
+        revenueAreaChart = new Chart(ctx, {
+          type: 'line',
+          data: chartData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                display: false, // Hide x-axis labels
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                stacked: true,
+                display: false, // Hide y-axis labels
+                grid: {
+                  display: false
+                },
+                beginAtZero: true
+              }
+            },
+            plugins: {
+              legend: {
+                display: false // Hide legend
+              },
+              tooltip: {
+                enabled: false // Disable tooltips completely
+              }
+            },
+            elements: {
+              point: {
+                radius: 0,
+                hoverRadius: 4
+              },
+              line: {
+                borderWidth: 1
+              }
+            },
+            interaction: {
+              mode: 'index',
+              intersect: false
+            }
+          }
+        });
+        
+        // Hide spinner when chart is ready
+        hideChartSpinner();
+      }, 300); // 300ms delay to show spinner briefly
     }
 
     // Dashboard functionality

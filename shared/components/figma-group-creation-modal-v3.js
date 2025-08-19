@@ -535,18 +535,7 @@ class FigmaGroupCreationModalV3 {
             !searchTerm || account.name.toLowerCase().includes(searchTerm)
         );
         
-        // When in edit mode (managing an existing group), sort selected accounts to the top
-        let sortedAccounts = filteredAccounts;
-        if (this.isEditMode) {
-            sortedAccounts = [
-                // Selected accounts first (in their original order)
-                ...filteredAccounts.filter(account => this.selectedAccounts.has(account.id)),
-                // Then unselected accounts
-                ...filteredAccounts.filter(account => !this.selectedAccounts.has(account.id))
-            ];
-        }
-        
-        container.innerHTML = sortedAccounts.map(account => `
+        container.innerHTML = filteredAccounts.map(account => `
             <div class="account-item" data-account-id="${account.id}">
                 <div class="checkbox-container">
                     <input type="checkbox" ${this.selectedAccounts.has(account.id) ? 'checked' : ''}>
