@@ -161,52 +161,7 @@
       overflow: hidden;
     }
 
-    /* Overlay metrics on top of the hero container */
-    .dashboard-metrics {
-      position: absolute;
-      top: 24px;
-      left: 24px;
-      z-index: 2;
-      display: flex;
-      gap: 48px;
-      background: transparent;
-      border: none;
-    }
 
-    .metric-card {
-      flex: none;
-      padding: 0;
-      border: none;
-    }
-
-    .metric-label {
-      font-size: 12px;
-      font-weight: 500;
-      color: #6c7688;
-      margin-bottom: 4px;
-      text-transform: none;
-    }
-
-    .metric-value {
-      font-size: 28px;
-      font-weight: 600;
-      color: #0c111d;
-      margin-bottom: 0;
-      line-height: 1.1;
-    }
-
-    .metric-change {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .metric-change.positive {
-      color: #027a48;
-    }
-
-    .metric-change.negative {
-      color: #d92d20;
-    }
 
     /* Metrics Grid */
     .metrics-grid {
@@ -1427,20 +1382,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
          <!-- Hero Dashboard Section -->
          <div class="dashboard-hero">
-           <div class="dashboard-metrics">
-             <div class="metric-card">
-               <div class="metric-label">Gross volume</div>
-               <div class="metric-value" id="grossVolumeMetric">$110,600</div>
-               <div class="metric-change positive">+12.3% from last period</div>
-             </div>
-             <div class="metric-card">
-               <div class="metric-label">Yesterday</div>
-               <div class="metric-value" id="yesterdayMetric">$92,040</div>
-               <div class="metric-change negative">-5.2% from previous day</div>
-             </div>
-           </div>
-           
-                               <!-- Metrics Grid -->
+           <!-- Metrics Grid -->
           <div class="metrics-grid">
             <div class="metric-card revenue-card">
               <div class="metric-header">
@@ -1736,22 +1678,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
           // Update metrics grid to reflect selected accounts
           updateMetricsGrid(selectedIds);
-
-          // Also update the dashboard header metrics for consistency
-          const selectedCount = selectedIds.length;
-          const totalAccounts = window.OrgDataManager?.getAllSubAccounts?.()?.length || 10;
-          const accountCount = selectedCount > 0 ? selectedCount : totalAccounts;
-          const multiplier = accountCount / totalAccounts;
-          
-          const baseGross = 110600;
-          const baseYesterday = 92040;
-          const grossVolume = `$${Math.round(baseGross * multiplier).toLocaleString()}`;
-          const yesterday = `$${Math.round(baseYesterday * multiplier).toLocaleString()}`;
-
-          const grossVolumeEl = document.getElementById('grossVolumeMetric');
-          const yesterdayEl = document.getElementById('yesterdayMetric');
-          if (grossVolumeEl) grossVolumeEl.textContent = grossVolume;
-          if (yesterdayEl) yesterdayEl.textContent = yesterday;
 
           // Match reporting behavior: update trigger label using component logic
           this.updateTriggerBasedOnSelection();
