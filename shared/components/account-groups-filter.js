@@ -362,6 +362,14 @@ class AccountGroupsFilter {
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
     
+    // Calculate and set dynamic max-height based on actual position
+    const finalPopoverTop = triggerRect.top + top;
+    const availableHeight = viewportHeight - finalPopoverTop - margin;
+    const constrainedMaxHeight = Math.max(minHeight, availableHeight);
+    
+    // Override CSS max-height with position-aware calculation
+    popover.style.maxHeight = `${constrainedMaxHeight}px`;
+    
     // Debug positioning (can be removed later)
     console.log('Popover positioning:', {
       viewportHeight,
@@ -370,6 +378,9 @@ class AccountGroupsFilter {
       spaceAbove,
       popoverHeight,
       calculatedTop: top,
+      finalPopoverTop,
+      availableHeight,
+      constrainedMaxHeight,
       positioning: spaceBelow >= popoverHeight + 4 ? 'below' : spaceAbove >= popoverHeight + 4 ? 'above' : spaceBelow >= spaceAbove ? 'below-constrained' : 'above-constrained'
     });
     
