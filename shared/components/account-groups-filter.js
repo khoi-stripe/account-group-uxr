@@ -306,15 +306,7 @@ class AccountGroupsFilter {
     // Calculate dynamic height based on content and viewport
     const { height: optimalHeight, canPositionBelow } = this.calculateOptimalHeight(triggerRect, viewportHeight, margin, popover);
     
-    // Debug logging
-    console.log('Height calculation:', {
-      optimalHeight,
-      canPositionBelow,
-      spaceBelow: viewportHeight - triggerRect.bottom - margin,
-      spaceAbove: triggerRect.top - margin,
-      triggerRect,
-      viewportHeight
-    });
+    // Height calculation complete
     
     // Calculate position based on locked alignment mode but current trigger size
     let left;
@@ -341,7 +333,7 @@ class AccountGroupsFilter {
     popover.style.top = `${top}px`;
     popover.style.height = `${optimalHeight}px`;
     
-    console.log('Applied positioning:', { left, top, height: optimalHeight });
+    // Positioning applied
     
     // Reset repositioning flag
     this.isRepositioning = false;
@@ -369,27 +361,14 @@ class AccountGroupsFilter {
       item.style.display !== 'none'
     ).length;
     
-    // Debug account count
-    console.log('Account count calculation:', {
-      totalItems: accountItems.length,
-      visibleAccountCount,
-      accountItemHeight
-    });
+    // Account count calculated
     
     const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
     
     // Calculate ideal height based on content
     const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
     
-    // Debug content calculation
-    console.log('Content calculation:', {
-      searchContainerHeight,
-      selectAllHeight,
-      accountsListHeight,
-      footerHeight,
-      groupsSectionPadding,
-      contentBasedHeight
-    });
+    // Content calculation complete
     
     // Apply constraints
     const minHeight = 360; // Updated minimum height for usability
@@ -398,13 +377,7 @@ class AccountGroupsFilter {
     const maxHeightBelow = Math.max(minHeight, spaceBelow - 4); // 4px gap
     const maxHeightAbove = Math.max(minHeight, spaceAbove - 4); // 4px gap
     
-    console.log('Space calculation:', {
-      spaceBelow,
-      spaceAbove,
-      maxHeightBelow,
-      maxHeightAbove,
-      minHeight
-    });
+    // Space calculation complete
     
     // Determine best position based on content needs and available space
     let canPositionBelowFinal;
@@ -557,6 +530,12 @@ class AccountGroupsFilter {
     this.updateSelectionCount();
     this.updateSelectAllState();
     this.checkAccountsListOverflow();
+    
+    // Recalculate popover height when content changes (group selection)
+    const popover = document.getElementById(this.options.popoverId);
+    if (popover && popover.style.display === 'flex') {
+      this.positionPopover();
+    }
     
     // Do not update trigger label until user clicks Apply
   }
