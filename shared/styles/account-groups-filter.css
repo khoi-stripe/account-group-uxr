@@ -54,18 +54,20 @@
   border-radius: 12px;
   background: #FFF;
   box-shadow: 0 15px 35px 0 rgba(48, 49, 61, 0.08), 0 5px 15px 0 rgba(0, 0, 0, 0.12);
-  overflow: hidden;
+  overflow: hidden !important;
+  height: auto !important; /* Let content determine height */
   min-height: 360px !important; /* Minimum height */
   max-height: calc(100vh - 48px) !important; /* Expand to viewport height with 24px margin on top and bottom */
-  width: 532px; /* Fixed total width */
-  display: flex;
-  flex-direction: row; /* Two-column layout */
-  position: absolute;
-  z-index: 2147483647; /* Ensure always above all UI elements */
-  text-align: left; /* Override any inherited text alignment */
+  width: 532px !important; /* Fixed total width */
+  display: flex !important;
+  flex-direction: row !important; /* Two-column layout */
+  position: absolute !important;
+  z-index: 2147483647 !important; /* Ensure always above all UI elements */
+  text-align: left !important; /* Override any inherited text alignment */
   /* top, left, margin-top will be set by JavaScript for smart positioning */
   /* Debug border to see if height is correct */
-  border: 2px solid red !important;
+  border: 3px solid red !important;
+  box-sizing: border-box !important;
 }
 
 /* Removed popover-content wrapper - now using direct two-column layout */
@@ -152,15 +154,18 @@
 
 /* Column 2 - Accounts Section (Full height with Search + Select All + List + Footer) */
 .account-groups-popover .accounts-section {
-  flex: 1;
-  height: 100%; /* Use full available height */
-  width: 332px; /* Remaining width after 200px groups section */
-  display: flex;
-  flex-direction: column;
-  background: white;
-  overflow: hidden; /* Contain scrolling to accounts-list */
-  text-align: left; /* Override any inherited text alignment */
-  position: relative; /* For absolute positioning of bottom shadow */
+  flex: 1 !important;
+  height: 100% !important; /* Use full available height */
+  min-height: 0 !important; /* Allow shrinking */
+  max-height: 100% !important; /* Don't exceed parent */
+  width: 332px !important; /* Remaining width after 200px groups section */
+  display: flex !important;
+  flex-direction: column !important;
+  background: white !important;
+  overflow: hidden !important; /* Contain scrolling to accounts-list */
+  text-align: left !important; /* Override any inherited text alignment */
+  position: relative !important; /* For absolute positioning of bottom shadow */
+  box-sizing: border-box !important;
 }
 
 .filter-search-container {
