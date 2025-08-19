@@ -373,25 +373,37 @@ class AccountGroupsFilter {
     
     // Apply constraints
     const minHeight = 360; // Updated minimum height for usability
-    const maxViewportHeight = viewportHeight - (margin * 2); // Max height considering viewport margins
-    const idealHeight = Math.max(minHeight, Math.min(contentBasedHeight, maxViewportHeight));
     
-    // Determine if we can position below trigger
-    const canPositionBelow = spaceBelow >= idealHeight + 4; // 4px gap
-    const canPositionAbove = spaceAbove >= idealHeight + 4;
+    // Calculate what height would work in each position
+    const maxHeightBelow = Math.max(minHeight, spaceBelow - 4); // 4px gap
+    const maxHeightAbove = Math.max(minHeight, spaceAbove - 4); // 4px gap
     
-    let finalHeight = idealHeight;
-    let canPositionBelowFinal = canPositionBelow;
+    // Determine best position based on content needs and available space
+    let canPositionBelowFinal;
+    let finalHeight;
     
-    // If ideal height doesn't fit in either position, use the position with more space
-    // and adjust height to fit
-    if (!canPositionBelow && !canPositionAbove) {
-      if (spaceBelow >= spaceAbove) {
-        finalHeight = Math.max(minHeight, spaceBelow - 4);
+    // First, check if content fits comfortably in either position
+    if (contentBasedHeight <= maxHeightBelow && contentBasedHeight <= maxHeightAbove) {
+      // Content fits in both positions - prefer below
+      canPositionBelowFinal = true;
+      finalHeight = contentBasedHeight;
+    } else if (contentBasedHeight <= maxHeightBelow) {
+      // Content fits below but not above
+      canPositionBelowFinal = true;
+      finalHeight = contentBasedHeight;
+    } else if (contentBasedHeight <= maxHeightAbove) {
+      // Content fits above but not below
+      canPositionBelowFinal = false;
+      finalHeight = contentBasedHeight;
+    } else {
+      // Content doesn't fit perfectly in either position
+      // Choose the position with more available space
+      if (maxHeightBelow >= maxHeightAbove) {
         canPositionBelowFinal = true;
+        finalHeight = maxHeightBelow;
       } else {
-        finalHeight = Math.max(minHeight, spaceAbove - 4);
         canPositionBelowFinal = false;
+        finalHeight = maxHeightAbove;
       }
     }
     
