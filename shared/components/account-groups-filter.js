@@ -300,9 +300,13 @@ class AccountGroupsFilter {
     const currentTriggerHeight = triggerRect.height;
     
     const popoverWidth = 532;
-    const popoverHeight = 360;
     const viewportHeight = window.innerHeight;
-    const margin = 16;
+    const margin = 24; // 24px margin from viewport edges (matching account switcher)
+    
+    // Calculate dynamic height based on viewport and content
+    const minHeight = 360; // Minimum height
+    const maxAvailableHeight = viewportHeight - (margin * 2); // 24px margin top and bottom
+    const idealHeight = Math.max(minHeight, Math.min(maxAvailableHeight, 600)); // Cap at reasonable max
     
     // Calculate position based on locked alignment mode but current trigger size
     let left;
@@ -316,23 +320,65 @@ class AccountGroupsFilter {
         break;
     }
     
-    // Calculate vertical position
-    let top = currentTriggerHeight + 4; // 4px below current trigger
+    // Calculate vertical position with smart positioning
+    const spaceBelow = viewportHeight - triggerRect.bottom - margin;
+    const spaceAbove = triggerRect.top - margin;
     
-    // Check if popover would go off the bottom of viewport
-    if (triggerRect.bottom + popoverHeight + 4 > viewportHeight - margin) {
-      // Position above trigger instead
-      top = -popoverHeight - 4;
+    let top;
+    let finalHeight = idealHeight;
+    
+    // Prefer positioning below trigger if there's enough space
+    if (spaceBelow >= idealHeight + 4) {
+      top = currentTriggerHeight + 4; // 4px below trigger
+    }
+    // If not enough space below, try above
+    else if (spaceAbove >= idealHeight + 4) {
+      top = -idealHeight - 4; // 4px above trigger
+    }
+    // If neither position works perfectly, use the position with more space
+    // and adjust height to fit
+    else if (spaceBelow >= spaceAbove) {
+      top = currentTriggerHeight + 4; // Position below
+      finalHeight = Math.max(minHeight, spaceBelow - 4);
+    } else {
+      // Position above with adjusted height
+      finalHeight = Math.max(minHeight, spaceAbove - 4);
+      top = -finalHeight - 4;
     }
     
-    // Ensure popover doesn't go off the top
-    if (triggerRect.top + top < margin) {
+    // Final safety check: ensure popover doesn't go beyond viewport bounds
+    const finalPopoverTop = triggerRect.top + top;
+    const finalPopoverBottom = finalPopoverTop + finalHeight;
+    
+    // If popover would be cut off at the bottom, position it at the bottom with margin
+    if (finalPopoverBottom > viewportHeight - margin) {
+      finalHeight = Math.max(minHeight, viewportHeight - finalPopoverTop - margin);
+    }
+    
+    // If popover would be cut off at the top, position it at the top with margin  
+    if (finalPopoverTop < margin) {
       top = margin - triggerRect.top;
+      finalHeight = Math.max(minHeight, viewportHeight - margin - triggerRect.top - top);
     }
     
     // Apply positioning (relative to trigger)
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
+    
+    // Apply dynamic height
+    popover.style.height = `${finalHeight}px`;
+    
+    // Update column heights to match
+    const groupsSection = popover.querySelector('.groups-section');
+    const accountsSection = popover.querySelector('.accounts-section');
+    
+    if (groupsSection) {
+      groupsSection.style.height = `${finalHeight}px`;
+    }
+    
+    if (accountsSection) {
+      accountsSection.style.height = `${finalHeight}px`;
+    }
     
     // Reset repositioning flag
     this.isRepositioning = false;
