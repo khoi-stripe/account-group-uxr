@@ -306,6 +306,16 @@ class AccountGroupsFilter {
     // Calculate dynamic height based on content and viewport
     const { height: optimalHeight, canPositionBelow } = this.calculateOptimalHeight(triggerRect, viewportHeight, margin);
     
+    // Debug logging
+    console.log('Height calculation:', {
+      optimalHeight,
+      canPositionBelow,
+      spaceBelow: viewportHeight - triggerRect.bottom - margin,
+      spaceAbove: triggerRect.top - margin,
+      triggerRect,
+      viewportHeight
+    });
+    
     // Calculate position based on locked alignment mode but current trigger size
     let left;
     switch (this.alignmentMode) {
@@ -318,7 +328,7 @@ class AccountGroupsFilter {
         break;
     }
     
-    // Calculate vertical position based on optimal height and available space
+    // Calculate vertical position - DON'T override the height calculation's positioning decision
     let top;
     if (canPositionBelow) {
       top = currentTriggerHeight + 4; // 4px below trigger
@@ -326,20 +336,12 @@ class AccountGroupsFilter {
       top = -optimalHeight - 4; // Position above trigger
     }
     
-    // Final safety check - ensure popover doesn't go off screen
-    const finalTop = triggerRect.top + top;
-    const finalBottom = finalTop + optimalHeight;
-    
-    if (finalTop < margin) {
-      top = margin - triggerRect.top;
-    } else if (finalBottom > viewportHeight - margin) {
-      top = (viewportHeight - margin - optimalHeight) - triggerRect.top;
-    }
-    
-    // Apply positioning and height (relative to trigger)
+    // Apply positioning and height (relative to trigger) - NO safety overrides
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
     popover.style.height = `${optimalHeight}px`;
+    
+    console.log('Applied positioning:', { left, top, height: optimalHeight });
     
     // Reset repositioning flag
     this.isRepositioning = false;
@@ -366,10 +368,28 @@ class AccountGroupsFilter {
     const visibleAccountCount = Array.from(accountItems).filter(item => 
       item.style.display !== 'none'
     ).length;
+    
+    // Debug account count
+    console.log('Account count calculation:', {
+      totalItems: accountItems.length,
+      visibleAccountCount,
+      accountItemHeight
+    });
+    
     const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
     
     // Calculate ideal height based on content
     const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
+    
+    // Debug content calculation
+    console.log('Content calculation:', {
+      searchContainerHeight,
+      selectAllHeight,
+      accountsListHeight,
+      footerHeight,
+      groupsSectionPadding,
+      contentBasedHeight
+    });
     
     // Apply constraints
     const minHeight = 360; // Updated minimum height for usability
@@ -377,6 +397,14 @@ class AccountGroupsFilter {
     // Calculate what height would work in each position
     const maxHeightBelow = Math.max(minHeight, spaceBelow - 4); // 4px gap
     const maxHeightAbove = Math.max(minHeight, spaceAbove - 4); // 4px gap
+    
+    console.log('Space calculation:', {
+      spaceBelow,
+      spaceAbove,
+      maxHeightBelow,
+      maxHeightAbove,
+      minHeight
+    });
     
     // Determine best position based on content needs and available space
     let canPositionBelowFinal;
