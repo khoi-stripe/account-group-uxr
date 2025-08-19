@@ -300,9 +300,14 @@ class AccountGroupsFilter {
     const currentTriggerHeight = triggerRect.height;
     
     const popoverWidth = 532;
-    const popoverHeight = 360;
     const viewportHeight = window.innerHeight;
-    const margin = 16;
+    const margin = 24; // Margin from viewport edge (matches our CSS calc)
+    
+    // Calculate the actual popover height based on available space
+    const maxAvailableHeight = viewportHeight - (margin * 2); // 24px margin top and bottom
+    const minHeight = 360;
+    const actualPopoverHeight = Math.min(maxAvailableHeight, Math.max(minHeight, 360));
+    const popoverHeight = actualPopoverHeight;
     
     // Calculate position based on locked alignment mode but current trigger size
     let left;
@@ -316,18 +321,27 @@ class AccountGroupsFilter {
         break;
     }
     
-    // Calculate vertical position
-    let top = currentTriggerHeight + 4; // 4px below current trigger
+    // Calculate vertical position with smart positioning
+    const spaceBelow = viewportHeight - triggerRect.bottom - margin;
+    const spaceAbove = triggerRect.top - margin;
     
-    // Check if popover would go off the bottom of viewport
-    if (triggerRect.bottom + popoverHeight + 4 > viewportHeight - margin) {
-      // Position above trigger instead
-      top = -popoverHeight - 4;
+    let top;
+    
+    // Prefer positioning below trigger if there's enough space
+    if (spaceBelow >= popoverHeight + 4) {
+      top = currentTriggerHeight + 4; // 4px below trigger
     }
-    
-    // Ensure popover doesn't go off the top
-    if (triggerRect.top + top < margin) {
-      top = margin - triggerRect.top;
+    // If not enough space below, try above
+    else if (spaceAbove >= popoverHeight + 4) {
+      top = -popoverHeight - 4; // 4px above trigger
+    }
+    // If neither position works perfectly, use the position with more space
+    // and let CSS max-height handle the overflow
+    else if (spaceBelow >= spaceAbove) {
+      top = currentTriggerHeight + 4; // Position below and let CSS handle height
+    } else {
+      // Position above, but adjust to not go off screen
+      top = Math.max(-triggerRect.top + margin, -popoverHeight - 4);
     }
     
     // Apply positioning (relative to trigger)
