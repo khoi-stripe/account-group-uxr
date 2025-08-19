@@ -618,20 +618,18 @@ class AccountGroupsFilter {
   }
   
   updateSelectionCount() {
-    // Count only checked accounts that are visible
-    let checkedVisible = 0;
+    // Count ALL checked accounts (visible and hidden) for the selection count display
+    let totalChecked = 0;
     document.querySelectorAll(`#${this.options.accountsListId} .account-item`).forEach(item => {
-      if (item.style.display !== 'none') {
-        const checkbox = item.querySelector('input[type="checkbox"]');
-        if (checkbox && checkbox.checked) {
-          checkedVisible++;
-        }
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      if (checkbox && checkbox.checked) {
+        totalChecked++;
       }
     });
     
     const selectionCount = document.getElementById(`${this.options.namespace}selectionCount`);
     if (selectionCount) {
-      selectionCount.textContent = `${checkedVisible} selected`;
+      selectionCount.textContent = `${totalChecked} selected`;
     }
     
     // Update Apply button state and hide validation error when selection changes
