@@ -361,7 +361,17 @@ class AccountGroupsFilter {
       item.style.display !== 'none'
     ).length;
     
-    // Account count calculated
+    // Debug: Account count calculated
+    console.log('🔍 Height Debug:', {
+      visibleAccountCount,
+      accountItemHeight,
+      accountsListHeight,
+      searchContainerHeight,
+      selectAllHeight,
+      footerHeight,
+      groupsSectionPadding,
+      contentBasedHeight
+    });
     
     const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
     
@@ -377,7 +387,15 @@ class AccountGroupsFilter {
     const maxHeightBelow = Math.max(minHeight, spaceBelow - 4); // 4px gap
     const maxHeightAbove = Math.max(minHeight, spaceAbove - 4); // 4px gap
     
-    // Space calculation complete
+    // Debug: Space and final calculation
+    console.log('📏 Final Height Debug:', {
+      contentBasedHeight,
+      maxHeightBelow,
+      maxHeightAbove,
+      'finalChoice': contentBasedHeight <= maxHeightBelow ? 'contentBased' : 'maxAvailable',
+      'finalHeight': finalHeight,
+      canPositionBelowFinal
+    });
     
     // Determine best position based on content needs and available space
     let canPositionBelowFinal;
