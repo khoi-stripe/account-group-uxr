@@ -1685,11 +1685,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Showed accounts card');
       }
       
-      // Show the dashboard filters
-      const dashboardFilters = document.querySelector('.dashboard-filters');
-      if (dashboardFilters) {
-        dashboardFilters.style.display = '';
-        console.log('✅ Showed dashboard filters');
+      // Show the account groups filter
+      const accountGroupsFilter = document.querySelector('.account-groups-filter-container');
+      if (accountGroupsFilter) {
+        accountGroupsFilter.style.display = '';
+        console.log('✅ Showed account groups filter');
       }
       
       // Restore metrics grid layout for 3 cards
@@ -1720,11 +1720,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Hidden accounts card');
       }
       
-      // Hide the dashboard filters - not relevant for individual account view
-      const dashboardFilters = document.querySelector('.dashboard-filters');
-      if (dashboardFilters) {
-        dashboardFilters.style.display = 'none';
-        console.log('✅ Hidden dashboard filters');
+      // Hide only the account groups filter - keep wireframe filters visible
+      const accountGroupsFilter = document.querySelector('.account-groups-filter-container');
+      if (accountGroupsFilter) {
+        accountGroupsFilter.style.display = 'none';
+        console.log('✅ Hidden account groups filter');
       }
       
       // Adjust metrics grid layout for 2 cards instead of 3
