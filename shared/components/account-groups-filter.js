@@ -300,14 +300,9 @@ class AccountGroupsFilter {
     const currentTriggerHeight = triggerRect.height;
     
     const popoverWidth = 532;
+    const popoverHeight = 360;
     const viewportHeight = window.innerHeight;
-    const margin = 24; // Margin from viewport edge (matches our CSS calc)
-    
-    // Calculate the actual popover height based on available space
-    const maxAvailableHeight = viewportHeight - (margin * 2); // 24px margin top and bottom
-    const minHeight = 360;
-    const actualPopoverHeight = Math.min(maxAvailableHeight, Math.max(minHeight, 360));
-    const popoverHeight = actualPopoverHeight;
+    const margin = 16;
     
     // Calculate position based on locked alignment mode but current trigger size
     let left;
@@ -321,83 +316,23 @@ class AccountGroupsFilter {
         break;
     }
     
-    // Calculate vertical position with smart positioning
-    const spaceBelow = viewportHeight - triggerRect.bottom - margin;
-    const spaceAbove = triggerRect.top - margin;
+    // Calculate vertical position
+    let top = currentTriggerHeight + 4; // 4px below current trigger
     
-    let top;
-    
-    // Prefer positioning below trigger if there's enough space
-    if (spaceBelow >= popoverHeight + 4) {
-      top = currentTriggerHeight + 4; // 4px below trigger
-    }
-    // If not enough space below, try above
-    else if (spaceAbove >= popoverHeight + 4) {
-      top = -popoverHeight - 4; // 4px above trigger
-    }
-    // If neither position works perfectly, use the position with more space
-    // and let CSS max-height handle the overflow
-    else if (spaceBelow >= spaceAbove) {
-      top = currentTriggerHeight + 4; // Position below and let CSS handle height
-    } else {
-      // Position above, but adjust to not go off screen
-      top = Math.max(-triggerRect.top + margin, -popoverHeight - 4);
+    // Check if popover would go off the bottom of viewport
+    if (triggerRect.bottom + popoverHeight + 4 > viewportHeight - margin) {
+      // Position above trigger instead
+      top = -popoverHeight - 4;
     }
     
-    // Final safety check: ensure popover doesn't go beyond viewport bounds
-    const finalPopoverTop = triggerRect.top + top;
-    const finalPopoverBottom = finalPopoverTop + popoverHeight;
-    
-    // If popover would be cut off at the bottom, position it at the bottom with margin
-    if (finalPopoverBottom > viewportHeight - margin) {
-      top = (viewportHeight - margin - popoverHeight) - triggerRect.top;
-    }
-    
-    // If popover would be cut off at the top, position it at the top with margin  
-    if (finalPopoverTop < margin) {
+    // Ensure popover doesn't go off the top
+    if (triggerRect.top + top < margin) {
       top = margin - triggerRect.top;
     }
     
     // Apply positioning (relative to trigger)
     popover.style.left = `${left}px`;
     popover.style.top = `${top}px`;
-    
-    // Calculate and set dynamic max-height based on actual position
-    const finalPopoverTop = triggerRect.top + top;
-    const availableHeight = viewportHeight - finalPopoverTop - margin;
-    const constrainedMaxHeight = Math.max(minHeight, availableHeight);
-    
-    // Override CSS max-height with position-aware calculation
-    popover.style.maxHeight = `${constrainedMaxHeight}px`;
-    
-    // Debug positioning (can be removed later)
-    console.log('Popover positioning:', {
-      viewportHeight,
-      triggerRect: { top: triggerRect.top, bottom: triggerRect.bottom },
-      spaceBelow,
-      spaceAbove,
-      popoverHeight,
-      calculatedTop: top,
-      finalPopoverTop,
-      availableHeight,
-      constrainedMaxHeight,
-      positioning: spaceBelow >= popoverHeight + 4 ? 'below' : spaceAbove >= popoverHeight + 4 ? 'above' : spaceBelow >= spaceAbove ? 'below-constrained' : 'above-constrained'
-    });
-    
-    // Debug computed styles
-    setTimeout(() => {
-      const computedStyles = window.getComputedStyle(popover);
-      console.log('Popover computed styles:', {
-        height: computedStyles.height,
-        minHeight: computedStyles.minHeight,
-        maxHeight: computedStyles.maxHeight,
-        top: computedStyles.top,
-        left: computedStyles.left,
-        overflow: computedStyles.overflow,
-        position: computedStyles.position,
-        actualBounds: popover.getBoundingClientRect()
-      });
-    }, 100);
     
     // Reset repositioning flag
     this.isRepositioning = false;
