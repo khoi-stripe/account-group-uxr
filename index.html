@@ -157,13 +157,18 @@
 
     /* Metrics Grid */
     .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
       margin-bottom: 24px;
       border-radius: 12px;
       padding: 16px;
       background: var(--neutral-50);
+    }
+
+    /* Metrics Cards Container */
+    .metrics-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     /* Metric Card Classes */
@@ -224,6 +229,72 @@
     .metric-badge--neutral {
       background: rgba(107, 114, 128, 0.1);
       color: #6b7280;
+    }
+
+    /* Revenue Breakdown Chart */
+    .revenue-breakdown {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .chart-header {
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--neutral-900);
+      margin: 0 0 4px 0;
+    }
+
+    .chart-subtitle {
+      font-size: 12px;
+      color: var(--neutral-600);
+      margin: 0;
+    }
+
+    .stacked-revenue-chart {
+      height: 120px;
+      position: relative;
+      display: flex;
+      align-items: end;
+      gap: 4px;
+      padding: 8px 0;
+    }
+
+    .account-bar {
+      flex: 1;
+      background: linear-gradient(to top, 
+        #635BFF 0%, 
+        #7C3AED 25%, 
+        #059669 50%, 
+        #DC2626 75%, 
+        #EA580C 100%);
+      border-radius: 2px 2px 0 0;
+      min-height: 8px;
+      position: relative;
+      transition: opacity 0.2s ease;
+    }
+
+    .account-bar:hover {
+      opacity: 0.8;
+      cursor: pointer;
+    }
+
+    .account-bar::after {
+      content: attr(data-account);
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--neutral-600);
+      white-space: nowrap;
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
 
@@ -1374,50 +1445,64 @@ document.addEventListener('DOMContentLoaded', function() {
 
          <!-- Metrics Grid -->
          <div class="metrics-grid">
-            <div class="metric-card revenue-card">
-              <div class="metric-header">
-                <h3 class="metric-title">Total Revenue</h3>
-                <div class="metric-badge metric-badge--positive">
-                  +12.5%
-                </div>
-              </div>
-              <div class="metric-value" id="total-revenue">
-                $142,580
-              </div>
-              <div class="metric-subtitle">
-                Last 30 days
-              </div>
-            </div>
+           <!-- Metrics Cards Container -->
+           <div class="metrics-cards">
+             <div class="metric-card revenue-card">
+               <div class="metric-header">
+                 <h3 class="metric-title">Total Revenue</h3>
+                 <div class="metric-badge metric-badge--positive">
+                   +12.5%
+                 </div>
+               </div>
+               <div class="metric-value" id="total-revenue">
+                 $142,580
+               </div>
+               <div class="metric-subtitle">
+                 Last 30 days
+               </div>
+             </div>
 
-            <div class="metric-card transactions-card">
-              <div class="metric-header">
-                <h3 class="metric-title">Transactions</h3>
-                <div class="metric-badge metric-badge--info">
-                  +8.2%
-                </div>
-              </div>
-              <div class="metric-value" id="total-transactions">
-                2,847
-              </div>
-              <div class="metric-subtitle">
-                Last 30 days
-              </div>
-            </div>
+             <div class="metric-card transactions-card">
+               <div class="metric-header">
+                 <h3 class="metric-title">Transactions</h3>
+                 <div class="metric-badge metric-badge--info">
+                   +8.2%
+                 </div>
+               </div>
+               <div class="metric-value" id="total-transactions">
+                 2,847
+               </div>
+               <div class="metric-subtitle">
+                 Last 30 days
+               </div>
+             </div>
 
-            <div class="metric-card accounts-card">
-              <div class="metric-header">
-                <h3 class="metric-title">Accounts</h3>
-                <div class="metric-badge metric-badge--neutral" id="filtered-accounts-badge" style="display: none;">
-                  <span id="filtered-accounts-count"></span>
-                </div>
-              </div>
-              <div class="metric-value" id="active-accounts">
-                5
-              </div>
-              <div class="metric-subtitle">
-                Current organization
-              </div>
-            </div>
+             <div class="metric-card accounts-card">
+               <div class="metric-header">
+                 <h3 class="metric-title">Accounts</h3>
+                 <div class="metric-badge metric-badge--neutral" id="filtered-accounts-badge" style="display: none;">
+                   <span id="filtered-accounts-count"></span>
+                 </div>
+               </div>
+               <div class="metric-value" id="active-accounts">
+                 5
+               </div>
+               <div class="metric-subtitle">
+                 Current organization
+               </div>
+             </div>
+           </div>
+
+           <!-- Revenue Breakdown Chart -->
+           <div class="revenue-breakdown">
+             <div class="chart-header">
+               <h3 class="chart-title">Revenue by Account</h3>
+               <div class="chart-subtitle">Last 30 days</div>
+             </div>
+             <div class="stacked-revenue-chart" id="revenueChart">
+               <!-- Stacked line chart will be rendered here -->
+             </div>
+           </div>
          </div>
 
          <!-- Dashboard Content Grid -->
@@ -1618,6 +1703,49 @@ document.addEventListener('DOMContentLoaded', function() {
       updateMetricCard('total-revenue', `$${metrics.totalRevenue.toLocaleString()}`, metrics.revenueGrowth);
       updateMetricCard('total-transactions', metrics.totalTransactions.toLocaleString(), metrics.transactionGrowth);
       updateActiveAccountsCard(metrics.activeAccounts, selectedAccountIds.length > 0);
+      
+      // Update revenue chart
+      updateRevenueChart(selectedAccountIds);
+    }
+
+    function generateAccountRevenueData(accountIds = []) {
+      const allAccounts = window.OrgDataManager?.getAllSubAccounts?.() || [];
+      const filteredAccounts = accountIds.length > 0 
+        ? allAccounts.filter(account => accountIds.includes(account.id))
+        : allAccounts;
+      
+      return filteredAccounts.map(account => ({
+        id: account.id,
+        name: account.name,
+        revenue: Math.floor(Math.random() * 50000) + 10000 // Random revenue between 10k-60k
+      }));
+    }
+
+    function updateRevenueChart(selectedAccountIds = []) {
+      const chartContainer = document.getElementById('revenueChart');
+      if (!chartContainer) return;
+      
+      const accountData = generateAccountRevenueData(selectedAccountIds);
+      const maxRevenue = Math.max(...accountData.map(a => a.revenue));
+      
+      // Clear existing chart
+      chartContainer.innerHTML = '';
+      
+      // Generate bars for each account
+      accountData.forEach(account => {
+        const bar = document.createElement('div');
+        bar.className = 'account-bar';
+        bar.setAttribute('data-account', account.name);
+        
+        // Calculate height as percentage of max revenue
+        const heightPercent = (account.revenue / maxRevenue) * 100;
+        bar.style.height = `${Math.max(heightPercent, 8)}%`;
+        
+        // Add tooltip
+        bar.title = `${account.name}: $${account.revenue.toLocaleString()}`;
+        
+        chartContainer.appendChild(bar);
+      });
     }
 
     // Dashboard functionality
