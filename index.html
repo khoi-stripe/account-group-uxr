@@ -1746,33 +1746,110 @@ document.addEventListener('DOMContentLoaded', function() {
       updateMetricsGrid([currentAccount.id]);
     }
     
-    // Metrics data generation
+    // Shared financial data cache (same as reporting page)
+    let accountFinancialDataCache = null;
+
+    // Generate consistent financial data for each account (shared with reporting page)
+    function generateAccountFinancialData() {
+      if (accountFinancialDataCache) {
+        return accountFinancialDataCache;
+      }
+      
+      const accountDataMap = new Map();
+      
+      if (window.OrgDataManager) {
+        // Exclude the aggregate "All accounts" entry so counts reflect real accounts only
+        const accounts = window.OrgDataManager.getAllSubAccounts().filter(acc => !acc.isAggregate);
+          
+        accounts.forEach((account, index) => {
+          // Use account ID to seed random data for consistency
+          const seed = account.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+          const seededRandom1 = (seed * 9301 + 49297) % 233280 / 233280;
+          const seededRandom2 = ((seed + 1) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom3 = ((seed + 2) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom4 = ((seed + 3) * 9301 + 49297) % 233280 / 233280;
+          
+          // Generate consistent financial data for each account
+          const baseRevenue = Math.floor(seededRandom1 * 50000) + 10000; // $10k-$60k base
+          const baseTransactions = Math.floor(seededRandom2 * 800) + 200; // 200-1000 transactions
+          
+          accountDataMap.set(account.id, {
+            name: account.name,
+            revenue: baseRevenue,
+            transactions: baseTransactions,
+            revenueGrowth: ((seededRandom3 * 40) - 10).toFixed(1), // -10% to +30%
+            transactionGrowth: ((seededRandom4 * 30) - 5).toFixed(1) // -5% to +25%
+          });
+        });
+      }
+      
+      // Fallback data if no org manager
+      if (accountDataMap.size === 0) {
+        const fallbackAccounts = [
+          { id: 'mobile-app', name: 'Mobile App' },
+          { id: 'web-platform', name: 'Web Platform' },
+          { id: 'api-services', name: 'API Services' },
+          { id: 'analytics', name: 'Analytics Dashboard' },
+          { id: 'payments', name: 'Payment Processing' }
+        ];
+        
+        fallbackAccounts.forEach((account, index) => {
+          // Use index to create consistent seeded data
+          const seed = index * 1000;
+          const seededRandom1 = (seed * 9301 + 49297) % 233280 / 233280;
+          const seededRandom2 = ((seed + 1) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom3 = ((seed + 2) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom4 = ((seed + 3) * 9301 + 49297) % 233280 / 233280;
+          
+          const baseRevenue = Math.floor(seededRandom1 * 50000) + 10000;
+          const baseTransactions = Math.floor(seededRandom2 * 800) + 200;
+          
+          accountDataMap.set(account.id, {
+            name: account.name,
+            revenue: baseRevenue,
+            transactions: baseTransactions,
+            revenueGrowth: ((seededRandom3 * 40) - 10).toFixed(1),
+            transactionGrowth: ((seededRandom4 * 30) - 5).toFixed(1)
+          });
+        });
+      }
+      
+      // Cache the result
+      accountFinancialDataCache = accountDataMap;
+      return accountDataMap;
+    }
+
+    // Metrics data generation (now uses same logic as reporting page)
     function generateMetricsData(accountIds = []) {
-      const allAccounts = window.OrgDataManager?.getAllSubAccounts?.() || [];
-      // Filter out aggregate accounts (like 'all') from counting
-      const realAccounts = allAccounts.filter(acc => !acc.isAggregate);
-      const filteredAccounts = accountIds.length > 0 
-        ? realAccounts.filter(account => accountIds.includes(account.id))
-        : realAccounts;
+      const accountDataMap = generateAccountFinancialData();
+      let filteredData = Array.from(accountDataMap.values());
       
-      // Generate realistic metrics based on filtered accounts
-      const accountCount = filteredAccounts.length;
-      const baseRevenue = 28500; // Base revenue per account
-      const baseTransactions = 570; // Base transactions per account
+      if (accountIds && accountIds.length > 0) {
+        // Filter to only selected accounts
+        filteredData = accountIds
+          .map(id => accountDataMap.get(id))
+          .filter(data => data); // Remove any undefined values
+      }
       
-      const totalRevenue = accountCount * baseRevenue + Math.floor(Math.random() * 10000);
-      const totalTransactions = accountCount * baseTransactions + Math.floor(Math.random() * 200);
+      // Calculate totals (same as reporting page)
+      const totalRevenue = filteredData.reduce((sum, account) => sum + account.revenue, 0);
+      const totalTransactions = filteredData.reduce((sum, account) => sum + account.transactions, 0);
+      const activeAccounts = filteredData.length;
       
-      // Generate realistic growth rates
-      const revenueGrowth = (Math.random() * 20 - 5).toFixed(1); // -5% to +15%
-      const transactionGrowth = (Math.random() * 15 - 3).toFixed(1); // -3% to +12%
+      // Calculate average growth rates (same as reporting page)
+      const revenueGrowth = filteredData.length > 0 
+        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.revenueGrowth), 0) / filteredData.length)
+        : 0;
+      const transactionGrowth = filteredData.length > 0 
+        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.transactionGrowth), 0) / filteredData.length)
+        : 0;
       
       return {
         totalRevenue,
         totalTransactions,
-        activeAccounts: accountCount,
-        revenueGrowth: parseFloat(revenueGrowth),
-        transactionGrowth: parseFloat(transactionGrowth)
+        activeAccounts,
+        revenueGrowth: parseFloat(revenueGrowth.toFixed(1)),
+        transactionGrowth: parseFloat(transactionGrowth.toFixed(1))
       };
     }
 
@@ -1848,21 +1925,19 @@ document.addEventListener('DOMContentLoaded', function() {
     let revenueAreaChart = null;
 
     function generateAccountRevenueData(accountIds = []) {
-      const allAccounts = window.OrgDataManager?.getAllSubAccounts?.() || [];
-      // Filter out aggregate accounts (like 'all') from revenue data
-      const realAccounts = allAccounts.filter(acc => !acc.isAggregate);
-      const filteredAccounts = accountIds.length > 0 
-        ? realAccounts.filter(account => accountIds.includes(account.id))
-        : realAccounts;
+      // Use the same financial data as metrics to ensure consistency
+      const accountDataMap = generateAccountFinancialData();
+      let filteredData = Array.from(accountDataMap.values());
       
-      const accountsWithRevenue = filteredAccounts.map(account => ({
-        id: account.id,
-        name: account.name,
-        revenue: Math.floor(Math.random() * 50000) + 10000 // Random revenue between 10k-60k
-      }));
+      if (accountIds && accountIds.length > 0) {
+        // Filter to only selected accounts
+        filteredData = accountIds
+          .map(id => accountDataMap.get(id))
+          .filter(data => data); // Remove any undefined values
+      }
       
       // Sort by revenue descending and take top 10
-      return accountsWithRevenue
+      return filteredData
         .sort((a, b) => b.revenue - a.revenue)
         .slice(0, 10);
     }
