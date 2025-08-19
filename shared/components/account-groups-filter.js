@@ -572,8 +572,14 @@ class AccountGroupsFilter {
     if (selectAllCheckbox) {
       selectAllCheckbox.addEventListener('change', () => {
         const isChecked = selectAllCheckbox.checked;
-        document.querySelectorAll(`#${this.options.accountsListId} .account-item input[type="checkbox"]`).forEach(checkbox => {
-          checkbox.checked = isChecked;
+        // Only affect visible accounts (matching group creation modal logic)
+        document.querySelectorAll(`#${this.options.accountsListId} .account-item`).forEach(item => {
+          if (item.style.display !== 'none') {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+              checkbox.checked = isChecked;
+            }
+          }
         });
         this.handleSelectAllChange();
       });
@@ -612,12 +618,20 @@ class AccountGroupsFilter {
   }
   
   updateSelectionCount() {
-    const checked = document.querySelectorAll(`#${this.options.accountsListId} .account-item input[type="checkbox"]:checked`).length;
-    const total = document.querySelectorAll(`#${this.options.accountsListId} .account-item`).length;
-    const selectionCount = document.getElementById(`${this.options.namespace}selectionCount`);
+    // Count only checked accounts that are visible
+    let checkedVisible = 0;
+    document.querySelectorAll(`#${this.options.accountsListId} .account-item`).forEach(item => {
+      if (item.style.display !== 'none') {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (checkbox && checkbox.checked) {
+          checkedVisible++;
+        }
+      }
+    });
     
+    const selectionCount = document.getElementById(`${this.options.namespace}selectionCount`);
     if (selectionCount) {
-      selectionCount.textContent = `${checked} selected`;
+      selectionCount.textContent = `${checkedVisible} selected`;
     }
     
     // Update Apply button state and hide validation error when selection changes
@@ -626,20 +640,42 @@ class AccountGroupsFilter {
   }
   
   updateSelectAllState() {
-    const accountCheckboxes = document.querySelectorAll(`#${this.options.accountsListId} .account-item input[type="checkbox"]`);
-    const checkedCount = document.querySelectorAll(`#${this.options.accountsListId} .account-item input[type="checkbox"]:checked`).length;
-    const selectAllCheckbox = document.getElementById(`${this.options.namespace}selectAll`);
+    // Count only visible accounts (matching group creation modal logic)
+    let visibleTotal = 0;
+    let visibleChecked = 0;
     
+    document.querySelectorAll(`#${this.options.accountsListId} .account-item`).forEach(item => {
+      if (item.style.display !== 'none') {
+        visibleTotal++;
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (checkbox && checkbox.checked) {
+          visibleChecked++;
+        }
+      }
+    });
+    
+    const selectAllCheckbox = document.getElementById(`${this.options.namespace}selectAll`);
     if (selectAllCheckbox) {
-      if (checkedCount === 0) {
+      if (visibleTotal === 0) {
+        // No visible accounts - disable select all
         selectAllCheckbox.checked = false;
         selectAllCheckbox.indeterminate = false;
-      } else if (checkedCount === accountCheckboxes.length) {
+        selectAllCheckbox.disabled = true;
+      } else if (visibleChecked === 0) {
+        // No visible accounts selected
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.disabled = false;
+      } else if (visibleChecked === visibleTotal) {
+        // All visible accounts selected
         selectAllCheckbox.checked = true;
         selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.disabled = false;
       } else {
+        // Some visible accounts selected
         selectAllCheckbox.checked = false;
         selectAllCheckbox.indeterminate = true;
+        selectAllCheckbox.disabled = false;
       }
     }
   }
