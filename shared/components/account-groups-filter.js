@@ -304,7 +304,7 @@ class AccountGroupsFilter {
     const margin = 24; // 24px margin from viewport edges (matching account switcher)
     
     // Calculate dynamic height based on content and viewport
-    const { height: optimalHeight, canPositionBelow } = this.calculateOptimalHeight(triggerRect, viewportHeight, margin);
+    const { height: optimalHeight, canPositionBelow } = this.calculateOptimalHeight(triggerRect, viewportHeight, margin, popover);
     
     // Debug logging
     console.log('Height calculation:', {
@@ -347,15 +347,15 @@ class AccountGroupsFilter {
     this.isRepositioning = false;
   }
   
-  calculateOptimalHeight(triggerRect, viewportHeight, margin) {
+  calculateOptimalHeight(triggerRect, viewportHeight, margin, popover) {
     // Calculate available space above and below trigger
     const spaceBelow = viewportHeight - triggerRect.bottom - margin;
     const spaceAbove = triggerRect.top - margin;
     
     // Calculate content-based height estimate
-    const accountsListContainer = this.container.querySelector('.accounts-list');
+    const accountsListContainer = popover.querySelector('.accounts-list');
     const accountItems = accountsListContainer ? accountsListContainer.querySelectorAll('.account-item') : [];
-    const selectAllContainer = this.container.querySelector('.select-all-container');
+    const selectAllContainer = popover.querySelector('.select-all-container');
     
     // Fixed height components
     const searchContainerHeight = 56; // search container + padding
