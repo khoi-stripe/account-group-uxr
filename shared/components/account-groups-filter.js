@@ -351,19 +351,22 @@ class AccountGroupsFilter {
     
     // Fixed height components
     const searchContainerHeight = 56; // search container + padding
-    const selectAllHeight = selectAllContainer ? 48 : 0; // select all row height
+    const selectAllHeight = selectAllContainer ? 36 : 0; // select all row height (36px as per CSS)
     const footerHeight = 64; // footer with buttons
     const groupsSectionPadding = 8; // margins and padding
     
-    // Variable height: account items (40px each + spacing)
-    const accountItemHeight = 40;
+    // Variable height: account items (36px each as per CSS)
+    const accountItemHeight = 36;
     const visibleAccountCount = Array.from(accountItems).filter(item => 
       item.style.display !== 'none'
     ).length;
     
     // Account count calculated
     
-    const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
+    // Calculate accounts list height with padding (accounts-list has 8px bottom padding)
+    const accountsListContentHeight = visibleAccountCount * accountItemHeight;
+    const accountsListPadding = 8; // 8px bottom padding from CSS
+    const accountsListHeight = Math.max(200, accountsListContentHeight + accountsListPadding);
     
     // Calculate ideal height based on content
     const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
