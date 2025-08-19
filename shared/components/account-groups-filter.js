@@ -346,53 +346,27 @@ class AccountGroupsFilter {
   }
   
   calculateOptimalHeight(triggerRect, viewportHeight, margin) {
-    // Calculate available space above and below trigger
+    // For now, use the default height from CSS to ensure compatibility
+    // This can be enhanced later when CSS dynamic height is safely implemented
+    const defaultHeight = 364;
+    const maxViewportHeight = viewportHeight - (margin * 2);
+    
+    // Use default height but cap it at available viewport space
+    const finalHeight = Math.min(defaultHeight, maxViewportHeight);
+    
+    // Calculate available space to determine positioning
     const spaceBelow = viewportHeight - triggerRect.bottom - margin;
     const spaceAbove = triggerRect.top - margin;
     
-    // Calculate content-based height estimate
-    const accountsListContainer = this.container.querySelector('.accounts-list');
-    const accountItems = accountsListContainer ? accountsListContainer.querySelectorAll('.account-item') : [];
-    const selectAllContainer = this.container.querySelector('.select-all-container');
+    // Prefer below if there's enough space, otherwise above
+    const canPositionBelow = spaceBelow >= finalHeight + 4;
+    const canPositionAbove = spaceAbove >= finalHeight + 4;
     
-    // Fixed height components
-    const searchContainerHeight = 56; // search container + padding
-    const selectAllHeight = selectAllContainer ? 48 : 0; // select all row height
-    const footerHeight = 64; // footer with buttons
-    const groupsSectionPadding = 8; // margins and padding
-    
-    // Variable height: account items (40px each + spacing)
-    const accountItemHeight = 40;
-    const visibleAccountCount = Array.from(accountItems).filter(item => 
-      item.style.display !== 'none'
-    ).length;
-    const accountsListHeight = Math.max(200, visibleAccountCount * accountItemHeight); // Minimum 200px for scrollable area
-    
-    // Calculate ideal height based on content
-    const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
-    
-    // Apply constraints
-    const minHeight = 364; // Minimum height for usability
-    const maxViewportHeight = viewportHeight - (margin * 2); // Max height considering viewport margins
-    const idealHeight = Math.max(minHeight, Math.min(contentBasedHeight, maxViewportHeight));
-    
-    // Determine if we can position below trigger
-    const canPositionBelow = spaceBelow >= idealHeight + 4; // 4px gap
-    const canPositionAbove = spaceAbove >= idealHeight + 4;
-    
-    let finalHeight = idealHeight;
     let canPositionBelowFinal = canPositionBelow;
     
-    // If ideal height doesn't fit in either position, use the position with more space
-    // and adjust height to fit
+    // If neither position has enough space, use the one with more space
     if (!canPositionBelow && !canPositionAbove) {
-      if (spaceBelow >= spaceAbove) {
-        finalHeight = Math.max(minHeight, spaceBelow - 4);
-        canPositionBelowFinal = true;
-      } else {
-        finalHeight = Math.max(minHeight, spaceAbove - 4);
-        canPositionBelowFinal = false;
-      }
+      canPositionBelowFinal = spaceBelow >= spaceAbove;
     }
     
     return {
