@@ -55,8 +55,8 @@
   background: #FFF;
   box-shadow: 0 15px 35px 0 rgba(48, 49, 61, 0.08), 0 5px 15px 0 rgba(0, 0, 0, 0.12);
   overflow: hidden;
-  min-height: 360px; /* Minimum height */
-  max-height: calc(100vh - 48px); /* Expand to viewport height with 24px margin on top and bottom */
+  min-height: 360px !important; /* Minimum height */
+  max-height: calc(100vh - 48px) !important; /* Expand to viewport height with 24px margin on top and bottom */
   width: 532px; /* Fixed total width */
   display: flex;
   flex-direction: row; /* Two-column layout */
@@ -64,6 +64,8 @@
   z-index: 2147483647; /* Ensure always above all UI elements */
   text-align: left; /* Override any inherited text alignment */
   /* top, left, margin-top will be set by JavaScript for smart positioning */
+  /* Debug border to see if height is correct */
+  border: 2px solid red !important;
 }
 
 /* Removed popover-content wrapper - now using direct two-column layout */

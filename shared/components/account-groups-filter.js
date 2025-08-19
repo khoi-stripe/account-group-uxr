@@ -373,6 +373,21 @@ class AccountGroupsFilter {
       positioning: spaceBelow >= popoverHeight + 4 ? 'below' : spaceAbove >= popoverHeight + 4 ? 'above' : spaceBelow >= spaceAbove ? 'below-constrained' : 'above-constrained'
     });
     
+    // Debug computed styles
+    setTimeout(() => {
+      const computedStyles = window.getComputedStyle(popover);
+      console.log('Popover computed styles:', {
+        height: computedStyles.height,
+        minHeight: computedStyles.minHeight,
+        maxHeight: computedStyles.maxHeight,
+        top: computedStyles.top,
+        left: computedStyles.left,
+        overflow: computedStyles.overflow,
+        position: computedStyles.position,
+        actualBounds: popover.getBoundingClientRect()
+      });
+    }, 100);
+    
     // Reset repositioning flag
     this.isRepositioning = false;
   }
