@@ -1633,19 +1633,23 @@
       
       
       
-      // Initialize financial reports
-      loadFinancialReports();
+      // Initialize financial reports using new account context pattern
+      updateAccountContext();
       
       console.log('🚀 Financial Reports Page ready!');
     });
 
     function switchToSubAccount(subAccountId) {
+      console.log('🔄 switchToSubAccount called with ID:', subAccountId);
       if (window.OrgDataManager.switchToSubAccount(subAccountId)) {
-        // Reload financial reports to reflect the new account context
-        loadFinancialReports();
+        console.log('✅ OrgDataManager.switchToSubAccount succeeded');
+        // Use the new pattern from homepage - update account context
+        updateAccountContext();
         
         // Clear any active filters when switching accounts
         clearActiveFilters();
+      } else {
+        console.warn('❌ OrgDataManager.switchToSubAccount failed');
       }
     }
 
@@ -1757,27 +1761,93 @@
       };
     }
 
-    function loadFinancialReports() {
-      const currentSubAccount = window.OrgDataManager.getCurrentSubAccount();
+    function updateAccountContext() {
+      const switcherData = window.OrgDataManager.getAccountSwitcherData();
+      const currentAccount = switcherData.currentAccount;
+      
+      console.log('🔍 updateAccountContext called');
+      console.log('📊 switcherData:', switcherData);
+      console.log('👤 currentAccount:', currentAccount);
+      console.log('🏢 isAggregate:', currentAccount?.isAggregate);
+      
+      if (!currentAccount) {
+        console.warn('❌ No current account found');
+        return;
+      }
+      
+      // Determine if this is aggregate view - check for explicit true value or 'all_accounts' ID
+      const isAggregateView = currentAccount.isAggregate === true || currentAccount.id === 'all_accounts';
+      
+      if (isAggregateView) {
+        console.log('🏢 Showing aggregate view');
+        showAggregateView();
+      } else {
+        console.log('👤 Showing individual account view for:', currentAccount.name);
+        showIndividualAccountView(currentAccount);
+      }
+    }
+    
+    function showAggregateView() {
+      console.log('🏢 showAggregateView() executing');
+      
       const currentOrg = window.OrgDataManager.getCurrentOrganization();
       const allSubAccounts = currentOrg.accounts.filter(acc => !acc.isAggregate);
       
-      // Check if we're viewing organization aggregate or specific account
-      if (currentSubAccount.isAggregate) {
-        // Organization view - show all accounts with aggregate totals
-        document.getElementById('reports-title').textContent = `${currentOrg.name} - Financial Reports`;
-        document.getElementById('reports-description').textContent = `Organization-wide financial data and analytics for all ${allSubAccounts.length} accounts. Filter to an account group or individual accounts for detailed breakdowns.`;
-        document.getElementById('active-accounts').textContent = allSubAccounts.length;
-        document.querySelector('.accounts-card').style.display = 'block';
-        updateAccountBreakdown(allSubAccounts, true); // true = show aggregate
-      } else {
-        // Specific account view - show only current account
-        const currentAccountOnly = allSubAccounts.filter(acc => acc.id === currentSubAccount.id);
-        document.getElementById('reports-title').textContent = `${currentSubAccount.name} - Financial Reports`;
-        document.getElementById('reports-description').textContent = `Detailed financial data and analytics for the ${currentSubAccount.name} account. Switch to organization view for aggregated data.`;
-        document.querySelector('.accounts-card').style.display = 'none';
-        updateAccountBreakdown(currentAccountOnly, false); // false = individual account
+      // Update page content for organization view
+      document.getElementById('reports-title').textContent = `${currentOrg.name} - Financial Reports`;
+      document.getElementById('reports-description').textContent = `Organization-wide financial data and analytics for all ${allSubAccounts.length} accounts. Filter to an account group or individual accounts for detailed breakdowns.`;
+      document.getElementById('active-accounts').textContent = allSubAccounts.length;
+      
+      // Show the accounts card
+      const accountsCard = document.querySelector('.accounts-card');
+      if (accountsCard) {
+        accountsCard.style.display = 'block';
+        console.log('✅ Showed accounts card');
       }
+      
+      // Show account group filters
+      const filterContainer = document.querySelector('.account-groups-filter-container');
+      if (filterContainer) {
+        filterContainer.style.display = 'block';
+        console.log('✅ Showed account group filters');
+      }
+      
+      // Update account breakdown for all accounts
+      updateAccountBreakdown(allSubAccounts, true); // true = show aggregate
+    }
+    
+    function showIndividualAccountView(currentAccount) {
+      console.log('👤 showIndividualAccountView() executing for:', currentAccount.name);
+      
+      const currentOrg = window.OrgDataManager.getCurrentOrganization();
+      const allSubAccounts = currentOrg.accounts.filter(acc => !acc.isAggregate);
+      const currentAccountOnly = allSubAccounts.filter(acc => acc.id === currentAccount.id);
+      
+      // Update page content for individual account view
+      document.getElementById('reports-title').textContent = `${currentAccount.name} - Financial Reports`;
+      document.getElementById('reports-description').textContent = `Detailed financial data and analytics for the ${currentAccount.name} account. Switch to organization view for aggregated data.`;
+      
+      // Hide the accounts card - not relevant for individual account view
+      const accountsCard = document.querySelector('.accounts-card');
+      if (accountsCard) {
+        accountsCard.style.display = 'none';
+        console.log('✅ Hidden accounts card');
+      }
+      
+      // Hide account group filters - not relevant for individual account view
+      const filterContainer = document.querySelector('.account-groups-filter-container');
+      if (filterContainer) {
+        filterContainer.style.display = 'none';
+        console.log('✅ Hidden account group filters');
+      }
+      
+      // Update account breakdown for current account only
+      updateAccountBreakdown(currentAccountOnly, false); // false = individual account
+    }
+    
+    // Legacy function name for compatibility - now just calls updateAccountContext
+    function loadFinancialReports() {
+      updateAccountContext();
     }
 
     function updateAccountBreakdown(accounts, isAggregateView = false) {
@@ -2819,34 +2889,16 @@
       let currentSubAccount = null;
       
       setInterval(() => {
-    if (managerRef) {
-      const newSubAccount = managerRef.getCurrentSubAccount();
+        if (managerRef) {
+          const newSubAccount = managerRef.getCurrentSubAccount();
           
           // Check if account has changed
           if (newSubAccount && (!currentSubAccount || currentSubAccount.id !== newSubAccount.id)) {
             currentSubAccount = newSubAccount;
+            console.log('🔄 Account change detected, updating context:', newSubAccount.name);
             
-            const filterContainer = document.querySelector('.account-groups-filter-container');
-            if (filterContainer) {
-              if (shouldShowAccountGroupsFilter()) {
-                filterContainer.style.display = 'block';
-                console.log('Account Groups Filter: Shown (viewing All accounts)');
-              } else {
-                filterContainer.style.display = 'none';
-                console.log('Account Groups Filter: Hidden (viewing individual account)');
-              }
-            }
-            
-            // Refresh content when account changes
-            if (newSubAccount.isAggregate) {
-              // Show all accounts when viewing "All accounts" aggregate view
-              filterReportsContent();
-              console.log('Content refreshed for account switch to All accounts:', newSubAccount.name);
-            } else {
-              // Filter to specific account when viewing individual account
-              filterReportsContent([newSubAccount.id]);
-              console.log('Content filtered to specific account:', newSubAccount.name, newSubAccount.id);
-            }
+            // Use our new unified pattern from homepage
+            updateAccountContext();
           }
         }
       }, 500); // Check every 500ms for account changes
