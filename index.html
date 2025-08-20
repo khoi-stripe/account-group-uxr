@@ -2124,7 +2124,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       for (let i = bodyLines.length - 1; i >= 0; i--) {
                         const body = bodyLines[i];
                         const colors = tooltip.labelColors[i];
-                        const style = `background: ${colors.backgroundColor}; border-color: ${colors.borderColor}; width: 8px; height: 8px; display: inline-block; margin-right: 8px; border-radius: 50%; flex-shrink: 0;`;
+                        const style = `background: ${colors.borderColor}; border-color: ${colors.borderColor}; width: 8px; height: 8px; display: inline-block; margin-right: 8px; border-radius: 50%; flex-shrink: 0;`;
                         innerHtml += '<div style="display: flex; align-items: center; padding: 4px 12px; color: #353a44; font-weight: 400; font-size: 12px; line-height: 14px;">';
                         innerHtml += '<span style="' + style + '"></span>';
                         innerHtml += '<span style="flex: 1;">' + body + '</span>';
