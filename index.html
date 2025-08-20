@@ -1506,6 +1506,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="revenue-breakdown">
             <div class="chart-header">
               <h3 class="chart-title">Revenue by Account</h3>
+              <div class="chart-subtitle">Top 5 accounts</div>
             </div>
             <div class="stacked-area-chart">
               <div class="chart-spinner" id="chartSpinner">
@@ -1709,6 +1710,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Set chart title to "Revenue by Account"');
       }
       
+      // Restore chart subtitle for aggregate view
+      const chartSubtitle = document.querySelector('.chart-subtitle');
+      if (chartSubtitle) {
+        chartSubtitle.textContent = 'Top 5 accounts';
+        console.log('✅ Set chart subtitle to "Top 5 accounts"');
+      }
+      
       // Update metrics for all accounts (existing behavior)
       updateMetricsGrid([]);
     }
@@ -1742,6 +1750,13 @@ document.addEventListener('DOMContentLoaded', function() {
       if (chartTitle) {
         chartTitle.textContent = 'Account Revenue';
         console.log('✅ Set chart title to "Account Revenue"');
+      }
+      
+      // Update chart subtitle for individual account
+      const chartSubtitle = document.querySelector('.chart-subtitle');
+      if (chartSubtitle) {
+        chartSubtitle.textContent = 'Top 5 accounts';
+        console.log('✅ Set chart subtitle to "Top 5 accounts"');
       }
       
       // Update metrics for just this account
