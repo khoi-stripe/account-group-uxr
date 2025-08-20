@@ -268,6 +268,8 @@
     .stacked-area-chart canvas {
       width: 100% !important;
       height: 100% !important;
+      position: relative;
+      z-index: 1;
     }
 
     /* Chart Loading Spinner */
@@ -2055,21 +2057,73 @@ document.addEventListener('DOMContentLoaded', function() {
                 display: false // Hide legend
               },
               tooltip: {
-                enabled: false // Disable tooltips completely
+                enabled: true,
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                titleColor: '#f8fafc',
+                bodyColor: '#e2e8f0',
+                borderColor: 'rgba(148, 163, 184, 0.2)',
+                borderWidth: 1,
+                cornerRadius: 8,
+                padding: 12,
+                titleFont: {
+                  size: 13,
+                  weight: '600',
+                  family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                },
+                bodyFont: {
+                  size: 12,
+                  weight: '500',
+                  family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                },
+                displayColors: true,
+                boxWidth: 8,
+                boxHeight: 8,
+                usePointStyle: true,
+                callbacks: {
+                  title: function(context) {
+                    return context[0].label;
+                  },
+                  label: function(context) {
+                    const accountName = context.dataset.label;
+                    const revenue = context.parsed.y;
+                    return `${accountName}: $${Math.round(revenue).toLocaleString()}`;
+                  },
+                  footer: function(context) {
+                    // Calculate total revenue for this day across all accounts
+                    const total = context.reduce((sum, item) => sum + item.parsed.y, 0);
+                    return `Total: $${Math.round(total).toLocaleString()}`;
+                  }
+                },
+                footerFont: {
+                  size: 11,
+                  weight: '600',
+                  family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                },
+                footerColor: '#94a3b8',
+                footerMarginTop: 8
               }
             },
             elements: {
               point: {
                 radius: 0,
-                hoverRadius: 4
+                hoverRadius: 6,
+                hoverBorderWidth: 2,
+                hoverBorderColor: '#ffffff'
               },
               line: {
-                borderWidth: 1
+                borderWidth: 1,
+                hoverBorderWidth: 2
               }
             },
             interaction: {
               mode: 'index',
               intersect: false
+            },
+            onHover: (event, activeElements) => {
+              // Change cursor to pointer when hovering over chart
+              event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
             }
           }
         });
