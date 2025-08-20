@@ -517,15 +517,15 @@
      /* Metric Card Classes */
      .metric-card {
        background: white;
-       border-radius: 12px;
-       padding: 20px;
+       border-radius: 8px;
+       padding: 16px;
      }
 
      .metric-header {
        display: flex;
        align-items: center;
        justify-content: space-between;
-       margin-bottom: 12px;
+       margin-bottom: 8px;
      }
 
      /* More compact specific metric cards */
@@ -543,16 +543,19 @@
 
      .metric-title {
        margin: 0;
-       font-size: 16px;
+       font-size: 14px;
        font-weight: 600;
        color: var(--neutral-900);
      }
 
      .metric-badge {
-       padding: 2px 6px;
-       border-radius: 12px;
+       display: inline-flex;
+       align-items: center;
+       padding: 4px 8px;
+       border-radius: 999px;
        font-size: 12px;
-       font-weight: 500;
+       font-weight: 600;
+       line-height: 1;
      }
 
      .metric-badge--positive {
@@ -571,10 +574,11 @@
      }
 
      .metric-value {
-       font-size: 32px;
+       font-size: 24px;
        font-weight: 700;
        color: var(--neutral-900);
        margin-bottom: 2px;
+       line-height: 1.1;
      }
 
          .metric-subtitle {
