@@ -239,6 +239,7 @@
       padding: 16px;
       overflow: visible; /* Allow tooltips to show outside container */
       position: relative;
+      z-index: 1; /* Ensure container doesn't interfere with tooltips */
     }
 
     .chart-header {
@@ -2057,30 +2058,120 @@ document.addEventListener('DOMContentLoaded', function() {
                 display: false // Hide legend
               },
               tooltip: {
-                enabled: true,
+                enabled: false, // Disable default tooltip
+                external: function(context) {
+                  // Create custom external tooltip
+                  const {chart, tooltip} = context;
+                  
+                  // Get or create tooltip element
+                  let tooltipEl = document.getElementById('chartjs-tooltip');
+                  if (!tooltipEl) {
+                    tooltipEl = document.createElement('div');
+                    tooltipEl.id = 'chartjs-tooltip';
+                    tooltipEl.style.cssText = `
+                      position: fixed;
+                      z-index: 9999;
+                      background: rgba(15, 23, 42, 0.95);
+                      color: #f8fafc;
+                      border: 1px solid rgba(148, 163, 184, 0.2);
+                      border-radius: 8px;
+                      padding: 12px;
+                      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                      font-size: 12px;
+                      pointer-events: none;
+                      opacity: 0;
+                      transition: opacity 0.2s ease;
+                      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                      backdrop-filter: blur(8px);
+                      max-width: 300px;
+                    `;
+                    document.body.appendChild(tooltipEl);
+                  }
+                  
+                  // Hide if no tooltip
+                  if (tooltip.opacity === 0) {
+                    tooltipEl.style.opacity = '0';
+                    return;
+                  }
+                  
+                  // Build tooltip content
+                  if (tooltip.body) {
+                    const titleLines = tooltip.title || [];
+                    const bodyLines = tooltip.body.map(b => b.lines);
+                    const footerLines = tooltip.footer || [];
+                    
+                    let innerHtml = '';
+                    
+                    // Title
+                    if (titleLines.length) {
+                      innerHtml += '<div style="font-weight: 600; font-size: 13px; margin-bottom: 8px; color: #f8fafc;">';
+                      titleLines.forEach(title => {
+                        innerHtml += title;
+                      });
+                      innerHtml += '</div>';
+                    }
+                    
+                    // Body
+                    if (bodyLines.length) {
+                      innerHtml += '<div style="margin-bottom: 8px;">';
+                      bodyLines.forEach((body, i) => {
+                        const colors = tooltip.labelColors[i];
+                        const style = `background: ${colors.backgroundColor}; border-color: ${colors.borderColor}; width: 8px; height: 8px; display: inline-block; margin-right: 8px; border-radius: 50%;`;
+                        innerHtml += '<div style="display: flex; align-items: center; margin-bottom: 4px; color: #e2e8f0; font-weight: 500;">';
+                        innerHtml += '<span style="' + style + '"></span>';
+                        innerHtml += body;
+                        innerHtml += '</div>';
+                      });
+                      innerHtml += '</div>';
+                    }
+                    
+                    // Footer
+                    if (footerLines.length) {
+                      innerHtml += '<div style="border-top: 1px solid rgba(148, 163, 184, 0.2); padding-top: 8px; margin-top: 8px; font-weight: 600; font-size: 11px; color: #94a3b8;">';
+                      footerLines.forEach(footer => {
+                        innerHtml += footer;
+                      });
+                      innerHtml += '</div>';
+                    }
+                    
+                    tooltipEl.innerHTML = innerHtml;
+                  }
+                  
+                  // Position tooltip
+                  const position = chart.canvas.getBoundingClientRect();
+                  const bodyFont = Chart.helpers.toFont(tooltip.options.bodyFont);
+                  
+                  // Calculate position relative to viewport
+                  let left = position.left + window.pageXOffset + tooltip.caretX;
+                  let top = position.top + window.pageYOffset + tooltip.caretY;
+                  
+                  // Adjust if tooltip would go off screen
+                  const tooltipRect = tooltipEl.getBoundingClientRect();
+                  const viewportWidth = window.innerWidth;
+                  const viewportHeight = window.innerHeight;
+                  
+                  // Adjust horizontal position
+                  if (left + tooltipRect.width > viewportWidth - 20) {
+                    left = viewportWidth - tooltipRect.width - 20;
+                  }
+                  if (left < 20) {
+                    left = 20;
+                  }
+                  
+                  // Adjust vertical position
+                  if (top + tooltipRect.height > viewportHeight - 20) {
+                    top = position.top + window.pageYOffset + tooltip.caretY - tooltipRect.height - 10;
+                  }
+                  if (top < 20) {
+                    top = 20;
+                  }
+                  
+                  tooltipEl.style.left = left + 'px';
+                  tooltipEl.style.top = top + 'px';
+                  tooltipEl.style.opacity = '1';
+                },
                 mode: 'index',
                 intersect: false,
-                backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                titleColor: '#f8fafc',
-                bodyColor: '#e2e8f0',
-                borderColor: 'rgba(148, 163, 184, 0.2)',
-                borderWidth: 1,
-                cornerRadius: 8,
-                padding: 12,
-                titleFont: {
-                  size: 13,
-                  weight: '600',
-                  family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-                },
-                bodyFont: {
-                  size: 12,
-                  weight: '500',
-                  family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-                },
-                displayColors: true,
-                boxWidth: 8,
-                boxHeight: 8,
-                usePointStyle: true,
                 callbacks: {
                   title: function(context) {
                     return context[0].label;
@@ -2095,14 +2186,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const total = context.reduce((sum, item) => sum + item.parsed.y, 0);
                     return `Total: $${Math.round(total).toLocaleString()}`;
                   }
-                },
-                footerFont: {
-                  size: 11,
-                  weight: '600',
-                  family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-                },
-                footerColor: '#94a3b8',
-                footerMarginTop: 8
+                }
               }
             },
             elements: {
