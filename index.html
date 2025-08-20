@@ -2108,34 +2108,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     let innerHtml = '';
                     
-                    // Title
-                    if (titleLines.length) {
-                      innerHtml += '<div style="font-weight: 600; font-size: 13px; margin-bottom: 6px; color: #353a44; padding: 4px 8px;">';
-                      titleLines.forEach(title => {
-                        innerHtml += title;
-                      });
-                      innerHtml += '</div>';
-                    }
-                    
-                    // Body
+                    // Body - only show account revenue data
                     if (bodyLines.length) {
                       bodyLines.forEach((body, i) => {
                         const colors = tooltip.labelColors[i];
                         const style = `background: ${colors.backgroundColor}; border-color: ${colors.borderColor}; width: 8px; height: 8px; display: inline-block; margin-right: 8px; border-radius: 50%; flex-shrink: 0;`;
-                        innerHtml += '<div style="display: flex; align-items: center; padding: 4px 8px; color: #353a44; font-weight: 400; font-size: 12px; line-height: 16px;">';
+                        innerHtml += '<div style="display: flex; align-items: center; padding: 8px 12px; color: #353a44; font-weight: 400; font-size: 12px; line-height: 16px;">';
                         innerHtml += '<span style="' + style + '"></span>';
                         innerHtml += '<span style="flex: 1;">' + body + '</span>';
                         innerHtml += '</div>';
                       });
-                    }
-                    
-                    // Footer
-                    if (footerLines.length) {
-                      innerHtml += '<div style="border-top: 1px solid rgba(0, 39, 77, 0.08); padding: 6px 8px 4px 8px; margin-top: 4px; font-weight: 600; font-size: 11px; color: #6b7280;">';
-                      footerLines.forEach(footer => {
-                        innerHtml += footer;
-                      });
-                      innerHtml += '</div>';
                     }
                     
                     tooltipEl.innerHTML = innerHtml;
@@ -2204,18 +2186,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 mode: 'index',
                 intersect: false,
                 callbacks: {
-                  title: function(context) {
-                    return context[0].label;
-                  },
                   label: function(context) {
                     const accountName = context.dataset.label;
                     const revenue = context.parsed.y;
                     return `${accountName}: $${Math.round(revenue).toLocaleString()}`;
-                  },
-                  footer: function(context) {
-                    // Calculate total revenue for this day across all accounts
-                    const total = context.reduce((sum, item) => sum + item.parsed.y, 0);
-                    return `Total: $${Math.round(total).toLocaleString()}`;
                   }
                 }
               }
