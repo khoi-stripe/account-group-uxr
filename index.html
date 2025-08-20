@@ -2091,6 +2091,12 @@ document.addEventListener('DOMContentLoaded', function() {
                   // Hide if no tooltip
                   if (tooltip.opacity === 0) {
                     tooltipEl.style.opacity = '0';
+                    // Also ensure chart points are cleared
+                    setTimeout(() => {
+                      if (tooltipEl.style.opacity === '0') {
+                        chart.update('none'); // Force chart to clear hover state
+                      }
+                    }, 100);
                     return;
                   }
                   
@@ -2139,18 +2145,22 @@ document.addEventListener('DOMContentLoaded', function() {
                   
                   // Position tooltip
                   const position = chart.canvas.getBoundingClientRect();
-                  const bodyFont = Chart.helpers.toFont(tooltip.options.bodyFont);
                   
-                  // Calculate position relative to viewport
+                  // Calculate position relative to viewport, offset tooltip to appear above the hover point
                   let left = position.left + window.pageXOffset + tooltip.caretX;
-                  let top = position.top + window.pageYOffset + tooltip.caretY;
+                  let top = position.top + window.pageYOffset + tooltip.caretY - 10; // Offset above the point
                   
-                  // Adjust if tooltip would go off screen
+                  // Get tooltip dimensions (need to temporarily show it to measure)
+                  tooltipEl.style.opacity = '1';
+                  tooltipEl.style.visibility = 'hidden'; // Hidden but rendered for measurement
                   const tooltipRect = tooltipEl.getBoundingClientRect();
+                  tooltipEl.style.visibility = 'visible';
+                  
                   const viewportWidth = window.innerWidth;
                   const viewportHeight = window.innerHeight;
                   
-                  // Adjust horizontal position
+                  // Adjust horizontal position - center tooltip on hover point
+                  left = left - (tooltipRect.width / 2);
                   if (left + tooltipRect.width > viewportWidth - 20) {
                     left = viewportWidth - tooltipRect.width - 20;
                   }
@@ -2158,12 +2168,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     left = 20;
                   }
                   
-                  // Adjust vertical position
-                  if (top + tooltipRect.height > viewportHeight - 20) {
-                    top = position.top + window.pageYOffset + tooltip.caretY - tooltipRect.height - 10;
-                  }
+                  // Adjust vertical position - place above hover point with margin
+                  top = top - tooltipRect.height - 15; // 15px margin above hover point
                   if (top < 20) {
-                    top = 20;
+                    // If tooltip would go above viewport, place it below the hover point instead
+                    top = position.top + window.pageYOffset + tooltip.caretY + 25;
+                  }
+                  if (top + tooltipRect.height > viewportHeight - 20) {
+                    top = viewportHeight - tooltipRect.height - 20;
                   }
                   
                   tooltipEl.style.left = left + 'px';
@@ -2209,6 +2221,14 @@ document.addEventListener('DOMContentLoaded', function() {
               // Change cursor to pointer when hovering over chart
               event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
             }
+          }
+        });
+        
+        // Add mouse leave handler to ensure tooltip is hidden when mouse leaves chart
+        canvas.addEventListener('mouseleave', () => {
+          const tooltipEl = document.getElementById('chartjs-tooltip');
+          if (tooltipEl) {
+            tooltipEl.style.opacity = '0';
           }
         });
         
