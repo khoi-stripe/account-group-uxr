@@ -2144,9 +2144,9 @@ document.addEventListener('DOMContentLoaded', function() {
                   // Position tooltip
                   const position = chart.canvas.getBoundingClientRect();
                   
-                  // Calculate position relative to viewport, offset tooltip to appear above the hover point
-                  let left = position.left + window.pageXOffset + tooltip.caretX;
-                  let top = position.top + window.pageYOffset + tooltip.caretY - 10; // Offset above the point
+                  // Calculate hover point position relative to viewport
+                  const hoverPointX = position.left + window.pageXOffset + tooltip.caretX;
+                  const hoverPointY = position.top + window.pageYOffset + tooltip.caretY;
                   
                   // Get tooltip dimensions (need to temporarily show it to measure)
                   tooltipEl.style.opacity = '1';
@@ -2156,24 +2156,45 @@ document.addEventListener('DOMContentLoaded', function() {
                   
                   const viewportWidth = window.innerWidth;
                   const viewportHeight = window.innerHeight;
+                  const tooltipMargin = 12; // Distance from hover point
+                  const edgeMargin = 20; // Distance from viewport edges
                   
-                  // Adjust horizontal position - center tooltip on hover point
-                  left = left - (tooltipRect.width / 2);
-                  if (left + tooltipRect.width > viewportWidth - 20) {
-                    left = viewportWidth - tooltipRect.width - 20;
-                  }
-                  if (left < 20) {
-                    left = 20;
+                  let left, top;
+                  
+                  // Determine if tooltip should go left or right of hover point
+                  const spaceOnRight = viewportWidth - hoverPointX;
+                  const spaceOnLeft = hoverPointX;
+                  const tooltipFitsRight = spaceOnRight >= tooltipRect.width + tooltipMargin + edgeMargin;
+                  const tooltipFitsLeft = spaceOnLeft >= tooltipRect.width + tooltipMargin + edgeMargin;
+                  
+                  // Position horizontally - prefer right, fallback to left, then center if needed
+                  if (tooltipFitsRight) {
+                    // Position to the right of hover point
+                    left = hoverPointX + tooltipMargin;
+                  } else if (tooltipFitsLeft) {
+                    // Position to the left of hover point
+                    left = hoverPointX - tooltipRect.width - tooltipMargin;
+                  } else {
+                    // Center on hover point as fallback
+                    left = hoverPointX - (tooltipRect.width / 2);
+                    // Ensure it stays within viewport
+                    if (left + tooltipRect.width > viewportWidth - edgeMargin) {
+                      left = viewportWidth - tooltipRect.width - edgeMargin;
+                    }
+                    if (left < edgeMargin) {
+                      left = edgeMargin;
+                    }
                   }
                   
-                  // Adjust vertical position - place above hover point with margin
-                  top = top - tooltipRect.height - 15; // 15px margin above hover point
-                  if (top < 20) {
-                    // If tooltip would go above viewport, place it below the hover point instead
-                    top = position.top + window.pageYOffset + tooltip.caretY + 25;
+                  // Position vertically - center on hover point
+                  top = hoverPointY - (tooltipRect.height / 2);
+                  
+                  // Ensure tooltip stays within viewport vertically
+                  if (top + tooltipRect.height > viewportHeight - edgeMargin) {
+                    top = viewportHeight - tooltipRect.height - edgeMargin;
                   }
-                  if (top + tooltipRect.height > viewportHeight - 20) {
-                    top = viewportHeight - tooltipRect.height - 20;
+                  if (top < edgeMargin) {
+                    top = edgeMargin;
                   }
                   
                   tooltipEl.style.left = left + 'px';
