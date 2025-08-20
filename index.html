@@ -2075,7 +2075,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       color: #353a44;
                       border: 1px solid rgba(0, 39, 77, 0.12);
                       border-radius: 8px;
-                      padding: 8px;
+                      padding: 4px;
                       font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
                       font-size: 12px;
                       pointer-events: none;
@@ -2113,7 +2113,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       bodyLines.forEach((body, i) => {
                         const colors = tooltip.labelColors[i];
                         const style = `background: ${colors.backgroundColor}; border-color: ${colors.borderColor}; width: 8px; height: 8px; display: inline-block; margin-right: 8px; border-radius: 50%; flex-shrink: 0;`;
-                        innerHtml += '<div style="display: flex; align-items: center; padding: 8px 12px; color: #353a44; font-weight: 400; font-size: 12px; line-height: 16px;">';
+                        innerHtml += '<div style="display: flex; align-items: center; padding: 4px 12px; color: #353a44; font-weight: 400; font-size: 12px; line-height: 14px;">';
                         innerHtml += '<span style="' + style + '"></span>';
                         innerHtml += '<span style="flex: 1;">' + body + '</span>';
                         innerHtml += '</div>';
