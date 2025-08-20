@@ -2124,11 +2124,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     let innerHtml = '';
                     
-                    // Check if we're showing top 5 out of more accounts
-                    const allAccounts = window.OrgDataManager?.getAllSubAccounts?.().filter(acc => !acc.isAggregate) || [];
-                    const showingTop5Title = allAccounts.length > 5;
+                    // Check if we're actually showing 5 accounts in the chart
+                    const showingTop5Title = bodyLines.length === 5;
                     
-                    // Add "Top 5 accounts" title if we have more than 5 accounts
+                    // Add "Top 5 accounts" title only when showing exactly 5 accounts
                     if (showingTop5Title) {
                       innerHtml += '<div style="font-weight: 600; font-size: 12px; color: #353a44; padding: 4px 12px; margin: 0;">';
                       innerHtml += 'Top 5 accounts';
