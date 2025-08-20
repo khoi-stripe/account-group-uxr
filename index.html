@@ -250,7 +250,7 @@
       font-size: 16px;
       font-weight: 600;
       color: var(--neutral-900);
-      margin: 0 0 4px 0;
+      margin: 0 0 2px 0;
     }
 
     .chart-subtitle {
@@ -1506,7 +1506,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="revenue-breakdown">
             <div class="chart-header">
               <h3 class="chart-title">Revenue by Account</h3>
-              <div class="chart-subtitle">Top 5 accounts</div>
+              <div class="chart-subtitle">Last 30 days</div>
             </div>
             <div class="stacked-area-chart">
               <div class="chart-spinner" id="chartSpinner">
@@ -1713,8 +1713,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Restore chart subtitle for aggregate view
       const chartSubtitle = document.querySelector('.chart-subtitle');
       if (chartSubtitle) {
-        chartSubtitle.textContent = 'Top 5 accounts';
-        console.log('✅ Set chart subtitle to "Top 5 accounts"');
+        chartSubtitle.textContent = 'Last 30 days';
+        console.log('✅ Set chart subtitle to "Last 30 days"');
       }
       
       // Update metrics for all accounts (existing behavior)
@@ -1755,8 +1755,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update chart subtitle for individual account
       const chartSubtitle = document.querySelector('.chart-subtitle');
       if (chartSubtitle) {
-        chartSubtitle.textContent = 'Top 5 accounts';
-        console.log('✅ Set chart subtitle to "Top 5 accounts"');
+        chartSubtitle.textContent = 'Last 30 days';
+        console.log('✅ Set chart subtitle to "Last 30 days"');
       }
       
       // Update metrics for just this account
