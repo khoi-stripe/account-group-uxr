@@ -2130,7 +2130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Add "Top 5 accounts" title if we have more than 5 accounts
                     if (showingTop5Title) {
-                      innerHtml += '<div style="font-weight: 600; font-size: 12px; margin-bottom: 4px; color: #353a44; padding: 4px 12px 0 12px;">';
+                      innerHtml += '<div style="font-weight: 600; font-size: 12px; color: #353a44; padding: 4px 12px; margin: 0;">';
                       innerHtml += 'Top 5 accounts';
                       innerHtml += '</div>';
                     }
@@ -2140,8 +2140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                       bodyLines.forEach((body, i) => {
                         const colors = tooltip.labelColors[i];
                         const style = `background: ${colors.backgroundColor}; border-color: ${colors.borderColor}; width: 8px; height: 8px; display: inline-block; margin-right: 8px; border-radius: 50%; flex-shrink: 0;`;
-                        const paddingTop = showingTop5Title && i === 0 ? '8px' : '4px'; // Extra padding after title
-                        innerHtml += '<div style="display: flex; align-items: center; padding: ' + paddingTop + ' 12px 4px 12px; color: #353a44; font-weight: 400; font-size: 12px; line-height: 14px;">';
+                        innerHtml += '<div style="display: flex; align-items: center; padding: 4px 12px; color: #353a44; font-weight: 400; font-size: 12px; line-height: 14px;">';
                         innerHtml += '<span style="' + style + '"></span>';
                         innerHtml += '<span style="flex: 1;">' + body + '</span>';
                         innerHtml += '</div>';
