@@ -1939,10 +1939,10 @@ document.addEventListener('DOMContentLoaded', function() {
           .filter(data => data); // Remove any undefined values
       }
       
-      // Sort by revenue descending and take top 10
+      // Sort by revenue descending and take top 5
       return filteredData
         .sort((a, b) => b.revenue - a.revenue)
-        .slice(0, 10);
+        .slice(0, 5);
     }
 
     function generateTimeSeriesData(accounts) {
