@@ -123,7 +123,32 @@
 
     .wireframe-bar.short { width: 24px; }
     .wireframe-bar.medium { width: 96px; }
-    .wireframe-bar.wide { width: 140px; }
+    .wireframe-bar.wide { width: 80px; }
+
+    /* Wireframe filter specific styles */
+    .wireframe-filter {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: auto;
+      max-width: 180px;
+    }
+
+    .wireframe-filter__bar {
+      background: #E8EAED;
+      border-radius: 8px;
+      height: 8px;
+      flex-shrink: 0;
+    }
+
+    .wireframe-filter__bar--wide {
+      width: 40px;
+    }
+
+    .wireframe-filter__divider {
+      color: #b6c0cd;
+      margin: 0 2px;
+    }
 
     /* Wireframe plus icon inside small circular chip */
     .wireframe-plus {

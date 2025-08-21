@@ -35,11 +35,11 @@
     }
     
     .wireframe-bar.medium {
-      width: 96px;
+      width: 60px;
     }
     
     .wireframe-bar.long {
-      width: 128px;
+      width: 80px;
     }
     
     @keyframes pulse {
@@ -55,6 +55,14 @@
       display: flex;
       height: 100vh;
       width: 100vw;
+    }
+
+    /* Override date-range-display to be more compact */
+    .date-range-display {
+      width: auto;
+      max-width: 160px;
+      padding: 0 8px;
+      gap: 4px;
     }
 
          /* Navigation Panel */
