@@ -25,6 +25,12 @@ class AccountSwitcher {
   init() {
     this.render();
     this.bindEvents();
+    
+    // Register with the global popover manager if it exists
+    if (window.GlobalPopoverManager) {
+      window.GlobalPopoverManager.register('account-switcher', () => this.close());
+      console.log('🎯 PopoverManager: Registered account-switcher menu');
+    }
   }
   
   generateInitials(name) {
@@ -1785,7 +1791,15 @@ class AccountSwitcher {
   }
   
   toggle() {
-    this.isOpen ? this.close() : this.open();
+    if (this.isOpen) {
+      this.close();
+    } else {
+      // Use the global popover manager to close other menus and open this one
+      if (window.GlobalPopoverManager) {
+        window.GlobalPopoverManager.openMenu('account-switcher');
+      }
+      this.open();
+    }
   }
   
   open() {
@@ -1810,6 +1824,11 @@ class AccountSwitcher {
     const switcher = this.container.querySelector('.account-switcher');
     if (switcher) {
       switcher.classList.remove('open');
+    }
+    
+    // Update the popover manager that this menu is closed
+    if (window.GlobalPopoverManager && window.GlobalPopoverManager.getCurrentOpenMenu() === 'account-switcher') {
+      window.GlobalPopoverManager.currentOpenMenu = null;
     }
     
     // Remove popover-open class from trigger

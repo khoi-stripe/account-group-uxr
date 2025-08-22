@@ -1854,10 +1854,9 @@
       console.log('🔧 isVisible:', isVisible);
       console.log('🔧 menu classes before:', menu.className);
       
-      // Close all other menus first
-      closeAllKebabMenus();
-      
       if (!isVisible) {
+        // Use the global popover manager to close other menus and open this one
+        window.GlobalPopoverManager.openMenu('sort-filter');
         // Only close sort menu if we're opening it (to clear state)
         closeSortMenu();
         // Clear any inline styles that might hide the menu
@@ -1912,6 +1911,10 @@
       const menu = document.getElementById('sort-filter-menu');
       if (menu) {
         menu.classList.remove('show');
+        // Update the popover manager that this menu is closed
+        if (window.GlobalPopoverManager.getCurrentOpenMenu() === 'sort-filter') {
+          window.GlobalPopoverManager.currentOpenMenu = null;
+        }
       }
     }
 
@@ -2300,6 +2303,68 @@
     window.initializeDragAndDrop = initializeDragAndDrop;
     window.refreshAccountGroupFilters = refreshAccountGroupFilters;
     
+    // Global Popover Manager - ensures only one menu/popover is open at a time
+    window.GlobalPopoverManager = {
+      currentOpenMenu: null,
+      registeredMenus: new Map(),
+      
+      // Register a menu/popover with the manager
+      register(menuId, closeFunction) {
+        this.registeredMenus.set(menuId, closeFunction);
+        console.log('🎯 PopoverManager: Registered menu:', menuId);
+      },
+      
+      // Unregister a menu/popover
+      unregister(menuId) {
+        this.registeredMenus.delete(menuId);
+        console.log('🎯 PopoverManager: Unregistered menu:', menuId);
+      },
+      
+      // Open a menu (closes any other open menu first)
+      openMenu(menuId) {
+        // Close any currently open menu first
+        if (this.currentOpenMenu && this.currentOpenMenu !== menuId) {
+          this.closeCurrentMenu();
+        }
+        
+        this.currentOpenMenu = menuId;
+        console.log('🎯 PopoverManager: Opened menu:', menuId);
+      },
+      
+      // Close the currently open menu
+      closeCurrentMenu() {
+        if (this.currentOpenMenu && this.registeredMenus.has(this.currentOpenMenu)) {
+          const closeFunction = this.registeredMenus.get(this.currentOpenMenu);
+          if (typeof closeFunction === 'function') {
+            closeFunction();
+            console.log('🎯 PopoverManager: Closed menu:', this.currentOpenMenu);
+          }
+        }
+        this.currentOpenMenu = null;
+      },
+      
+      // Force close all menus
+      closeAllMenus() {
+        this.registeredMenus.forEach((closeFunction, menuId) => {
+          if (typeof closeFunction === 'function') {
+            closeFunction();
+            console.log('🎯 PopoverManager: Force closed menu:', menuId);
+          }
+        });
+        this.currentOpenMenu = null;
+      },
+      
+      // Check if a specific menu is currently open
+      isMenuOpen(menuId) {
+        return this.currentOpenMenu === menuId;
+      },
+      
+      // Get currently open menu
+      getCurrentOpenMenu() {
+        return this.currentOpenMenu;
+      }
+    };
+    
     // Debug: Check if functions are accessible
     console.log('🔧 Global functions set:', {
       toggleSortFilter: typeof window.toggleSortFilter,
@@ -2680,6 +2745,10 @@
       // Initialize checkmarks for current sort option
       const currentOption = getCurrentSortOption();
       updateSortMenuCheckmarks(currentOption);
+      
+      // Register sort filter with the global popover manager
+      window.GlobalPopoverManager.register('sort-filter', closeSortMenu);
+      console.log('🎯 PopoverManager: Registered sort-filter menu');
     });
     
     function initializeCustomOrder() {
@@ -3016,7 +3085,12 @@
     function toggleKebabMenu(button, groupId, isSavedGroup) {
       console.log('🔥 toggleKebabMenu called!', {button, groupId, isSavedGroup});
       
-      // Close all other menus first
+      // Use the global popover manager to close other menus first
+      if (window.GlobalPopoverManager) {
+        window.GlobalPopoverManager.openMenu(`kebab-${groupId}`);
+      }
+      
+      // Close all other kebab menus first
       closeAllKebabMenus();
       
       let menu = button.querySelector('.kebab-menu');
@@ -3077,6 +3151,21 @@
         position: menu.style.position,
         classes: menu.className
       });
+      
+      // Register this kebab menu with the popover manager
+      const kebabMenuId = `kebab-${groupId}`;
+      if (window.GlobalPopoverManager) {
+        window.GlobalPopoverManager.register(kebabMenuId, () => {
+          menu.classList.remove('show');
+          menu.style.display = 'none';
+          // Reset parent card z-index
+          const card = button.closest('.account-group-card');
+          if (card) {
+            card.style.zIndex = '';
+          }
+        });
+        console.log('🎯 PopoverManager: Registered kebab menu:', kebabMenuId);
+      }
       
       // Close menu when clicking outside
       setTimeout(() => {
@@ -3233,6 +3322,12 @@
           card.style.zIndex = '';
         }
       });
+      
+      // Update the popover manager that kebab menus are closed
+      if (window.GlobalPopoverManager && window.GlobalPopoverManager.getCurrentOpenMenu() && 
+          window.GlobalPopoverManager.getCurrentOpenMenu().startsWith('kebab-')) {
+        window.GlobalPopoverManager.currentOpenMenu = null;
+      }
     }
 
     // Force clear any cached kebab menus on page load

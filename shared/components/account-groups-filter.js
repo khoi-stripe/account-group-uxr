@@ -35,6 +35,25 @@ class AccountGroupsFilter {
     this.lastGroupKey = null; // Persisted last selected group key
     
     this.init();
+    
+    // Register with the global popover manager if it exists
+    if (window.GlobalPopoverManager) {
+      window.GlobalPopoverManager.register('account-groups-filter', () => {
+        const popover = document.getElementById(this.options.popoverId);
+        const trigger = document.getElementById(this.options.triggerId);
+        if (popover) {
+          popover.style.display = 'none';
+        }
+        if (trigger) {
+          trigger.classList.remove('open');
+        }
+        // Clear stored position data when closing
+        this.triggerDimensions = null;
+        this.alignmentMode = 'left';
+        this.alignmentLocked = false;
+      });
+      console.log('🎯 PopoverManager: Registered account-groups-filter menu');
+    }
   }
   
   init() {
@@ -434,7 +453,17 @@ class AccountGroupsFilter {
       this.triggerDimensions = null;
       this.alignmentMode = 'left';
       this.alignmentLocked = false;
+      
+      // Update the popover manager that this menu is closed
+      if (window.GlobalPopoverManager && window.GlobalPopoverManager.getCurrentOpenMenu() === 'account-groups-filter') {
+        window.GlobalPopoverManager.currentOpenMenu = null;
+      }
     } else {
+      // Use the global popover manager to close other menus first
+      if (window.GlobalPopoverManager) {
+        window.GlobalPopoverManager.openMenu('account-groups-filter');
+      }
+      
       // Capture current selection state before opening
       this.captureCommittedSelection();
       popover.style.display = 'flex';
