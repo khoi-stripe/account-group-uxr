@@ -2224,6 +2224,7 @@
     window.saveCustomGroupOrder = saveCustomGroupOrder;
     window.updateGroupOrder = updateGroupOrder;
     window.initializeDragAndDrop = initializeDragAndDrop;
+    window.attachDragListeners = attachDragListeners;
     
     // Debug: Check if functions are accessible
     console.log('🔧 Global functions set:', {
@@ -2451,9 +2452,13 @@
         });
         
         // Apply responsive badge truncation after rendering real content
-    applyResponsiveBadgeTruncation();
-    setupAllEventHandlers();
+        applyResponsiveBadgeTruncation();
+        setupAllEventHandlers();
         setupTooltipHover();
+        
+        // Explicitly re-attach drag listeners after content is loaded
+        console.log('🔧 Re-attaching drag listeners after async content load');
+        attachDragListeners();
       }, 300); // Show spinner for 300ms to simulate loading
     }
 
