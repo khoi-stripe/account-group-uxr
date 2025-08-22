@@ -1886,15 +1886,9 @@
           else if (text === 'Z–A') sortOption = 'zToA';
           else if (text === 'Custom order') {
             sortOption = 'customOrder';
-            // Check if this is the custom order item and handle visibility
-            const customOrder = getCustomGroupOrder();
-            if (customOrder && customOrder.length > 0) {
-              item.style.display = '';
-              console.log('🔧 Custom order menu item: showing (has custom order)');
-            } else {
-              item.style.display = 'none';
-              console.log('🔧 Custom order menu item: hiding (no custom order)');
-            }
+            // Use the proper visibility function that checks session state
+            updateCustomOrderMenuVisibility();
+            console.log('🔧 Custom order menu item: using proper session-based visibility logic');
           }
           
           if (sortOption) {
