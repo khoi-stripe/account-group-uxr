@@ -29,34 +29,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
-    /* Wireframe bar styles to match Figma design */
-    .wireframe-bar {
-      background: #E8EAED;
-      border-radius: 8px;
-      height: 8px;
-      animation: pulse 2s ease-in-out infinite;
-    }
-    
-    .wireframe-bar.short {
-      width: 48px;
-    }
-    
-    .wireframe-bar.medium {
-      width: 96px;
-    }
-    
-    .wireframe-bar.long {
-      width: 128px;
-    }
-    
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.7;
-      }
-    }
+
 
     /* Tooltip hover styles */
     .info-icon-container:hover .info-tooltip {
@@ -1365,29 +1338,7 @@
            padding: 0 0 12px 0;
            border-bottom: 1px solid #d8dee4;
          ">
-            <!-- Table Filters (disabled account filter) -->
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="
-                display: flex;
-                align-items: center;
-                height: 24px;
-                padding: 0 6px 0 12px;
-                border: 1px solid #b6c0cd;
-                border-radius: 999px;
-                background: transparent;
-                cursor: default;
-              ">
-                <div style="margin-right: 6px; display: flex; align-items: center;">
-                  <div class="wireframe-bar short"></div>
-                </div>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="6" cy="6" r="5" stroke="#6c7688" stroke-width="1" fill="none"/>
-                  <path d="M6 3v6M3 6h6" stroke="#6c7688" stroke-width="1" stroke-linecap="round"/>
-                </svg>
-                </div>
-            </div>
-            
-            <!-- Table Actions (sort filter and add group button) -->
+            <!-- Table Filters (Sort Filter) -->
             <div style="display: flex; align-items: center; gap: 8px;">
               <!-- Sort Filter -->
               <div class="sort-filter-container" style="position: relative;">
@@ -1415,7 +1366,7 @@
                   </svg>
                 </button>
                 
-                                <!-- Sort Filter Menu (matching kebab menu) -->
+                <!-- Sort Filter Menu (matching kebab menu) -->
                 <div id="sort-filter-menu" class="kebab-menu">
                   <button class="kebab-menu-item" onclick="setSortOption('lastUpdated')">
                     Last updated
@@ -1431,6 +1382,10 @@
                   </button>
                 </div>
               </div>
+            </div>
+            
+            <!-- Table Actions (add group button) -->
+            <div style="display: flex; align-items: center; gap: 8px;">
               
               <button onclick="showFigmaCreateGroupModalV3()" style="
                 background: #675dff;
