@@ -264,6 +264,8 @@
     /* Sort filter menu positioning - 4px below trigger instead of overlapping */
     #sort-filter-menu {
       margin-top: 4px;
+      left: 0; /* Default to left-aligned, will be overridden by smart positioning JS */
+      right: auto;
     }
 
     .kebab-menu-item {
@@ -1865,6 +1867,31 @@
         menu.style.visibility = '';
         menu.style.pointerEvents = '';
         menu.classList.add('show');
+        
+        // Smart positioning: prefer left-aligned for sort filter, but flip to right if it goes off viewport
+        const trigger = document.getElementById('sort-filter-trigger');
+        if (trigger) {
+          const triggerRect = trigger.getBoundingClientRect();
+          const menuWidth = 200; // Approximate width of sort menu
+          const viewportWidth = window.innerWidth;
+          const margin = 16;
+          
+          // Check if left-aligned menu would go off right edge
+          const leftAlignedRight = triggerRect.left + menuWidth;
+          
+          if (leftAlignedRight > viewportWidth - margin) {
+            // Left alignment would go off right edge - use right alignment
+            menu.style.left = 'auto';
+            menu.style.right = '0';
+            console.log('🎯 Sort filter: Using right alignment (left would overflow)');
+          } else {
+            // Left alignment fits - use left alignment
+            menu.style.left = '0';
+            menu.style.right = 'auto';
+            console.log('🎯 Sort filter: Using left alignment (fits in viewport)');
+          }
+        }
+        
         console.log('🔧 Added show class, menu classes after:', menu.className);
         console.log('🔧 Menu after clearing styles:');
         console.log(menu.outerHTML);
