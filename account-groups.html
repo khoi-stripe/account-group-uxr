@@ -99,6 +99,23 @@
       box-shadow: 0px 4px 15px rgba(48,49,61,0.12);
     }
     
+    /* Drag handle styles */
+    .drag-handle {
+      transition: opacity 0.15s ease;
+    }
+    
+    .account-group-card:hover .drag-handle svg {
+      opacity: 0.6 !important;
+    }
+    
+    .drag-handle:hover svg {
+      opacity: 0.8 !important;
+    }
+    
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+    
     /* Disable drag during kebab menu interactions */
     .account-group-card:has(.kebab-menu.show) {
       cursor: default !important;
@@ -1714,6 +1731,18 @@
           data-draggable="true"
           style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 0px rgba(0,0,0,0.12); box-sizing: border-box; cursor: move;">
           <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 16px; width: 100%; min-height: 64px;">
+            <!-- Drag handle -->
+            <div class="drag-handle" style="display: flex; align-items: center; padding: 4px; cursor: grab; flex-shrink: 0; margin-top: 2px;">
+              <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.4;">
+                <circle cx="2" cy="2" r="1" fill="#8A96A4"/>
+                <circle cx="6" cy="2" r="1" fill="#8A96A4"/>
+                <circle cx="2" cy="7" r="1" fill="#8A96A4"/>
+                <circle cx="6" cy="7" r="1" fill="#8A96A4"/>
+                <circle cx="2" cy="12" r="1" fill="#8A96A4"/>
+                <circle cx="6" cy="12" r="1" fill="#8A96A4"/>
+              </svg>
+            </div>
+            
             <!-- Title + count container -->
             <div class="group-card-title-count-container" style="display: flex; flex-direction: row; gap: 16px; align-items: flex-start; width: 240px;">
               <!-- Title and Created Date -->
