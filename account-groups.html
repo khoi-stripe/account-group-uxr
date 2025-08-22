@@ -262,6 +262,7 @@
     .kebab-menu-item {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 8px;
       padding: 8px 12px;
       font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -276,6 +277,11 @@
       width: 100%;
       text-align: left;
       box-sizing: border-box;
+    }
+
+    .sort-menu-checkmark {
+      flex-shrink: 0;
+      margin-left: auto;
     }
 
     .kebab-menu-item:hover {
@@ -1364,17 +1370,29 @@
                 
                 <!-- Sort Filter Menu (matching kebab menu) -->
                 <div id="sort-filter-menu" class="kebab-menu">
-                  <button class="kebab-menu-item" onclick="setSortOption('lastUpdated')">
-                    Last updated
+                  <button id="sort-lastUpdated" class="kebab-menu-item" onclick="setSortOption('lastUpdated')">
+                    <span>Last updated</span>
+                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
+                    </svg>
                   </button>
-                  <button class="kebab-menu-item" onclick="setSortOption('aToZ')">
-                    A–Z
+                  <button id="sort-aToZ" class="kebab-menu-item" onclick="setSortOption('aToZ')">
+                    <span>A–Z</span>
+                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
+                    </svg>
                   </button>
-                  <button class="kebab-menu-item" onclick="setSortOption('zToA')">
-                    Z–A
+                  <button id="sort-zToA" class="kebab-menu-item" onclick="setSortOption('zToA')">
+                    <span>Z–A</span>
+                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
+                    </svg>
                   </button>
-                  <button id="custom-order-menu-item" class="kebab-menu-item" onclick="setSortOption('customOrder')" style="display: none;">
-                    Custom order
+                  <button id="sort-customOrder" class="kebab-menu-item" onclick="setSortOption('customOrder')" style="display: none;">
+                    <span>Custom order</span>
+                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -1931,6 +1949,9 @@
           break;
       }
       
+      // Update checkmark visibility
+      updateSortMenuCheckmarks(option);
+      
       // Close menu
       closeSortMenu();
       
@@ -1942,6 +1963,23 @@
       setTimeout(() => {
         initializeDragAndDrop();
       }, 100);
+    }
+
+    function updateSortMenuCheckmarks(selectedOption) {
+      // Hide all checkmarks first
+      document.querySelectorAll('.sort-menu-checkmark').forEach(checkmark => {
+        checkmark.style.display = 'none';
+      });
+      
+      // Show checkmark for selected option
+      const selectedId = `sort-${selectedOption}`;
+      const selectedButton = document.getElementById(selectedId);
+      if (selectedButton) {
+        const checkmark = selectedButton.querySelector('.sort-menu-checkmark');
+        if (checkmark) {
+          checkmark.style.display = 'block';
+        }
+      }
     }
 
     // Custom order management functions
@@ -1969,12 +2007,12 @@
     // Check if custom order exists and show/hide menu item accordingly
     function updateCustomOrderMenuVisibility() {
       const customOrder = getCustomGroupOrder();
-      const menuItem = document.getElementById('custom-order-menu-item');
+      const menuItem = document.getElementById('sort-customOrder');
       
       if (menuItem) {
         if (customOrder && customOrder.length > 0) {
           console.log('🔄 Showing custom order menu item (custom order exists)');
-          menuItem.style.display = '';
+          menuItem.style.display = 'flex';
         } else {
           console.log('🔄 Hiding custom order menu item (no custom order)');
           menuItem.style.display = 'none';
@@ -2536,6 +2574,10 @@
       
       // Initialize custom order if it exists
       initializeCustomOrder();
+      
+      // Initialize checkmarks for current sort option
+      const currentOption = getCurrentSortOption();
+      updateSortMenuCheckmarks(currentOption);
     });
     
     function initializeCustomOrder() {
