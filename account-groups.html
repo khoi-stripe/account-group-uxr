@@ -2049,6 +2049,9 @@
       // Switch to custom order mode
       setSortOption('customOrder');
       
+      // Refresh any active account group filters to reflect new order
+      refreshAccountGroupFilters();
+      
       console.log('🔄 Group order updated:', newOrder);
       return newOrder;
     }
@@ -2179,6 +2182,28 @@
       console.log('🔄 Drag ended');
     }
 
+    // Function to refresh account group filters when order changes
+    function refreshAccountGroupFilters() {
+      console.log('🔄 Refreshing account group filters after order change');
+      
+      // Refresh any global filter instances
+      if (window.reportsFilter && typeof window.reportsFilter.refresh === 'function') {
+        console.log('🔄 Refreshing reports filter');
+        window.reportsFilter.refresh();
+      }
+      
+      if (window.dashboardFilter && typeof window.dashboardFilter.refresh === 'function') {
+        console.log('🔄 Refreshing dashboard filter');
+        window.dashboardFilter.refresh();
+      }
+      
+      // Trigger a custom event that other filters can listen to
+      const event = new CustomEvent('accountGroupOrderChanged', {
+        detail: { customOrder: getCustomGroupOrder() }
+      });
+      document.dispatchEvent(event);
+    }
+
     // Make functions globally accessible
     window.toggleSortFilter = toggleSortFilter;
     window.setSortOption = setSortOption;
@@ -2186,6 +2211,7 @@
     window.saveCustomGroupOrder = saveCustomGroupOrder;
     window.updateGroupOrder = updateGroupOrder;
     window.initializeDragAndDrop = initializeDragAndDrop;
+    window.refreshAccountGroupFilters = refreshAccountGroupFilters;
     
     // Debug: Check if functions are accessible
     console.log('🔧 Global functions set:', {
@@ -2445,7 +2471,32 @@
         const groups = {};
 
         // Add custom account groups created by users
-        const customGroups = window.OrgDataManager?.getAccountGroups() || [];
+        let customGroups = window.OrgDataManager?.getAccountGroups() || [];
+
+        // Apply custom order if available
+        const customOrder = getCustomGroupOrder();
+        if (customOrder && customOrder.length > 0) {
+          // Sort groups according to custom order
+          customGroups.sort((a, b) => {
+            const indexA = customOrder.indexOf(a.id);
+            const indexB = customOrder.indexOf(b.id);
+            
+            // If both items are in custom order, sort by their position
+            if (indexA !== -1 && indexB !== -1) {
+              return indexA - indexB;
+            }
+            
+            // If only one item is in custom order, prioritize it
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+            
+            // If neither is in custom order, sort alphabetically
+            return a.name.localeCompare(b.name);
+          });
+        } else {
+          // No custom order, sort alphabetically
+          customGroups.sort((a, b) => a.name.localeCompare(b.name));
+        }
 
         customGroups.forEach(group => {
           // Get account IDs for this group
@@ -2541,7 +2592,19 @@
       
       // Refresh any existing account group filters that might already be on pages
       refreshAccountGroupFilters();
+      
+      // Initialize custom order if it exists
+      initializeCustomOrder();
     });
+    
+    function initializeCustomOrder() {
+      const customOrder = getCustomGroupOrder();
+      if (customOrder && customOrder.length > 0) {
+        console.log('🔄 Custom order found on page load, applying:', customOrder);
+        setSortOption('customOrder');
+        updateCustomOrderMenuVisibility();
+      }
+    }
 
     function applyResponsiveBadgeTruncation() {
       const accountContainers = document.querySelectorAll('.group-card-accounts-container');

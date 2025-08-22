@@ -34,8 +34,33 @@ function generateCustomAccountGroups() {
     const groups = {};
 
     // Add custom account groups created by users (single source of truth)
-    const customGroups = window.OrgDataManager?.getAccountGroups() || [];
+    let customGroups = window.OrgDataManager?.getAccountGroups() || [];
     // custom groups fetched
+
+    // Apply custom order if available
+    const customOrder = window.OrgDataManager?.getCustomGroupOrder() || [];
+    if (customOrder && customOrder.length > 0) {
+      // Sort groups according to custom order
+      customGroups.sort((a, b) => {
+        const indexA = customOrder.indexOf(a.id);
+        const indexB = customOrder.indexOf(b.id);
+        
+        // If both items are in custom order, sort by their position
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+        
+        // If only one item is in custom order, prioritize it
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        
+        // If neither is in custom order, sort alphabetically
+        return a.name.localeCompare(b.name);
+      });
+    } else {
+      // No custom order, sort alphabetically
+      customGroups.sort((a, b) => a.name.localeCompare(b.name));
+    }
 
     customGroups.forEach(group => {
       // Get account IDs for this group
