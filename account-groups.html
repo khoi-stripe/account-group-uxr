@@ -2349,8 +2349,13 @@
       
       // Open a menu (closes any other open menu first)
       openMenu(menuId) {
+        console.log('🎯 PopoverManager: Request to open menu:', menuId);
+        console.log('🎯 PopoverManager: Currently open menu:', this.currentOpenMenu);
+        console.log('🎯 PopoverManager: Registered menus:', Array.from(this.registeredMenus.keys()));
+        
         // Close any currently open menu first
         if (this.currentOpenMenu && this.currentOpenMenu !== menuId) {
+          console.log('🎯 PopoverManager: Closing current menu:', this.currentOpenMenu);
           this.closeCurrentMenu();
         }
         
@@ -2362,10 +2367,17 @@
       closeCurrentMenu() {
         if (this.currentOpenMenu && this.registeredMenus.has(this.currentOpenMenu)) {
           const closeFunction = this.registeredMenus.get(this.currentOpenMenu);
+          console.log('🎯 PopoverManager: Found close function for', this.currentOpenMenu, ':', typeof closeFunction);
           if (typeof closeFunction === 'function') {
+            console.log('🎯 PopoverManager: Calling close function for:', this.currentOpenMenu);
             closeFunction();
             console.log('🎯 PopoverManager: Closed menu:', this.currentOpenMenu);
+          } else {
+            console.log('🎯 PopoverManager: Close function is not a function:', closeFunction);
           }
+        } else {
+          console.log('🎯 PopoverManager: No close function found for:', this.currentOpenMenu);
+          console.log('🎯 PopoverManager: Available menus:', Array.from(this.registeredMenus.keys()));
         }
         this.currentOpenMenu = null;
       },
