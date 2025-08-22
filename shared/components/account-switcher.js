@@ -1791,13 +1791,11 @@ class AccountSwitcher {
   }
   
   toggle() {
-    console.log('🎯 AccountSwitcher: toggle() called, isOpen:', this.isOpen);
     if (this.isOpen) {
       this.close();
     } else {
       // Use the global popover manager to close other menus and open this one
       if (window.GlobalPopoverManager) {
-        console.log('🎯 AccountSwitcher: Calling GlobalPopoverManager.openMenu(account-switcher)');
         window.GlobalPopoverManager.openMenu('account-switcher');
       }
       this.open();
@@ -1821,20 +1819,14 @@ class AccountSwitcher {
   }
   
   close() {
-    console.log('🎯 AccountSwitcher: close() called');
     this.isOpen = false;
     
     const switcher = this.container.querySelector('.account-switcher');
     if (switcher) {
       switcher.classList.remove('open');
-      console.log('🎯 AccountSwitcher: Removed open class from switcher');
     }
     
-    // Update the popover manager that this menu is closed
-    if (window.GlobalPopoverManager && window.GlobalPopoverManager.getCurrentOpenMenu() === 'account-switcher') {
-      window.GlobalPopoverManager.currentOpenMenu = null;
-      console.log('🎯 AccountSwitcher: Updated popover manager that menu is closed');
-    }
+    // Note: No need to update popover manager state since it's handled by the manager
     
     // Remove popover-open class from trigger
     const trigger = this.container.querySelector('.account-switcher-trigger');
