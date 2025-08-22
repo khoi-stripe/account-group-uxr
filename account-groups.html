@@ -91,12 +91,16 @@
       background: rgba(103, 93, 255, 0.05);
     }
     
-    .groups-container.custom-order-mode .account-group-card {
+    .account-group-card {
       cursor: grab;
     }
     
-    .groups-container.custom-order-mode .account-group-card:hover {
+    .account-group-card:hover {
       box-shadow: 0px 4px 15px rgba(48,49,61,0.12);
+    }
+    
+    .account-group-card:active {
+      cursor: grabbing;
     }
     
     /* Drag handle styles */
@@ -106,10 +110,6 @@
     
     .account-group-card:hover .drag-handle img {
       opacity: 0.6 !important;
-    }
-    
-    .groups-container.custom-order-mode .account-group-card:active {
-      cursor: grabbing;
     }
     
     /* Disable drag during kebab menu interactions */
