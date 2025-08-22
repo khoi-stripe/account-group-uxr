@@ -2022,15 +2022,23 @@
     // Check if custom order exists and show/hide menu item accordingly
     function updateCustomOrderMenuVisibility() {
       const customOrder = getCustomGroupOrder();
+      const allGroups = window.OrgDataManager.getAccountGroups();
       const menuItem = document.getElementById('sort-customOrder');
       
       if (menuItem) {
-        if (customOrder && customOrder.length > 0) {
-          console.log('🔄 Showing custom order menu item (custom order exists)');
+        // Show custom order only if there are multiple groups AND a custom order exists
+        if (customOrder && customOrder.length > 1 && allGroups.length > 1) {
+          console.log('🔄 Showing custom order menu item (custom order exists with multiple groups)');
           menuItem.style.display = 'flex';
         } else {
-          console.log('🔄 Hiding custom order menu item (no custom order)');
+          console.log('🔄 Hiding custom order menu item (no custom order or not enough groups)');
           menuItem.style.display = 'none';
+          
+          // If current sort is custom order but it's no longer valid, switch to default
+          if (getCurrentSortOption() === 'customOrder') {
+            console.log('🔄 Switching from invalid custom order to last updated');
+            setSortOption('lastUpdated');
+          }
         }
       }
     }
@@ -2040,6 +2048,12 @@
       const allGroups = window.OrgDataManager.getAccountGroups();
       const currentSortOption = getCurrentSortOption();
       applySortToGroups(allGroups, currentSortOption);
+      
+      // Only allow reordering if there are multiple groups
+      if (allGroups.length < 2) {
+        console.log('🔄 Cannot reorder: only one group exists');
+        return;
+      }
       
       // Move the group from source to destination
       const movedGroup = allGroups.splice(sourceIndex, 1)[0];
@@ -2071,10 +2085,19 @@
         return;
       }
       
-      // Always enable drag and drop - groups are always draggable
-      console.log('🔄 Enabling drag and drop (always on)');
-      container.classList.add('custom-order-mode');
-      attachDragListeners();
+      const allGroups = window.OrgDataManager.getAccountGroups();
+      
+      // Only enable drag and drop if there are multiple groups
+      if (allGroups.length > 1) {
+        console.log('🔄 Enabling drag and drop (multiple groups exist)');
+        container.classList.add('custom-order-mode');
+        attachDragListeners();
+      } else {
+        console.log('🔄 Disabling drag and drop (only one or no groups)');
+        container.classList.remove('custom-order-mode');
+        detachDragListeners();
+        disableDragHandles();
+      }
     }
     
     function attachDragListeners() {
@@ -2104,6 +2127,22 @@
         card.removeEventListener('dragleave', handleDragLeave);
         card.removeEventListener('drop', handleDrop);
         handle.removeEventListener('dragend', handleDragEnd);
+      });
+    }
+    
+    function disableDragHandles() {
+      const dragHandles = document.querySelectorAll('.drag-handle');
+      
+      dragHandles.forEach(handle => {
+        // Remove draggable attribute and grab cursor
+        handle.removeAttribute('draggable');
+        handle.style.cursor = 'default';
+        
+        // Make drag handle less visible when disabled
+        const img = handle.querySelector('img');
+        if (img) {
+          img.style.opacity = '0.2';
+        }
       });
     }
     
@@ -2452,6 +2491,9 @@
     applyResponsiveBadgeTruncation();
     setupAllEventHandlers();
         setupTooltipHover();
+        
+        // Update custom order menu visibility based on current groups
+        updateCustomOrderMenuVisibility();
       }, 300); // Show spinner for 300ms to simulate loading
     }
 
@@ -2597,11 +2639,20 @@
     
     function initializeCustomOrder() {
       const customOrder = getCustomGroupOrder();
-      if (customOrder && customOrder.length > 0) {
-        console.log('🔄 Custom order found on page load, applying:', customOrder);
+      const allGroups = window.OrgDataManager.getAccountGroups();
+      
+      // Only apply custom order if there are multiple groups AND a custom order exists
+      if (customOrder && customOrder.length > 1 && allGroups.length > 1) {
+        console.log('🔄 Custom order found on page load with multiple groups, applying:', customOrder);
         setSortOption('customOrder');
-        updateCustomOrderMenuVisibility();
+      } else {
+        console.log('🔄 No valid custom order or not enough groups, using default: lastUpdated');
+        // Ensure we're using the default sort
+        if (getCurrentSortOption() !== 'lastUpdated') {
+          setSortOption('lastUpdated');
+        }
       }
+      updateCustomOrderMenuVisibility();
     }
 
     function applyResponsiveBadgeTruncation() {
