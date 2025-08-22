@@ -1778,6 +1778,7 @@
 
     // Sort filter functionality
     let currentSortOption = 'lastUpdated'; // Default sort option
+    let hasCustomizedOrderInSession = false; // Track if user has reordered in current session
 
     function getCurrentSortOption() {
       return currentSortOption;
@@ -2026,12 +2027,15 @@
       const menuItem = document.getElementById('sort-customOrder');
       
       if (menuItem) {
-        // Show custom order only if there are multiple groups AND a custom order exists
-        if (customOrder && customOrder.length > 1 && allGroups.length > 1) {
-          console.log('🔄 Showing custom order menu item (custom order exists with multiple groups)');
+        // Show custom order only if:
+        // 1. There are multiple groups
+        // 2. AND user has actually customized order in this session
+        // 3. AND a custom order exists in storage
+        if (allGroups.length > 1 && hasCustomizedOrderInSession && customOrder && customOrder.length > 1) {
+          console.log('🔄 Showing custom order menu item (user has customized order in session)');
           menuItem.style.display = 'flex';
         } else {
-          console.log('🔄 Hiding custom order menu item (no custom order or not enough groups)');
+          console.log('🔄 Hiding custom order menu item (user has not customized order in session)');
           menuItem.style.display = 'none';
           
           // If current sort is custom order but it's no longer valid, switch to default
@@ -2062,6 +2066,9 @@
       // Save the new order
       const newOrder = allGroups.map(group => group.id);
       saveCustomGroupOrder(newOrder);
+      
+      // Mark that user has customized order in this session
+      hasCustomizedOrderInSession = true;
       
       // Switch to custom order mode
       setSortOption('customOrder');
@@ -2666,17 +2673,16 @@
       const customOrder = getCustomGroupOrder();
       const allGroups = window.OrgDataManager.getAccountGroups();
       
-      // Only apply custom order if there are multiple groups AND a custom order exists
-      if (customOrder && customOrder.length > 1 && allGroups.length > 1) {
-        console.log('🔄 Custom order found on page load with multiple groups, applying:', customOrder);
-        setSortOption('customOrder');
-      } else {
-        console.log('🔄 No valid custom order or not enough groups, using default: lastUpdated');
-        // Ensure we're using the default sort
-        if (getCurrentSortOption() !== 'lastUpdated') {
-          setSortOption('lastUpdated');
-        }
+      // Don't automatically apply custom order on page load
+      // User must actively reorder to see the custom order option
+      console.log('🔄 Page loaded - using default sort: lastUpdated');
+      console.log('🔄 Custom order exists but hidden until user reorders in this session');
+      
+      // Always start with default sort on page load
+      if (getCurrentSortOption() !== 'lastUpdated') {
+        setSortOption('lastUpdated');
       }
+      
       updateCustomOrderMenuVisibility();
     }
 
