@@ -104,11 +104,11 @@
       transition: opacity 0.15s ease;
     }
     
-    .account-group-card:hover .drag-handle svg {
+    .account-group-card:hover .drag-handle img {
       opacity: 0.6 !important;
     }
     
-    .drag-handle:hover svg {
+    .drag-handle:hover img {
       opacity: 0.8 !important;
     }
     
@@ -1733,14 +1733,7 @@
           <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 16px; width: 100%; min-height: 64px;">
             <!-- Drag handle -->
             <div class="drag-handle" style="display: flex; align-items: center; padding: 4px; cursor: grab; flex-shrink: 0; margin-top: 2px;">
-              <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.4;">
-                <circle cx="2" cy="2" r="1" fill="#8A96A4"/>
-                <circle cx="6" cy="2" r="1" fill="#8A96A4"/>
-                <circle cx="2" cy="7" r="1" fill="#8A96A4"/>
-                <circle cx="6" cy="7" r="1" fill="#8A96A4"/>
-                <circle cx="2" cy="12" r="1" fill="#8A96A4"/>
-                <circle cx="6" cy="12" r="1" fill="#8A96A4"/>
-              </svg>
+              <img src="./shared/svgs/dragHandle.svg" alt="Drag handle" width="12" height="12" style="opacity: 0.4;">
             </div>
             
             <!-- Title + count container -->
