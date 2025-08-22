@@ -254,6 +254,12 @@
       display: block !important;
     }
 
+    /* Sort filter trigger styles */
+    .sort-filter-trigger:hover {
+      background: var(--neutral-25);
+      border-color: var(--neutral-200);
+    }
+    
     /* Sort filter menu positioning - 4px below trigger instead of overlapping */
     #sort-filter-menu {
       margin-top: 4px;
@@ -1344,26 +1350,29 @@
             <div style="display: flex; align-items: center; gap: 8px;">
               <!-- Sort Filter -->
               <div class="sort-filter-container" style="position: relative;">
-                <button id="sort-filter-trigger" onclick="toggleSortFilter()" style="
+                <button id="sort-filter-trigger" class="sort-filter-trigger" onclick="toggleSortFilter()" style="
                   display: flex;
                   align-items: center;
-                  height: 24px;
-                  padding: 0 6px 0 12px;
-                  border: 1px solid #b6c0cd;
-                  border-radius: 999px;
-                  background: transparent;
+                  justify-content: center;
+                  padding: 4px 8px;
+                  border: 1px solid var(--neutral-100);
+                  border-radius: 100px;
+                  background: white;
                   cursor: pointer;
-                  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
-                  font-weight: 600;
-                  font-size: 12px;
-                  line-height: 16px;
-                  color: #596171;
-                  letter-spacing: -0.024px;
-                  margin-right: 6px;
-                  gap: 6px;
+                  transition: all 0.15s ease;
+                  white-space: nowrap;
+                  font-size: var(--font-size-12);
+                  font-weight: var(--font-weight-semibold);
+                  line-height: var(--line-height-16);
+                  letter-spacing: 0;
+                  color: var(--neutral-900);
                 ">
-                  <span id="sort-filter-label">Last updated</span>
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <span class="trigger-show" style="color: var(--neutral-700);">Sort</span>
+                  <span class="trigger-separator" style="color: var(--neutral-300); margin: 0 4px;">|</span>
+                  <span class="trigger-option" id="sort-filter-option" style="color: var(--neutral-900); display: flex; align-items: center;">
+                    <span style="color: var(--brand-600);">Last updated</span>
+                  </span>
+                  <svg class="trigger-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--neutral-500); margin-left: 4px; flex-shrink: 0; transition: transform 0.2s ease;">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
                   </svg>
                 </button>
@@ -1922,31 +1931,36 @@
     function setSortOption(option) {
       console.log('🎯 setSortOption called with:', option);
       console.log('🎯 Event details:', event);
-      const label = document.getElementById('sort-filter-label');
+      const triggerOption = document.getElementById('sort-filter-option');
       
       // Update current sort option
       currentSortOption = option;
       
-      // Update label text
-      console.log('🎯 Updating label element:', label);
+      // Update trigger option text with styling
+      console.log('🎯 Updating trigger option element:', triggerOption);
+      let displayText = '';
       switch (option) {
         case 'aToZ':
-          label.textContent = 'A–Z';
-          console.log('🎯 Set label to: A–Z');
+          displayText = '<span style="color: var(--brand-600);">A–Z</span>';
+          console.log('🎯 Set trigger to: A–Z');
           break;
         case 'zToA':
-          label.textContent = 'Z–A';
-          console.log('🎯 Set label to: Z–A');
+          displayText = '<span style="color: var(--brand-600);">Z–A</span>';
+          console.log('🎯 Set trigger to: Z–A');
           break;
         case 'customOrder':
-          label.textContent = 'Custom order';
-          console.log('🎯 Set label to: Custom order');
+          displayText = '<span style="color: var(--brand-600);">Custom order</span>';
+          console.log('🎯 Set trigger to: Custom order');
           break;
         case 'lastUpdated':
         default:
-          label.textContent = 'Last updated';
-          console.log('🎯 Set label to: Last updated');
+          displayText = '<span style="color: var(--brand-600);">Last updated</span>';
+          console.log('🎯 Set trigger to: Last updated');
           break;
+      }
+      
+      if (triggerOption) {
+        triggerOption.innerHTML = displayText;
       }
       
       // Update checkmark visibility
