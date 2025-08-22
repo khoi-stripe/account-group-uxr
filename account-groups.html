@@ -74,6 +74,41 @@
       position: relative !important;
     }
     
+    /* Drag and Drop Styles */
+    .account-group-card[draggable="true"] {
+      transition: all 0.2s ease;
+    }
+    
+    .account-group-card.dragging {
+      opacity: 0.5;
+      transform: rotate(2deg);
+      box-shadow: 0px 8px 25px rgba(48,49,61,0.15);
+      z-index: 1000;
+    }
+    
+    .account-group-card.drag-over {
+      border: 2px dashed #675dff;
+      background: rgba(103, 93, 255, 0.05);
+    }
+    
+    .groups-container.custom-order-mode .account-group-card {
+      cursor: move;
+    }
+    
+    .groups-container.custom-order-mode .account-group-card:hover {
+      box-shadow: 0px 4px 15px rgba(48,49,61,0.12);
+    }
+    
+    /* Disable drag during kebab menu interactions */
+    .account-group-card:has(.kebab-menu.show) {
+      cursor: default !important;
+      pointer-events: auto;
+    }
+    
+    .account-group-card:has(.kebab-menu.show) * {
+      cursor: default !important;
+    }
+    
     /* Fallback for browsers without :has() support */
     .account-group-card {
       position: relative;
@@ -1379,6 +1414,9 @@
                   <button class="kebab-menu-item" onclick="setSortOption('zToA')">
                     Z–A
                   </button>
+                  <button class="kebab-menu-item" onclick="setSortOption('customOrder')">
+                    Custom order
+                  </button>
                 </div>
               </div>
               
@@ -1669,7 +1707,9 @@
           data-group-name="${sanitizedGroupName}" 
           data-group-type="${groupType}"
           data-account-count="${accounts.length}"
-          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 0px rgba(0,0,0,0.12); box-sizing: border-box;">
+          draggable="true"
+          data-draggable="true"
+          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 0px rgba(0,0,0,0.12); box-sizing: border-box; cursor: move;">
           <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 16px; width: 100%; min-height: 64px;">
             <!-- Title + count container -->
             <div class="group-card-title-count-container" style="display: flex; flex-direction: row; gap: 16px; align-items: flex-start; width: 240px;">
@@ -1756,6 +1796,31 @@
           break;
         case 'zToA':
           groups.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case 'customOrder':
+          // Apply custom order from saved preferences
+          const customOrder = getCustomGroupOrder();
+          if (customOrder && customOrder.length > 0) {
+            groups.sort((a, b) => {
+              const indexA = customOrder.indexOf(a.id);
+              const indexB = customOrder.indexOf(b.id);
+              
+              // If both items are in custom order, sort by their position
+              if (indexA !== -1 && indexB !== -1) {
+                return indexA - indexB;
+              }
+              
+              // If only one item is in custom order, prioritize it
+              if (indexA !== -1) return -1;
+              if (indexB !== -1) return 1;
+              
+              // If neither is in custom order, sort alphabetically
+              return a.name.localeCompare(b.name);
+            });
+          } else {
+            // No custom order saved, fall back to alphabetical
+            groups.sort((a, b) => a.name.localeCompare(b.name));
+          }
           break;
         case 'lastUpdated':
         default:
@@ -1873,6 +1938,10 @@
           label.textContent = 'Z–A';
           console.log('🎯 Set label to: Z–A');
           break;
+        case 'customOrder':
+          label.textContent = 'Custom order';
+          console.log('🎯 Set label to: Custom order');
+          break;
         case 'lastUpdated':
         default:
           label.textContent = 'Last updated';
@@ -1886,11 +1955,181 @@
       // Reload groups with new sort order
       console.log('🎯 Reloading groups with sort:', option);
       loadAccountGroups();
+      
+      // Initialize drag and drop for new sort option
+      setTimeout(() => {
+        initializeDragAndDrop();
+      }, 100);
+    }
+
+    // Custom order management functions
+    function getCustomGroupOrder() {
+      // Get custom order from OrgDataManager (organization-specific)
+      const customOrder = window.OrgDataManager?.getCustomGroupOrder();
+      console.log('📋 Retrieved custom group order:', customOrder);
+      return customOrder || [];
+    }
+    
+    function saveCustomGroupOrder(groupIds) {
+      // Save custom order to OrgDataManager (organization-specific)
+      console.log('💾 Saving custom group order:', groupIds);
+      if (window.OrgDataManager?.setCustomGroupOrder) {
+        window.OrgDataManager.setCustomGroupOrder(groupIds);
+        return true;
+      }
+      return false;
+    }
+    
+    function updateGroupOrder(sourceIndex, destinationIndex) {
+      // Get current groups in their displayed order
+      const allGroups = window.OrgDataManager.getAccountGroups();
+      const currentSortOption = getCurrentSortOption();
+      applySortToGroups(allGroups, currentSortOption);
+      
+      // Move the group from source to destination
+      const movedGroup = allGroups.splice(sourceIndex, 1)[0];
+      allGroups.splice(destinationIndex, 0, movedGroup);
+      
+      // Save the new order
+      const newOrder = allGroups.map(group => group.id);
+      saveCustomGroupOrder(newOrder);
+      
+      // Switch to custom order mode
+      setSortOption('customOrder');
+      
+      console.log('🔄 Group order updated:', newOrder);
+      return newOrder;
+    }
+
+    // Drag and Drop functionality
+    let draggedElement = null;
+    let dragOverElement = null;
+    
+    function initializeDragAndDrop() {
+      const container = document.getElementById('groups-container');
+      if (!container) return;
+      
+      // Enable drag and drop only in custom order mode
+      const currentSort = getCurrentSortOption();
+      if (currentSort === 'customOrder') {
+        container.classList.add('custom-order-mode');
+        attachDragListeners();
+      } else {
+        container.classList.remove('custom-order-mode');
+        detachDragListeners();
+      }
+    }
+    
+    function attachDragListeners() {
+      const groupCards = document.querySelectorAll('.account-group-card[draggable="true"]');
+      
+      groupCards.forEach(card => {
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragenter', handleDragEnter);
+        card.addEventListener('dragover', handleDragOver);
+        card.addEventListener('dragleave', handleDragLeave);
+        card.addEventListener('drop', handleDrop);
+        card.addEventListener('dragend', handleDragEnd);
+      });
+    }
+    
+    function detachDragListeners() {
+      const groupCards = document.querySelectorAll('.account-group-card[draggable="true"]');
+      
+      groupCards.forEach(card => {
+        card.removeEventListener('dragstart', handleDragStart);
+        card.removeEventListener('dragenter', handleDragEnter);
+        card.removeEventListener('dragover', handleDragOver);
+        card.removeEventListener('dragleave', handleDragLeave);
+        card.removeEventListener('drop', handleDrop);
+        card.removeEventListener('dragend', handleDragEnd);
+      });
+    }
+    
+    function handleDragStart(e) {
+      draggedElement = this;
+      this.classList.add('dragging');
+      
+      // Set drag data
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.outerHTML);
+      e.dataTransfer.setData('text/plain', this.dataset.groupId);
+      
+      console.log('🔄 Drag started for group:', this.dataset.groupId);
+    }
+    
+    function handleDragEnter(e) {
+      if (this !== draggedElement) {
+        this.classList.add('drag-over');
+        dragOverElement = this;
+      }
+    }
+    
+    function handleDragOver(e) {
+      if (e.preventDefault) {
+        e.preventDefault(); // Allow drop
+      }
+      
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+    
+    function handleDragLeave(e) {
+      // Only remove drag-over class if we're actually leaving the element
+      if (!this.contains(e.relatedTarget)) {
+        this.classList.remove('drag-over');
+      }
+    }
+    
+    function handleDrop(e) {
+      if (e.stopPropagation) {
+        e.stopPropagation(); // Stops some browsers from redirecting
+      }
+      
+      if (draggedElement !== this) {
+        // Get all group cards in current order
+        const container = document.getElementById('groups-container');
+        const allCards = Array.from(container.querySelectorAll('.account-group-card'));
+        
+        // Find indices
+        const draggedIndex = allCards.indexOf(draggedElement);
+        const targetIndex = allCards.indexOf(this);
+        
+        console.log('🔄 Dropping group at position:', draggedIndex, '→', targetIndex);
+        
+        // Update order
+        updateGroupOrder(draggedIndex, targetIndex);
+      }
+      
+      return false;
+    }
+    
+    function handleDragEnd(e) {
+      // Clean up
+      this.classList.remove('dragging');
+      
+      if (dragOverElement) {
+        dragOverElement.classList.remove('drag-over');
+        dragOverElement = null;
+      }
+      
+      // Clean up all drag-over classes
+      document.querySelectorAll('.drag-over').forEach(el => {
+        el.classList.remove('drag-over');
+      });
+      
+      draggedElement = null;
+      
+      console.log('🔄 Drag ended');
     }
 
     // Make functions globally accessible
     window.toggleSortFilter = toggleSortFilter;
     window.setSortOption = setSortOption;
+    window.getCustomGroupOrder = getCustomGroupOrder;
+    window.saveCustomGroupOrder = saveCustomGroupOrder;
+    window.updateGroupOrder = updateGroupOrder;
+    window.initializeDragAndDrop = initializeDragAndDrop;
     
     // Debug: Check if functions are accessible
     console.log('🔧 Global functions set:', {
@@ -2709,6 +2948,11 @@
     function setupAllEventHandlers() {
       setupKebabEventListeners();
       setupExpandCollapseHandlers();
+      
+      // Initialize drag and drop based on current sort option
+      setTimeout(() => {
+        initializeDragAndDrop();
+      }, 50);
     }
 
     function createKebabMenu(groupId, isSavedGroup) {

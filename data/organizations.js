@@ -542,6 +542,53 @@ class OrganizationDataManager {
     this.init();
   }
 
+  // Custom Group Ordering
+  getCustomGroupOrder() {
+    // Get custom order from organization-specific localStorage
+    const orgId = this.currentOrganization?.id;
+    if (!orgId) return [];
+    
+    const storageKey = `customGroupOrder_${orgId}`;
+    const stored = localStorage.getItem(storageKey);
+    
+    try {
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error parsing custom group order:', error);
+      return [];
+    }
+  }
+  
+  setCustomGroupOrder(groupIds) {
+    // Save custom order to organization-specific localStorage
+    const orgId = this.currentOrganization?.id;
+    if (!orgId) {
+      console.error('No current organization for saving custom group order');
+      return false;
+    }
+    
+    const storageKey = `customGroupOrder_${orgId}`;
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(groupIds));
+      console.log(`💾 Saved custom group order for org ${orgId}:`, groupIds);
+      return true;
+    } catch (error) {
+      console.error('Error saving custom group order:', error);
+      return false;
+    }
+  }
+  
+  clearCustomGroupOrder() {
+    // Clear custom order for current organization
+    const orgId = this.currentOrganization?.id;
+    if (!orgId) return false;
+    
+    const storageKey = `customGroupOrder_${orgId}`;
+    localStorage.removeItem(storageKey);
+    console.log(`🗑️ Cleared custom group order for org ${orgId}`);
+    return true;
+  }
+
   // UXR Analytics
   getGroupingInsights() {
     return {
