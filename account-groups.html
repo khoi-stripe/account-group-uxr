@@ -1414,7 +1414,7 @@
                   <button class="kebab-menu-item" onclick="setSortOption('zToA')">
                     Z–A
                   </button>
-                  <button class="kebab-menu-item" onclick="setSortOption('customOrder')">
+                  <button id="custom-order-menu-item" class="kebab-menu-item" onclick="setSortOption('customOrder')" style="display: none;">
                     Custom order
                   </button>
                 </div>
@@ -1522,6 +1522,9 @@
       
       // Initialize account groups page
       loadAccountGroups();
+      
+      // Check if custom order exists and show/hide menu item
+      updateCustomOrderMenuVisibility();
       
       console.log('🚀 Account Groups Page ready!');
     });
@@ -1885,7 +1888,18 @@
           if (text === 'Last updated') sortOption = 'lastUpdated';
           else if (text === 'A–Z') sortOption = 'aToZ';
           else if (text === 'Z–A') sortOption = 'zToA';
-          else if (text === 'Custom order') sortOption = 'customOrder';
+          else if (text === 'Custom order') {
+            sortOption = 'customOrder';
+            // Check if this is the custom order item and handle visibility
+            const customOrder = getCustomGroupOrder();
+            if (customOrder && customOrder.length > 0) {
+              item.style.display = '';
+              console.log('🔧 Custom order menu item: showing (has custom order)');
+            } else {
+              item.style.display = 'none';
+              console.log('🔧 Custom order menu item: hiding (no custom order)');
+            }
+          }
           
           if (sortOption) {
             item._sortHandler = () => setSortOption(sortOption);
@@ -1976,9 +1990,29 @@
       console.log('💾 Saving custom group order:', groupIds);
       if (window.OrgDataManager?.setCustomGroupOrder) {
         window.OrgDataManager.setCustomGroupOrder(groupIds);
+        
+        // Show custom order menu item now that user has created a custom order
+        updateCustomOrderMenuVisibility();
+        
         return true;
       }
       return false;
+    }
+    
+    // Check if custom order exists and show/hide menu item accordingly
+    function updateCustomOrderMenuVisibility() {
+      const customOrder = getCustomGroupOrder();
+      const menuItem = document.getElementById('custom-order-menu-item');
+      
+      if (menuItem) {
+        if (customOrder && customOrder.length > 0) {
+          console.log('🔄 Showing custom order menu item (custom order exists)');
+          menuItem.style.display = '';
+        } else {
+          console.log('🔄 Hiding custom order menu item (no custom order)');
+          menuItem.style.display = 'none';
+        }
+      }
     }
     
     function updateGroupOrder(sourceIndex, destinationIndex) {
@@ -2014,19 +2048,10 @@
         return;
       }
       
-      // Enable drag and drop only in custom order mode
-      const currentSort = getCurrentSortOption();
-      console.log('🔄 Current sort option:', currentSort);
-      
-      if (currentSort === 'customOrder') {
-        console.log('🔄 Enabling custom order mode');
-        container.classList.add('custom-order-mode');
-        attachDragListeners();
-      } else {
-        console.log('🔄 Disabling custom order mode');
-        container.classList.remove('custom-order-mode');
-        detachDragListeners();
-      }
+      // Always enable drag and drop - groups are always draggable
+      console.log('🔄 Enabling drag and drop (always on)');
+      container.classList.add('custom-order-mode');
+      attachDragListeners();
     }
     
     function attachDragListeners() {
