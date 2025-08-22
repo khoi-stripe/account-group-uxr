@@ -2038,7 +2038,8 @@
         // 1. There are multiple groups
         // 2. AND user has actually customized order in this session
         // 3. AND a custom order exists in storage
-        if (allGroups.length > 1 && hasCustomizedOrderInSession && customOrder && customOrder.length > 1) {
+        // CRITICAL: hasCustomizedOrderInSession must be true to show this option
+        if (allGroups.length > 1 && hasCustomizedOrderInSession === true && customOrder && customOrder.length > 1) {
           console.log('✅ Showing custom order menu item (all conditions met)');
           menuItem.style.display = 'flex';
         } else {
@@ -2671,6 +2672,13 @@
       
       // Refresh any existing account group filters that might already be on pages
       refreshAccountGroupFilters();
+      
+        // Force hide custom order menu initially
+      const customOrderMenuItem = document.getElementById('sort-customOrder');
+      if (customOrderMenuItem) {
+        customOrderMenuItem.style.display = 'none';
+        console.log('🔒 Force-hiding custom order menu on page load');
+      }
       
       // Initialize custom order if it exists
       initializeCustomOrder();
