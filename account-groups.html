@@ -2091,6 +2091,7 @@
       if (allGroups.length > 1) {
         console.log('🔄 Enabling drag and drop (multiple groups exist)');
         container.classList.add('custom-order-mode');
+        enableDragHandles();
         attachDragListeners();
       } else {
         console.log('🔄 Disabling drag and drop (only one or no groups)');
@@ -2134,14 +2135,38 @@
       const dragHandles = document.querySelectorAll('.drag-handle');
       
       dragHandles.forEach(handle => {
-        // Remove draggable attribute and grab cursor
+        // Hide the drag handle completely when only one group exists
+        handle.style.display = 'none';
         handle.removeAttribute('draggable');
         handle.style.cursor = 'default';
         
-        // Make drag handle less visible when disabled
+        // Adjust card padding when drag handle is hidden
+        const card = handle.closest('.account-group-card');
+        if (card) {
+          card.style.padding = '16px'; // Equal padding on all sides when no drag handle
+        }
+      });
+    }
+    
+    function enableDragHandles() {
+      const dragHandles = document.querySelectorAll('.drag-handle');
+      
+      dragHandles.forEach(handle => {
+        // Show and re-enable drag handles for multiple groups
+        handle.style.display = 'flex';
+        handle.setAttribute('draggable', 'true');
+        handle.style.cursor = 'grab';
+        
+        // Reset any opacity changes
         const img = handle.querySelector('img');
         if (img) {
-          img.style.opacity = '0.2';
+          img.style.opacity = '0.4';
+        }
+        
+        // Restore original card padding when drag handle is shown
+        const card = handle.closest('.account-group-card');
+        if (card) {
+          card.style.padding = '16px 16px 16px 8px'; // Original padding with reduced left for drag handle
         }
       });
     }
