@@ -2149,6 +2149,7 @@
     }
     
     function handleDragEnter(e) {
+      e.preventDefault(); // Prevent default to allow drop
       console.log('🔄 handleDragEnter called on:', this.dataset.groupId);
       if (this !== draggedElement) {
         console.log('🔄 Adding drag-over class to:', this.dataset.groupId);
@@ -2162,6 +2163,7 @@
         e.preventDefault(); // Allow drop
       }
       
+      console.log('🔄 handleDragOver called on:', this.dataset.groupId);
       e.dataTransfer.dropEffect = 'move';
       return false;
     }
@@ -2174,9 +2176,12 @@
     }
     
     function handleDrop(e) {
+      e.preventDefault(); // Prevent default behavior
       if (e.stopPropagation) {
         e.stopPropagation(); // Stops some browsers from redirecting
       }
+      
+      console.log('🔄 handleDrop called on:', this.dataset.groupId);
       
       if (draggedElement !== this) {
         // Get all group cards in current order
