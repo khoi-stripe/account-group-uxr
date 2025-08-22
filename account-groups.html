@@ -63,15 +63,11 @@
       background: rgba(103, 93, 255, 0.05);
     }
     
-    .account-group-card {
-      cursor: grab;
-    }
-    
     .account-group-card:hover {
       box-shadow: 0px 4px 15px rgba(48,49,61,0.12);
     }
     
-    .account-group-card:active {
+    .drag-handle:active {
       cursor: grabbing;
     }
     
@@ -1677,12 +1673,11 @@
           data-group-name="${sanitizedGroupName}" 
           data-group-type="${groupType}"
           data-account-count="${accounts.length}"
-          draggable="true"
           data-draggable="true"
           style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 8px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
           <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; width: 100%; min-height: 64px;">
             <!-- Drag handle -->
-            <div class="drag-handle" style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 16px; padding: 0; margin: 0; align-self: center;">
+            <div class="drag-handle" draggable="true" style="display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0; width: 16px; padding: 0; margin: 0; align-self: center;">
               <img src="./shared/svgs/dragHandle.svg" alt="Drag handle" width="12" height="12" style="opacity: 0.4;">
             </div>
             
@@ -2030,44 +2025,48 @@
     }
     
     function attachDragListeners() {
-      const groupCards = document.querySelectorAll('.account-group-card[draggable="true"]');
-      console.log('🔄 attachDragListeners: Found', groupCards.length, 'draggable cards');
+      const dragHandles = document.querySelectorAll('.drag-handle[draggable="true"]');
+      console.log('🔄 attachDragListeners: Found', dragHandles.length, 'draggable handles');
       
-      groupCards.forEach((card, index) => {
-        console.log('🔄 Attaching listeners to card', index + 1, ':', card.dataset.groupId);
-        card.addEventListener('dragstart', handleDragStart);
+      dragHandles.forEach((handle, index) => {
+        const card = handle.closest('.account-group-card');
+        console.log('🔄 Attaching listeners to handle', index + 1, ':', card.dataset.groupId);
+        handle.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragenter', handleDragEnter);
         card.addEventListener('dragover', handleDragOver);
         card.addEventListener('dragleave', handleDragLeave);
         card.addEventListener('drop', handleDrop);
-        card.addEventListener('dragend', handleDragEnd);
+        handle.addEventListener('dragend', handleDragEnd);
       });
     }
     
     function detachDragListeners() {
-      const groupCards = document.querySelectorAll('.account-group-card[draggable="true"]');
+      const dragHandles = document.querySelectorAll('.drag-handle[draggable="true"]');
       
-      groupCards.forEach(card => {
-        card.removeEventListener('dragstart', handleDragStart);
+      dragHandles.forEach(handle => {
+        const card = handle.closest('.account-group-card');
+        handle.removeEventListener('dragstart', handleDragStart);
         card.removeEventListener('dragenter', handleDragEnter);
         card.removeEventListener('dragover', handleDragOver);
         card.removeEventListener('dragleave', handleDragLeave);
         card.removeEventListener('drop', handleDrop);
-        card.removeEventListener('dragend', handleDragEnd);
+        handle.removeEventListener('dragend', handleDragEnd);
       });
     }
     
     function handleDragStart(e) {
-      console.log('🔄 handleDragStart called on:', this.dataset.groupId);
-      draggedElement = this;
-      this.classList.add('dragging');
+      // 'this' is now the drag handle, get the card
+      const card = this.closest('.account-group-card');
+      console.log('🔄 handleDragStart called on:', card.dataset.groupId);
+      draggedElement = card;
+      card.classList.add('dragging');
       
       // Set drag data
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', this.outerHTML);
-      e.dataTransfer.setData('text/plain', this.dataset.groupId);
+      e.dataTransfer.setData('text/html', card.outerHTML);
+      e.dataTransfer.setData('text/plain', card.dataset.groupId);
       
-      console.log('🔄 Drag started for group:', this.dataset.groupId);
+      console.log('🔄 Drag started for group:', card.dataset.groupId);
     }
     
     function handleDragEnter(e) {
@@ -2119,8 +2118,11 @@
     }
     
     function handleDragEnd(e) {
+      // 'this' is now the drag handle, get the card
+      const card = this.closest('.account-group-card');
+      
       // Clean up
-      this.classList.remove('dragging');
+      card.classList.remove('dragging');
       
       if (dragOverElement) {
         dragOverElement.classList.remove('drag-over');
