@@ -545,14 +545,23 @@ class OrganizationDataManager {
   // Custom Group Ordering
   getCustomGroupOrder() {
     // Get custom order from organization-specific localStorage
-    const orgId = this.currentOrganization?.id;
-    if (!orgId) return [];
+    console.log('🔧 getCustomGroupOrder called');
+    console.log('🔧 currentOrganization:', this.currentOrganization);
+    
+    let orgId = this.currentOrganization?.id;
+    if (!orgId) {
+      console.log('🔧 No current org, using fallback...');
+      orgId = this.organizations?.[0]?.id || 'default';
+      console.log('🔧 Using fallback org ID:', orgId);
+    }
     
     const storageKey = `customGroupOrder_${orgId}`;
     const stored = localStorage.getItem(storageKey);
     
     try {
-      return stored ? JSON.parse(stored) : [];
+      const result = stored ? JSON.parse(stored) : [];
+      console.log(`🔧 Retrieved custom order for ${orgId}:`, result);
+      return result;
     } catch (error) {
       console.error('Error parsing custom group order:', error);
       return [];
@@ -561,10 +570,29 @@ class OrganizationDataManager {
   
   setCustomGroupOrder(groupIds) {
     // Save custom order to organization-specific localStorage
+    console.log('🔧 setCustomGroupOrder called with:', groupIds);
+    console.log('🔧 currentOrganization:', this.currentOrganization);
+    console.log('🔧 currentOrganization.id:', this.currentOrganization?.id);
+    
     const orgId = this.currentOrganization?.id;
     if (!orgId) {
       console.error('No current organization for saving custom group order');
-      return false;
+      console.log('🔧 Available organizations:', this.organizations);
+      console.log('🔧 Using fallback org ID approach...');
+      
+      // Fallback: use the first organization ID or a default
+      const fallbackOrgId = this.organizations?.[0]?.id || 'default';
+      console.log('🔧 Using fallback org ID:', fallbackOrgId);
+      
+      const storageKey = `customGroupOrder_${fallbackOrgId}`;
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(groupIds));
+        console.log(`💾 Saved custom group order for fallback org ${fallbackOrgId}:`, groupIds);
+        return true;
+      } catch (error) {
+        console.error('Error saving custom group order with fallback:', error);
+        return false;
+      }
     }
     
     const storageKey = `customGroupOrder_${orgId}`;
