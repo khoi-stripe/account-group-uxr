@@ -1938,10 +1938,8 @@
       const menu = document.getElementById('sort-filter-menu');
       if (menu) {
         menu.classList.remove('show');
-        // Update the popover manager that this menu is closed
-        if (window.GlobalPopoverManager.getCurrentOpenMenu() === 'sort-filter') {
-          window.GlobalPopoverManager.currentOpenMenu = null;
-        }
+        // Note: No need to update popover manager state here since the manager handles it
+        console.log('🎯 SortFilter: Menu closed');
       }
     }
 
@@ -2356,10 +2354,29 @@
         // Close any currently open menu first
         if (this.currentOpenMenu && this.currentOpenMenu !== menuId) {
           console.log('🎯 PopoverManager: Closing current menu:', this.currentOpenMenu);
-          this.closeCurrentMenu();
+          const previousMenu = this.currentOpenMenu;
+          // Set the new menu ID BEFORE calling close functions to prevent race condition
+          this.currentOpenMenu = menuId;
+          // Call the close function for the previous menu
+          if (this.registeredMenus.has(previousMenu)) {
+            const closeFunction = this.registeredMenus.get(previousMenu);
+            console.log('🎯 PopoverManager: Found close function for', previousMenu, ':', typeof closeFunction);
+            if (typeof closeFunction === 'function') {
+              console.log('🎯 PopoverManager: Calling close function for:', previousMenu);
+              closeFunction();
+              console.log('🎯 PopoverManager: Closed menu:', previousMenu);
+            } else {
+              console.log('🎯 PopoverManager: Close function is not a function:', closeFunction);
+            }
+          } else {
+            console.log('🎯 PopoverManager: No close function found for:', previousMenu);
+            console.log('🎯 PopoverManager: Available menus:', Array.from(this.registeredMenus.keys()));
+          }
+        } else {
+          // No previous menu to close, just set the current menu
+          this.currentOpenMenu = menuId;
         }
         
-        this.currentOpenMenu = menuId;
         console.log('🎯 PopoverManager: Opened menu:', menuId);
       },
       
