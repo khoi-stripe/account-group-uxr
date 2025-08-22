@@ -291,18 +291,23 @@ class AccountGroupsFilter {
     const viewportWidth = window.innerWidth;
     const margin = 16;
     
-    // Check if right-aligned popover would go off right edge
+    // Check if left-aligned popover would go off left edge
     const triggerLeftInViewport = triggerRect.left;
-    const rightAlignedLeft = triggerLeftInViewport + this.triggerDimensions.width - popoverWidth;
-    const rightAlignedRight = rightAlignedLeft + popoverWidth;
+    const leftAlignedRight = triggerLeftInViewport + popoverWidth;
     
-    // Determine alignment: prefer right, fallback to left
-    if (rightAlignedRight > viewportWidth - margin || rightAlignedLeft < margin) {
-      // Right alignment would go off edge - use left alignment
-      this.alignmentMode = 'left';
+    // Determine alignment: prefer left, fallback to right
+    if (leftAlignedRight > viewportWidth - margin) {
+      // Left alignment would go off right edge - use right alignment
+      const rightAlignedLeft = triggerLeftInViewport + this.triggerDimensions.width - popoverWidth;
+      if (rightAlignedLeft >= margin) {
+        this.alignmentMode = 'right';
+      } else {
+        // Both alignments problematic, use left anyway
+        this.alignmentMode = 'left';
+      }
     } else {
-      // Right alignment fits - use right alignment
-      this.alignmentMode = 'right';
+      // Left alignment fits - use left alignment
+      this.alignmentMode = 'left';
     }
   }
   

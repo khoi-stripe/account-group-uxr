@@ -3126,7 +3126,7 @@
         display: menu.style.display
       });
       
-      // Force show the menu
+      // Force show the menu with smart positioning
       menu.style.display = 'block';
       menu.style.opacity = '1';
       menu.style.visibility = 'visible';
@@ -3134,8 +3134,30 @@
       menu.style.pointerEvents = 'auto';
       menu.style.position = 'absolute';
       menu.style.top = '100%';
-      menu.style.right = '0';
       menu.style.zIndex = '10001';
+      
+      // Smart positioning: prefer right-aligned, but flip to left if it goes off viewport
+      const buttonRect = button.getBoundingClientRect();
+      const menuWidth = 160; // Min width from CSS
+      const viewportWidth = window.innerWidth;
+      const margin = 16;
+      
+      // Check if right-aligned menu would go off right edge
+      const rightAlignedLeft = buttonRect.right - menuWidth;
+      const rightAlignedRight = buttonRect.right;
+      
+      if (rightAlignedRight > viewportWidth - margin || rightAlignedLeft < margin) {
+        // Right alignment would go off edge - use left alignment
+        menu.style.left = '0';
+        menu.style.right = 'auto';
+        console.log('🎯 Kebab menu: Using left alignment (right would overflow)');
+      } else {
+        // Right alignment fits - use right alignment
+        menu.style.right = '0';
+        menu.style.left = 'auto';
+        console.log('🎯 Kebab menu: Using right alignment (fits in viewport)');
+      }
+      
       menu.classList.add('show');
       
       // Increase parent card z-index for browsers without :has() support
