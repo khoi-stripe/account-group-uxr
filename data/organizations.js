@@ -532,7 +532,7 @@ class OrganizationDataManager {
     // Clear user-created custom account groups stored by creation modal
     localStorage.removeItem('accountGroups');
     Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('uxr_account_groups_')) {
+      if (key.startsWith('uxr_account_groups_') || key.startsWith('customGroupOrder_')) {
         localStorage.removeItem(key);
       }
     });

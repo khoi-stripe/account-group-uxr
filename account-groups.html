@@ -2026,16 +2026,27 @@
       const allGroups = window.OrgDataManager.getAccountGroups();
       const menuItem = document.getElementById('sort-customOrder');
       
+      // Enhanced debugging
+      console.log('🔍 updateCustomOrderMenuVisibility() called:');
+      console.log('  - allGroups.length:', allGroups.length);
+      console.log('  - hasCustomizedOrderInSession:', hasCustomizedOrderInSession);
+      console.log('  - customOrder:', customOrder);
+      console.log('  - customOrder.length:', customOrder ? customOrder.length : 'null');
+      
       if (menuItem) {
         // Show custom order only if:
         // 1. There are multiple groups
         // 2. AND user has actually customized order in this session
         // 3. AND a custom order exists in storage
         if (allGroups.length > 1 && hasCustomizedOrderInSession && customOrder && customOrder.length > 1) {
-          console.log('🔄 Showing custom order menu item (user has customized order in session)');
+          console.log('✅ Showing custom order menu item (all conditions met)');
           menuItem.style.display = 'flex';
         } else {
-          console.log('🔄 Hiding custom order menu item (user has not customized order in session)');
+          console.log('❌ Hiding custom order menu item - reasons:');
+          if (allGroups.length <= 1) console.log('  - Not enough groups (need 2+)');
+          if (!hasCustomizedOrderInSession) console.log('  - User has not customized order in this session');
+          if (!customOrder || customOrder.length <= 1) console.log('  - No valid custom order in storage');
+          
           menuItem.style.display = 'none';
           
           // If current sort is custom order but it's no longer valid, switch to default
