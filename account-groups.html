@@ -1885,6 +1885,7 @@
           if (text === 'Last updated') sortOption = 'lastUpdated';
           else if (text === 'A–Z') sortOption = 'aToZ';
           else if (text === 'Z–A') sortOption = 'zToA';
+          else if (text === 'Custom order') sortOption = 'customOrder';
           
           if (sortOption) {
             item._sortHandler = () => setSortOption(sortOption);
@@ -2006,15 +2007,23 @@
     let dragOverElement = null;
     
     function initializeDragAndDrop() {
+      console.log('🔄 initializeDragAndDrop called');
       const container = document.getElementById('groups-container');
-      if (!container) return;
+      if (!container) {
+        console.log('❌ groups-container not found');
+        return;
+      }
       
       // Enable drag and drop only in custom order mode
       const currentSort = getCurrentSortOption();
+      console.log('🔄 Current sort option:', currentSort);
+      
       if (currentSort === 'customOrder') {
+        console.log('🔄 Enabling custom order mode');
         container.classList.add('custom-order-mode');
         attachDragListeners();
       } else {
+        console.log('🔄 Disabling custom order mode');
         container.classList.remove('custom-order-mode');
         detachDragListeners();
       }
@@ -2022,8 +2031,10 @@
     
     function attachDragListeners() {
       const groupCards = document.querySelectorAll('.account-group-card[draggable="true"]');
+      console.log('🔄 attachDragListeners: Found', groupCards.length, 'draggable cards');
       
-      groupCards.forEach(card => {
+      groupCards.forEach((card, index) => {
+        console.log('🔄 Attaching listeners to card', index + 1, ':', card.dataset.groupId);
         card.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragenter', handleDragEnter);
         card.addEventListener('dragover', handleDragOver);
@@ -2047,6 +2058,7 @@
     }
     
     function handleDragStart(e) {
+      console.log('🔄 handleDragStart called on:', this.dataset.groupId);
       draggedElement = this;
       this.classList.add('dragging');
       
@@ -2059,7 +2071,9 @@
     }
     
     function handleDragEnter(e) {
+      console.log('🔄 handleDragEnter called on:', this.dataset.groupId);
       if (this !== draggedElement) {
+        console.log('🔄 Adding drag-over class to:', this.dataset.groupId);
         this.classList.add('drag-over');
         dragOverElement = this;
       }
