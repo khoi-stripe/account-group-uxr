@@ -2554,22 +2554,6 @@
     // Make generateAccountGroups globally accessible
     window.generateAccountGroups = generateAccountGroups;
 
-    // Function to refresh any existing account group filters on the page
-    function refreshAccountGroupFilters() {
-      // Check if there are any AccountGroupsFilter instances on the page
-      if (typeof window.accountGroupsFilters !== 'undefined' && Array.isArray(window.accountGroupsFilters)) {
-        console.log('🔄 Refreshing account group filters...');
-        window.accountGroupsFilters.forEach(filter => {
-          if (filter && typeof filter.refreshAccountGroups === 'function') {
-            filter.refreshAccountGroups();
-          }
-        });
-      }
-    }
-
-    // Make refreshAccountGroupFilters globally accessible
-    window.refreshAccountGroupFilters = refreshAccountGroupFilters;
-
     // Test the generateAccountGroups function and refresh any existing filters
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🧪 Testing generateAccountGroups function...');
