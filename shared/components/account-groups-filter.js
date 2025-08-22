@@ -37,8 +37,17 @@ class AccountGroupsFilter {
     this.init();
     
     // Register with the global popover manager if it exists
+    // Use unique ID based on namespace or triggerId to avoid conflicts with multiple filter instances
+    this.popoverManagerId = this.options.namespace ? 
+      `account-groups-filter-${this.options.namespace}` : 
+      `account-groups-filter-${this.options.triggerId}`;
+      
+    this.registerWithPopoverManager();
+  }
+  
+  registerWithPopoverManager() {
     if (window.GlobalPopoverManager) {
-      window.GlobalPopoverManager.register('account-groups-filter', () => {
+      window.GlobalPopoverManager.register(this.popoverManagerId, () => {
         const popover = document.getElementById(this.options.popoverId);
         const trigger = document.getElementById(this.options.triggerId);
         if (popover) {
@@ -52,7 +61,12 @@ class AccountGroupsFilter {
         this.alignmentMode = 'left';
         this.alignmentLocked = false;
       });
-      console.log('🎯 PopoverManager: Registered account-groups-filter menu');
+      console.log('🎯 PopoverManager: Registered account-groups-filter menu with ID:', this.popoverManagerId);
+    } else {
+      // Retry registration after a short delay if GlobalPopoverManager isn't ready yet
+      setTimeout(() => {
+        this.registerWithPopoverManager();
+      }, 100);
     }
   }
   
@@ -455,13 +469,13 @@ class AccountGroupsFilter {
       this.alignmentLocked = false;
       
       // Update the popover manager that this menu is closed
-      if (window.GlobalPopoverManager && window.GlobalPopoverManager.getCurrentOpenMenu() === 'account-groups-filter') {
+      if (window.GlobalPopoverManager && window.GlobalPopoverManager.getCurrentOpenMenu() === this.popoverManagerId) {
         window.GlobalPopoverManager.currentOpenMenu = null;
       }
     } else {
       // Use the global popover manager to close other menus first
       if (window.GlobalPopoverManager) {
-        window.GlobalPopoverManager.openMenu('account-groups-filter');
+        window.GlobalPopoverManager.openMenu(this.popoverManagerId);
       }
       
       // Capture current selection state before opening
