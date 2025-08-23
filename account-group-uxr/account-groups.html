@@ -76,7 +76,7 @@
     /* Drag handle styles */
     .drag-handle {
       transition: opacity 0.15s ease;
-      /* Expanded drag area - covers full left side of card */
+      /* Expanded drag area - covers full height of card */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2583,7 +2583,7 @@
       // Hug contents: no min-height or flex growth
       container.style.minHeight = 'auto';
       container.style.flex = '0 0 auto';
-      container.style.padding = '0';
+      container.style.padding = 'var(--Spacing-medium, 16px)';
       container.style.flexDirection = 'column';
       container.style.alignItems = 'flex-start';
       container.style.gap = '16px';
