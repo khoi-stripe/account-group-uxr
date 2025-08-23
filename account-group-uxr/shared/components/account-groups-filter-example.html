@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Groups Filter - Design Preview</title>
+    
+    <!-- Import shared styles -->
+    <link rel="stylesheet" href="../styles/variables.css">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/account-groups-filter.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            font-family: var(--font-family-ui);
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--neutral-900);
+            margin: 0 0 8px 0;
+        }
+
+        .page-description {
+            font-size: 14px;
+            color: var(--neutral-600);
+            margin: 0;
+        }
+
+        .filter-demo {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Force the popover to display and position it for design work */
+        .account-groups-popover {
+            display: flex !important;
+            position: static !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="page-title">Account Groups Filter - Design Preview</h1>
+            <p class="page-description">
+                Design and development workspace for the account groups filter component. 
+                The filter is shown in its open state for easy design iteration.
+            </p>
+        </div>
+
+        <div class="filter-demo">
+            <!-- Filter Trigger Button -->
+            <button class="account-groups-trigger open" id="filterTrigger">
+                <span class="trigger-show">Accounts</span>
+                <span class="trigger-separator">|</span>
+                <span class="trigger-option" id="filterOption">All</span>
+                <svg class="trigger-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
+                </svg>
+            </button>
+
+            <!-- Filter Popover (Always Open for Design Work) -->
+            <div class="account-groups-popover" id="popover">
+                <!-- Column 1 - Groups -->
+                <div class="groups-section">
+                    <div class="groups-header">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px; flex-shrink: 0;">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M16 7.82679C16 7.94141 15.9803 8.05518 15.9417 8.16312L13.974 13.6727C13.6898 14.4687 12.9358 15 12.0906 15H2C0.895431 15 0 14.1046 0 13V3C0 1.89543 0.89543 1 2 1H4.58579C4.851 1 5.10536 1.10536 5.29289 1.29289L6 2H11C12.1046 2 13 2.89543 13 4V5H14C15.1046 5 16 5.89543 16 7V7.82679ZM3.75 6.5C3.33579 6.5 3 6.16421 3 5.75C3 5.33579 3.33579 5 3.75 5H11.5V4C11.5 3.72386 11.2761 3.5 11 3.5H6C5.60218 3.5 5.22064 3.34196 4.93934 3.06066L4.37868 2.5H2C1.72386 2.5 1.5 2.72386 1.5 3V13C1.5 13.2761 1.72386 13.5 2 13.5H12.0906C12.3019 13.5 12.4904 13.3672 12.5614 13.1682L14.5 7.74018V7C14.5 6.72386 14.2761 6.5 14 6.5H3.75Z" fill="currentColor"/>
+                        </svg>
+                        Groups
+                    </div>
+                    <button class="group-item active" data-group="all">All</button>
+                    <button class="group-item" data-group="shady_stuff">Shady Stuff</button>
+                    <button class="group-item" data-group="all_accounts">All Accounts</button>
+                    <button class="group-item" data-group="large_group">Large Group</button>
+                    <button class="group-item" data-group="test">Test</button>
+                </div>
+
+                <!-- Column 2 - Accounts Section -->
+                <div class="accounts-section">
+                    <div class="filter-search-container">
+                        <div class="filter-search-icon">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                                <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <input type="text" class="filter-search-input" id="searchInput" placeholder="Search accounts">
+                    </div>
+                    
+                    <!-- Select All Row -->
+                    <div class="select-all-container" id="selectAllContainer">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Accounts List -->
+                    <div class="accounts-list" id="accountsList">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="popover-footer">
+                        <div class="footer-buttons">
+                            <button class="btn-cancel" onclick="closeFilter()">Cancel</button>
+                            <button class="btn-apply" onclick="applyFilter()">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="account-groups-filter.js"></script>
+    <script src="account-groups-data.js"></script>
+    <script>
+        // Helper function to generate initials from name
+        function generateInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // Sample account data for design work
+        function generateAccountGroups() {
+            const rawAccounts = [
+                { id: 'sa', name: 'Shadow Analytics', color: '#4285f4', avatar: 'https://picsum.photos/seed/shadow/32/32' },
+                { id: 'aa', name: 'Apex Acquisitions', color: '#34a853', avatar: 'https://picsum.photos/seed/apex/32/32' },
+                { id: 'nn', name: 'Nightfall Networks', color: '#4285f4', avatar: 'https://picsum.photos/seed/nightfall/32/32' },
+                { id: 'cc', name: 'Cerberus Corp', color: '#34a853', avatar: 'https://picsum.photos/seed/cerberus/32/32' },
+                { id: 'pl', name: 'Phantom Labs', color: '#4285f4', avatar: 'https://picsum.photos/seed/phantom/32/32' },
+                { id: 'ot', name: 'Obsidian Technologies', color: '#34a853', avatar: 'https://picsum.photos/seed/obsidian/32/32' },
+                { id: 'he', name: 'Helios Energy', color: '#4285f4', avatar: 'https://picsum.photos/seed/helios/32/32' },
+                { id: 'bb', name: 'Blackwater Banking', color: '#34a853', avatar: 'https://picsum.photos/seed/blackwater/32/32' },
+                { id: 'cp', name: 'Chimera Platforms', color: '#4285f4', avatar: 'https://picsum.photos/seed/chimera/32/32' },
+                { id: 'll', name: 'Labyrinth Logic', color: '#34a853', avatar: 'https://picsum.photos/seed/labyrinth/32/32' },
+                { id: 'ti', name: 'Typhon Industries', color: '#4285f4', avatar: 'https://picsum.photos/seed/typhon/32/32' },
+                { id: 'hf', name: 'Hydra Financial', color: '#34a853', avatar: 'https://picsum.photos/seed/hydra/32/32' },
+                { id: 'nd', name: 'Nemesis Digital', color: '#4285f4', avatar: 'https://picsum.photos/seed/nemesis/32/32' },
+                { id: 'ps', name: 'Pandora Solutions', color: '#34a853', avatar: 'https://picsum.photos/seed/pandora/32/32' },
+                { id: 'mi', name: 'Mirage Innovations', color: '#4285f4', avatar: 'https://picsum.photos/seed/mirage/32/32' },
+                { id: 'leviathan', name: 'Leviathan Ltd', color: '#34a853', avatar: 'https://picsum.photos/seed/leviathan/32/32' },
+                { id: 'es', name: 'Enigma Solutions', color: '#4285f4', avatar: 'https://picsum.photos/seed/enigma/32/32' },
+                { id: 'tt', name: 'Tartarus Tech', color: '#34a853', avatar: 'https://picsum.photos/seed/tartarus/32/32' },
+                { id: 'ea', name: 'Erebus Aerospace', color: '#4285f4', avatar: 'https://picsum.photos/seed/erebus/32/32' },
+                { id: 'srs', name: 'Styx River Solutions', color: '#34a853', avatar: 'https://picsum.photos/seed/styx/32/32' }
+            ];
+
+            // Transform raw account data to the format expected by the filter
+            const transformedAccounts = rawAccounts.map(account => ({
+                id: account.id,
+                name: account.name,
+                initials: generateInitials(account.name),
+                color: account.color === '#4285f4' ? 'blue' : 'green', // Convert hex to class name
+                backgroundColor: account.color, // Keep original hex for background
+                checked: true,
+                type: 'Account',
+                avatar: account.avatar // Add avatar URL
+            }));
+
+            return {
+                all: transformedAccounts,
+                shady_stuff: transformedAccounts.filter(acc => ['sa', 'nn', 'ot'].includes(acc.id)),
+                all_accounts: transformedAccounts.filter(acc => ['aa', 'cc', 'pl'].includes(acc.id)),
+                large_group: transformedAccounts.filter(acc => ['he', 'bb', 'cp', 'll', 'ti', 'hf', 'nd', 'ps', 'mi', 'leviathan'].includes(acc.id)),
+                test: transformedAccounts.filter(acc => ['es', 'tt', 'ea'].includes(acc.id))
+            };
+        }
+
+        // Global functions for button handlers
+        function closeFilter() {
+            console.log('Close filter clicked');
+        }
+
+        function applyFilter() {
+            console.log('Apply filter clicked');
+        }
+
+        // Initialize the filter component
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎨 Initializing design preview filter...');
+            
+            const getAccountGroups = () => {
+                console.log('📋 Using sample account groups for design preview');
+                return generateAccountGroups();
+            };
+            
+            // Test data generation
+            const testData = getAccountGroups();
+            console.log('🔧 Test data:', testData);
+            
+            // Initialize the filter
+            const filter = new AccountGroupsFilter({
+                triggerId: 'filterTrigger',
+                popoverId: 'popover',
+                searchInputId: 'searchInput',
+                selectAllContainerId: 'selectAllContainer',
+                accountsListId: 'accountsList',
+                triggerOptionId: 'filterOption',
+                generateAccountGroups: getAccountGroups
+            });
+            
+            // Make filter globally accessible
+            window.designFilter = filter;
+            
+            console.log('✅ Design preview filter initialized:', filter);
+            
+            // Force render after a delay to ensure DOM is ready
+            setTimeout(() => {
+                console.log('🔧 Forcing initial render...');
+                filter.renderAccounts();
+                
+                // Check if elements exist
+                const selectAll = document.getElementById('selectAllContainer');
+                const accountsList = document.getElementById('accountsList');
+                console.log('🔧 selectAllContainer:', selectAll);
+                console.log('🔧 accountsList:', accountsList);
+                console.log('🔧 selectAll innerHTML:', selectAll?.innerHTML);
+                console.log('🔧 accountsList innerHTML:', accountsList?.innerHTML);
+            }, 100);
+        });
+    </script>
+</body>
+</html>

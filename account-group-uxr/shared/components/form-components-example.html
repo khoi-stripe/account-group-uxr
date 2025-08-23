@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Components - Consolidated UI System</title>
+    
+    <!-- Include shared styles -->
+    <link rel="stylesheet" href="../styles/variables.css">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/typography.css">
+    
+    <style>
+        body {
+            padding: 40px;
+            background: var(--neutral-25);
+            font-family: var(--font-family-ui);
+        }
+        
+        .demo-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-section {
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--neutral-100);
+        }
+        
+        .demo-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        
+        .demo-item {
+            padding: 20px;
+            border: 1px solid var(--neutral-200);
+            border-radius: 8px;
+            background: var(--neutral-25);
+        }
+        
+        .demo-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--neutral-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .code-example {
+            background: var(--neutral-900);
+            color: var(--neutral-100);
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--green-100);
+            color: var(--green-800);
+            margin-bottom: 16px;
+        }
+        
+        .form-showcase {
+            max-width: 400px;
+        }
+        
+        .inline-demo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .size-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Form Components</h1>
+        <span class="status-badge">Consolidated System</span>
+        <p style="color: var(--neutral-600); margin-bottom: 32px;">
+            A unified form UI system that ensures consistency across all components and pages.
+        </p>
+
+        <!-- Text Inputs -->
+        <div class="demo-section">
+            <h2>Text Inputs</h2>
+            <p style="color: var(--neutral-600);">Standard text input with focus states and validation.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-title">Default</div>
+                    <div class="form-group">
+                        <label class="form-label" for="demo-input-1">Group name</label>
+                        <input type="text" id="demo-input-1" class="form-input" placeholder="North America">
+                        <div class="form-help">Enter a descriptive name</div>
+                    </div>
+                    <div class="code-example">&lt;input class="form-input" placeholder="North America"&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Error State</div>
+                    <div class="form-group">
+                        <label class="form-label" for="demo-input-2">Email address</label>
+                        <input type="email" id="demo-input-2" class="form-input error" value="invalid-email">
+                        <div class="form-error">Please enter a valid email address</div>
+                    </div>
+                    <div class="code-example">&lt;input class="form-input error"&gt;
+&lt;div class="form-error"&gt;Error message&lt;/div&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Success State</div>
+                    <div class="form-group">
+                        <label class="form-label" for="demo-input-3">Organization</label>
+                        <input type="text" id="demo-input-3" class="form-input success" value="Acme Technologies">
+                        <div class="form-success">Organization verified</div>
+                    </div>
+                    <div class="code-example">&lt;input class="form-input success"&gt;
+&lt;div class="form-success"&gt;Success message&lt;/div&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Disabled</div>
+                    <div class="form-group">
+                        <label class="form-label" for="demo-input-4">Read only</label>
+                        <input type="text" id="demo-input-4" class="form-input" value="Cannot be edited" disabled>
+                    </div>
+                    <div class="code-example">&lt;input class="form-input" disabled&gt;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Size Variants -->
+        <div class="demo-section">
+            <h2>Input Size Variants</h2>
+            <p style="color: var(--neutral-600);">Three size variants available for text inputs, selectors, and search inputs.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-title">Small (24px height)</div>
+                    <div class="size-demo">
+                        <div class="form-group">
+                            <label class="form-label" for="input-small">Text Input</label>
+                            <input type="text" id="input-small" class="form-input small" placeholder="Small input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="select-small">Select Input</label>
+                            <select id="select-small" class="form-select small">
+                                <option>Option 1</option>
+                                <option>Option 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="search-small">Search Input</label>
+                            <input type="search" id="search-small" class="search-input small" placeholder="Search...">
+                        </div>
+                    </div>
+                    <div class="code-example">&lt;input class="form-input small"&gt;
+&lt;select class="form-select small"&gt;
+&lt;input class="search-input small"&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Medium (28px height)</div>
+                    <div class="size-demo">
+                        <div class="form-group">
+                            <label class="form-label" for="input-medium">Text Input</label>
+                            <input type="text" id="input-medium" class="form-input medium" placeholder="Medium input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="select-medium">Select Input</label>
+                            <select id="select-medium" class="form-select medium">
+                                <option>Option 1</option>
+                                <option>Option 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="search-medium">Search Input</label>
+                            <input type="search" id="search-medium" class="search-input medium" placeholder="Search...">
+                        </div>
+                    </div>
+                    <div class="code-example">&lt;input class="form-input medium"&gt;
+&lt;select class="form-select medium"&gt;
+&lt;input class="search-input medium"&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Large (40px height)</div>
+                    <div class="size-demo">
+                        <div class="form-group">
+                            <label class="form-label" for="input-large">Text Input</label>
+                            <input type="text" id="input-large" class="form-input large" placeholder="Large input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="select-large">Select Input</label>
+                            <select id="select-large" class="form-select large">
+                                <option>Option 1</option>
+                                <option>Option 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="search-large">Search Input</label>
+                            <input type="search" id="search-large" class="search-input large" placeholder="Search...">
+                        </div>
+                    </div>
+                    <div class="code-example">&lt;input class="form-input large"&gt;
+&lt;select class="form-select large"&gt;
+&lt;input class="search-input large"&gt;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Textarea -->
+        <div class="demo-section">
+            <h2>Textarea</h2>
+            <p style="color: var(--neutral-600);">Multi-line text input with resize capability.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-title">Default</div>
+                    <div class="form-group">
+                        <label class="form-label" for="demo-textarea-1">Description</label>
+                        <textarea id="demo-textarea-1" class="form-textarea" placeholder="Add a description to help others understand this group's purpose" rows="3"></textarea>
+                        <div class="form-help">Optional field</div>
+                    </div>
+                    <div class="code-example">&lt;textarea class="form-textarea" rows="3"&gt;&lt;/textarea&gt;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Inputs -->
+        <div class="demo-section">
+            <h2>Search Inputs</h2>
+            <p style="color: var(--neutral-600);">Search inputs for different contexts with appropriate styling.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-title">Base Search</div>
+                    <input type="text" class="search-input" placeholder="Search accounts...">
+                    <div class="code-example">&lt;input class="search-input" placeholder="Search..."&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Dashboard Search</div>
+                    <input type="text" class="dashboard-search-input" placeholder="Search...">
+                    <div class="code-example">&lt;input class="dashboard-search-input" placeholder="Search..."&gt;</div>
+                    <div style="font-size: 12px; color: var(--neutral-600); margin-top: 8px;">
+                        Distinct styling for dashboard chrome with more padding and focus shadow
+                    </div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Filter Context</div>
+                    <input type="text" class="search-input filter" placeholder="Search accounts">
+                    <div class="code-example">&lt;input class="search-input filter" placeholder="Search..."&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">With Icon</div>
+                    <div style="position: relative;">
+                        <input type="text" class="search-input with-icon" placeholder="Search...">
+                        <svg style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--neutral-500);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="code-example">&lt;input class="search-input with-icon" placeholder="Search..."&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Legacy Filter Search</div>
+                    <input type="text" class="filter-search-input" placeholder="Legacy filter search">
+                    <div class="code-example">&lt;!-- Backward compatibility --&gt;
+&lt;input class="filter-search-input"&gt;</div>
+                    <div style="font-size: 12px; color: var(--neutral-600); margin-top: 8px;">
+                        Legacy class - use .search-input.filter for new code
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Select Dropdowns -->
+        <div class="demo-section">
+            <h2>Select Dropdowns</h2>
+            <p style="color: var(--neutral-600);">Custom styled select with built-in arrow icon.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-title">Default</div>
+                    <div class="form-group">
+                        <label class="form-label" for="demo-select-1">Account type</label>
+                        <select id="demo-select-1" class="form-select">
+                            <option>Select account type...</option>
+                            <option>Standard</option>
+                            <option>Express</option>
+                            <option>Connected</option>
+                        </select>
+                    </div>
+                    <div class="code-example">&lt;select class="form-select"&gt;
+  &lt;option&gt;Select...&lt;/option&gt;
+&lt;/select&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Disabled</div>
+                    <div class="form-group">
+                        <label class="form-label" for="demo-select-2">Locked option</label>
+                        <select id="demo-select-2" class="form-select" disabled>
+                            <option>Standard (locked)</option>
+                        </select>
+                    </div>
+                    <div class="code-example">&lt;select class="form-select" disabled&gt;&lt;/select&gt;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkboxes and Radio -->
+        <div class="demo-section">
+            <h2>Checkboxes & Radio</h2>
+            <p style="color: var(--neutral-600);">Custom styled form controls with support for checked, unchecked, and indeterminate states.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-title">Checkboxes</div>
+                    <div class="inline-demo">
+                        <input type="checkbox" id="demo-cb-1" class="form-checkbox" checked>
+                        <label for="demo-cb-1">Selected option</label>
+                    </div>
+                    <div class="inline-demo">
+                        <input type="checkbox" id="demo-cb-2" class="form-checkbox">
+                        <label for="demo-cb-2">Unselected option</label>
+                    </div>
+                    <div class="inline-demo">
+                        <input type="checkbox" id="demo-cb-3" class="form-checkbox">
+                        <label for="demo-cb-3">Indeterminate (mixed)</label>
+                    </div>
+                    <div class="code-example">&lt;input type="checkbox" class="form-checkbox"&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Radio Buttons</div>
+                    <div class="inline-demo">
+                        <input type="radio" id="demo-radio-1" name="demo-radio" class="form-radio" checked>
+                        <label for="demo-radio-1">Option A</label>
+                    </div>
+                    <div class="inline-demo">
+                        <input type="radio" id="demo-radio-2" name="demo-radio" class="form-radio">
+                        <label for="demo-radio-2">Option B</label>
+                    </div>
+                    <div class="code-example">&lt;input type="radio" class="form-radio"&gt;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Sizes -->
+        <div class="demo-section">
+            <h2>Form Sizes</h2>
+            <p style="color: var(--neutral-600);">Different sizes for various contexts.</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-title">Size Variants</div>
+                    <div class="size-demo">
+                        <input type="text" class="form-input sm" placeholder="Small input">
+                        <input type="text" class="form-input" placeholder="Default input">
+                        <input type="text" class="form-input lg" placeholder="Large input">
+                    </div>
+                    <div class="code-example">&lt;input class="form-input sm"&gt;
+&lt;input class="form-input"&gt;
+&lt;input class="form-input lg"&gt;</div>
+                </div>
+                
+                <div class="demo-item">
+                    <div class="demo-title">Select Sizes</div>
+                    <div class="size-demo">
+                        <select class="form-select sm">
+                            <option>Small select</option>
+                        </select>
+                        <select class="form-select">
+                            <option>Default select</option>
+                        </select>
+                        <select class="form-select lg">
+                            <option>Large select</option>
+                        </select>
+                    </div>
+                    <div class="code-example">&lt;select class="form-select sm"&gt;&lt;/select&gt;
+&lt;select class="form-select"&gt;&lt;/select&gt;
+&lt;select class="form-select lg"&gt;&lt;/select&gt;</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete Form Example -->
+        <div class="demo-section">
+            <h2>Complete Form Example</h2>
+            <p style="color: var(--neutral-600);">Putting it all together with consistent styling.</p>
+            
+            <div class="form-showcase">
+                <form>
+                    <div class="form-section">
+                        <label class="form-label" for="complete-name">Organization name</label>
+                        <input type="text" id="complete-name" class="form-input" placeholder="Acme Technologies">
+                        <div class="form-help">This will be visible to all team members</div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <label class="form-label" for="complete-type">Account type</label>
+                        <select id="complete-type" class="form-select">
+                            <option>Select account type...</option>
+                            <option>Standard</option>
+                            <option>Express</option>
+                            <option>Connected</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-section">
+                        <label class="form-label" for="complete-description">Description</label>
+                        <textarea id="complete-description" class="form-textarea" rows="3" placeholder="Add a brief description..."></textarea>
+                    </div>
+                    
+                    <div class="form-section">
+                        <input type="checkbox" id="complete-agree" class="form-checkbox">
+                        <label for="complete-agree">I agree to the terms and conditions</label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Organization</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="demo-section">
+            <h2>Benefits of Consolidated Form System</h2>
+            <ul style="color: var(--neutral-600); line-height: 1.8;">
+                <li><strong>Consistency:</strong> All form elements look and behave the same across the app</li>
+                <li><strong>Context-Aware:</strong> Different search styles for different use cases (dashboard vs filters)</li>
+                <li><strong>Maintainability:</strong> Single source of truth for form styling</li>
+                <li><strong>Accessibility:</strong> Built-in focus states and proper contrast</li>
+                <li><strong>Performance:</strong> Reduced CSS duplication across components</li>
+                <li><strong>Developer Experience:</strong> Just add classes, no custom CSS needed</li>
+                <li><strong>Backward Compatible:</strong> Legacy classes still work during migration</li>
+                <li><strong>Theming:</strong> Easy to update colors and spacing globally</li>
+                <li><strong>Validation:</strong> Built-in error and success states</li>
+                <li><strong>Responsive:</strong> All inputs work well on mobile and desktop</li>
+            </ul>
+            
+            <h3 style="margin-top: 32px;">Search Input Architecture</h3>
+            <ul style="color: var(--neutral-600); line-height: 1.8;">
+                <li><strong>.search-input</strong> - Base search for general use</li>
+                <li><strong>.dashboard-search-input</strong> - Distinct styling for dashboard chrome</li>
+                <li><strong>.search-input.filter</strong> - Modifier for filter contexts</li>
+                <li><strong>.search-input.with-icon</strong> - Modifier for search with icons</li>
+                <li><strong>.filter-search-input</strong> - Legacy class (use .search-input.filter instead)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Set the indeterminate state on the demo checkbox
+        document.addEventListener('DOMContentLoaded', function() {
+            const indeterminateCheckbox = document.getElementById('demo-cb-3');
+            if (indeterminateCheckbox) {
+                indeterminateCheckbox.indeterminate = true;
+            }
+        });
+    </script>
+</body>
+</html>
