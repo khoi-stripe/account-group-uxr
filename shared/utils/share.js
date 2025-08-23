@@ -167,7 +167,6 @@ class PrototypeShare {
         
         // Save account groups per organization to localStorage
         if (sharedData.accountGroups && sharedData.accountGroups.length > 0) {
-          console.log('💾 Saving account groups to localStorage:', sharedData.accountGroups.length, 'total groups');
           sharedData.organizations.forEach(org => {
             const orgGroups = sharedData.accountGroups.filter(g => 
               g.organizationName === org.name
@@ -175,13 +174,10 @@ class PrototypeShare {
             if (orgGroups.length > 0) {
               const storageKey = `uxr_account_groups_${org.name}`;
               localStorage.setItem(storageKey, JSON.stringify(orgGroups));
-              console.log(`💾 Saved ${orgGroups.length} groups for org "${org.name}" to key "${storageKey}"`);
             } else {
-              console.log(`⚠️ No groups found for organization "${org.name}"`);
             }
           });
         } else {
-          console.log('⚠️ No account groups in shared data to save');
         }
 
         // Restore current state if provided
@@ -195,9 +191,7 @@ class PrototypeShare {
               
               // AFTER setting current organization, load account groups for that org
               if (window.OrgDataManager.loadAccountGroups) {
-                console.log('🔄 Loading account groups for organization:', org.name);
                 window.OrgDataManager.loadAccountGroups();
-                console.log('📊 Account groups loaded:', window.OrgDataManager.accountGroups?.length || 0);
               }
               
               if (subAccountId) {
@@ -213,9 +207,7 @@ class PrototypeShare {
           if (sharedData.organizations.length > 0) {
             window.OrgDataManager.setCurrentOrganization(sharedData.organizations[0]);
             if (window.OrgDataManager.loadAccountGroups) {
-              console.log('🔄 Loading account groups for first organization:', sharedData.organizations[0].name);
               window.OrgDataManager.loadAccountGroups();
-              console.log('📊 Account groups loaded:', window.OrgDataManager.accountGroups?.length || 0);
             }
           }
         }
@@ -232,7 +224,6 @@ class PrototypeShare {
         }
       }
 
-      console.log('Successfully imported shared prototype data:', sharedData.metadata);
       return true;
       
     } catch (error) {
@@ -247,7 +238,6 @@ class PrototypeShare {
     const shareId = urlParams.get('share');
     
     if (shareId) {
-      console.log('Loading shared prototype:', shareId);
       const result = await this.loadSharedPrototype(shareId);
       
       if (result.success) {
@@ -335,7 +325,6 @@ if (typeof window !== 'undefined') {
     const shareId = urlParams.get('share');
     
     if (shareId) {
-      console.log('🔗 Shared link detected, loading data before page initialization...');
       
       // Wait for page to be minimally ready
       if (document.readyState === 'loading') {
@@ -361,7 +350,6 @@ if (typeof window !== 'undefined') {
         
         // Show success message
         share.showShareLoadMessage(result.createdAt);
-        console.log('✅ Shared data loaded successfully before page initialization');
       } else {
         // Show error message
         share.showShareErrorMessage(result.error);

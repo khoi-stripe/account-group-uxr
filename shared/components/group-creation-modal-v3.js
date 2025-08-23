@@ -39,13 +39,9 @@ class FigmaGroupCreationModalV3 {
     }
 
     show(options = {}) {
-        console.log('FigmaGroupCreationModalV3.show() called with options:', options);
         this.onComplete = options.onComplete;
-        console.log('About to call reset()...');
         this.reset();
-        console.log('Reset completed, about to call showStep1()...');
         this.showStep1();
-        console.log('showStep1() completed');
     }
     
     reset() {
@@ -54,7 +50,6 @@ class FigmaGroupCreationModalV3 {
     }
 
     showStep1() {
-        console.log('showStep1() called');
         const content = `
             <style>
                 .step1-content { padding: 32px 32px 0 32px; }
@@ -102,8 +97,6 @@ class FigmaGroupCreationModalV3 {
         `;
 
         if (!this.modal) {
-            console.log('Creating new modal...');
-            console.log('Modal class:', window.Modal);
             this.modal = new Modal({
                 title: ' ', // Use a space to ensure header is visible
                 content: content,
@@ -112,18 +105,12 @@ class FigmaGroupCreationModalV3 {
                 showHeader: true,
                 closable: true
             });
-            console.log('Modal created:', this.modal);
-            console.log('About to call modal.show()...');
             this.modal.show();
-            console.log('modal.show() completed');
         } else {
-            console.log('Reusing existing modal...');
             this.modal.setTitle('');
             this.modal.setContent(content);
             this.modal.setFooterActions([]);
-            console.log('About to call modal.show() on existing modal...');
             this.modal.show();
-            console.log('modal.show() completed on existing modal');
         }
         
         // Rely on standardized modal size from CSS variables
@@ -713,7 +700,6 @@ class FigmaGroupCreationModalV3 {
             // Prefer OrgDataManager as single source of truth
             if (window.OrgDataManager && typeof window.OrgDataManager.createAccountGroup === 'function') {
                 const created = window.OrgDataManager.createAccountGroup(groupData);
-                console.log('Group saved via OrgDataManager:', created);
                 return;
             }
 
@@ -728,7 +714,6 @@ class FigmaGroupCreationModalV3 {
             const existingGroups = JSON.parse(localStorage.getItem(storageKey) || '[]');
             existingGroups.push(groupData);
             localStorage.setItem(storageKey, JSON.stringify(existingGroups));
-            console.log('Group saved (fallback) for organization:', currentOrg.name, groupData);
         } catch (error) {
             console.error('Failed to save group:', error);
             alert('Failed to save group. Please try again.');

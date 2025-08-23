@@ -49,13 +49,14 @@
     
     /* Drag and Drop Styles */
     .account-group-card[draggable="true"] {
-      transition: all 0.2s ease;
+      transition: box-shadow 0.2s ease;
     }
     
     .account-group-card.dragging {
-      opacity: 0.5;
-      box-shadow: 0px 8px 25px rgba(48,49,61,0.15);
+      opacity: 1.0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       z-index: 1000;
+      cursor: grabbing !important;
     }
     
     .account-group-card.drag-over {
@@ -291,6 +292,8 @@
     .sort-menu-checkmark {
       flex-shrink: 0;
       margin-left: auto;
+      /* Force SVG to be neutral-500 color (#6D7C8C) */
+      filter: brightness(0) saturate(100%) invert(54%) sepia(8%) saturate(1157%) hue-rotate(169deg) brightness(95%) contrast(91%) !important;
     }
 
     .kebab-menu-item:hover {
@@ -1076,6 +1079,7 @@
   /* color intentionally omitted to allow label override */
 }
 </style>
+  <!-- Force deployment v4 -->
 </head>
 <body>
   <div class="layout-container">
@@ -1384,27 +1388,19 @@
                 <div id="sort-filter-menu" class="kebab-menu">
                   <button id="sort-lastUpdated" class="kebab-menu-item" onclick="setSortOption('lastUpdated')">
                     <span>Last updated</span>
-                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
-                    </svg>
+                    <img class="sort-menu-checkmark" src="shared/svgs/checkCircleFilled.svg" width="12" height="12" style="display: none;" alt="Selected">
                   </button>
                   <button id="sort-aToZ" class="kebab-menu-item" onclick="setSortOption('aToZ')">
                     <span>A–Z</span>
-                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
-                    </svg>
+                    <img class="sort-menu-checkmark" src="shared/svgs/checkCircleFilled.svg" width="12" height="12" style="display: none;" alt="Selected">
                   </button>
                   <button id="sort-zToA" class="kebab-menu-item" onclick="setSortOption('zToA')">
                     <span>Z–A</span>
-                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
-                    </svg>
+                    <img class="sort-menu-checkmark" src="shared/svgs/checkCircleFilled.svg" width="12" height="12" style="display: none;" alt="Selected">
                   </button>
                   <button id="sort-customOrder" class="kebab-menu-item" onclick="setSortOption('customOrder')" style="display: none;">
                     <span>Custom order</span>
-                    <svg class="sort-menu-checkmark" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                      <path d="M13.3536 4.64645C13.5488 4.84171 13.5488 5.15829 13.3536 5.35355L6.35355 12.3536C6.15829 12.5488 5.84171 12.5488 5.64645 12.3536L2.64645 9.35355C2.45118 9.15829 2.45118 8.84171 2.64645 8.64645C2.84171 8.45118 3.15829 8.45118 3.35355 8.64645L6 11.2929L12.6464 4.64645C12.8417 4.45118 13.1583 4.45118 13.3536 4.64645Z" fill="#675dff"/>
-                    </svg>
+                    <img class="sort-menu-checkmark" src="shared/svgs/checkCircleFilled.svg" width="12" height="12" style="display: none;" alt="Selected">
                   </button>
                 </div>
               </div>
@@ -2057,16 +2053,13 @@
       if (menuItem) {
         // Show custom order only if:
         // 1. There are multiple groups
-        // 2. AND user has actually customized order in this session
-        // 3. AND a custom order exists in storage
-        // CRITICAL: hasCustomizedOrderInSession must be true to show this option
-        if (allGroups.length > 1 && hasCustomizedOrderInSession === true && customOrder && customOrder.length > 1) {
+        // 2. AND a custom order exists in storage (from any session)
+        if (allGroups.length > 1 && customOrder && customOrder.length > 1) {
           console.log('✅ Showing custom order menu item (all conditions met)');
           menuItem.style.display = 'flex';
         } else {
           console.log('❌ Hiding custom order menu item - reasons:');
           if (allGroups.length <= 1) console.log('  - Not enough groups (need 2+)');
-          if (!hasCustomizedOrderInSession) console.log('  - User has not customized order in this session');
           if (!customOrder || customOrder.length <= 1) console.log('  - No valid custom order in storage');
           
           menuItem.style.display = 'none';
@@ -2145,8 +2138,21 @@
       const dragHandles = document.querySelectorAll('.drag-handle[draggable="true"]');
       console.log('🔄 attachDragListeners: Found', dragHandles.length, 'draggable handles');
       
+      if (dragHandles.length === 0) {
+        console.log('❌ No draggable handles found! Checking for .drag-handle elements...');
+        const allHandles = document.querySelectorAll('.drag-handle');
+        console.log('🔍 Found', allHandles.length, 'total .drag-handle elements');
+        allHandles.forEach((handle, index) => {
+          console.log(`🔍 Handle ${index + 1}:`, handle.getAttribute('draggable'), handle.style.display);
+        });
+      }
+      
       dragHandles.forEach((handle, index) => {
         const card = handle.closest('.account-group-card');
+        if (!card) {
+          console.log('❌ No card found for handle', index + 1);
+          return;
+        }
         console.log('🔄 Attaching listeners to handle', index + 1, ':', card.dataset.groupId);
         handle.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragenter', handleDragEnter);
@@ -2217,6 +2223,35 @@
       console.log('🔄 handleDragStart called on:', card.dataset.groupId);
       draggedElement = card;
       card.classList.add('dragging');
+      
+      // Calculate click position relative to the card
+      const cardRect = card.getBoundingClientRect();
+      const offsetX = e.clientX - cardRect.left;
+      const offsetY = e.clientY - cardRect.top;
+      
+      // Create drag image
+      const dragImage = card.cloneNode(true);
+      dragImage.style.transform = 'rotate(2deg)';
+      dragImage.style.opacity = '0.9';
+      dragImage.style.boxShadow = '0 8px 20px rgba(103, 93, 255, 0.4)';
+      dragImage.style.border = '1px solid #675dff';
+      dragImage.style.borderRadius = '8px';
+      dragImage.style.backgroundColor = '#ffffff';
+      dragImage.style.position = 'absolute';
+      dragImage.style.top = '-1000px';
+      dragImage.style.left = '-1000px';
+      dragImage.style.width = card.offsetWidth + 'px';
+      dragImage.style.zIndex = '10000';
+      
+      document.body.appendChild(dragImage);
+      e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+      
+      // Clean up drag image after a short delay
+      setTimeout(() => {
+        if (document.body.contains(dragImage)) {
+          document.body.removeChild(dragImage);
+        }
+      }, 0);
       
       // Set drag data
       e.dataTransfer.effectAllowed = 'move';
@@ -2785,13 +2820,21 @@
       const customOrder = getCustomGroupOrder();
       const allGroups = window.OrgDataManager.getAccountGroups();
       
-      // Don't automatically apply custom order on page load
-      // User must actively reorder to see the custom order option
-      console.log('🔄 Page loaded - using default sort: lastUpdated');
-      console.log('🔄 Custom order exists but hidden until user reorders in this session');
-      
-      // Always start with default sort on page load
-      if (getCurrentSortOption() !== 'lastUpdated') {
+      // Check if current order matches saved custom order
+      if (customOrder && customOrder.length > 1 && allGroups.length > 1) {
+        const currentOrder = allGroups.map(group => group.id);
+        const ordersMatch = customOrder.length === currentOrder.length && 
+                           customOrder.every((id, index) => id === currentOrder[index]);
+        
+        if (ordersMatch) {
+          console.log('🔄 Page loaded - current order matches saved custom order, setting to customOrder');
+          setSortOption('customOrder');
+        } else {
+          console.log('🔄 Page loaded - current order differs from saved custom order, using lastUpdated');
+          setSortOption('lastUpdated');
+        }
+      } else {
+        console.log('🔄 Page loaded - no valid custom order, using default sort: lastUpdated');
         setSortOption('lastUpdated');
       }
       
