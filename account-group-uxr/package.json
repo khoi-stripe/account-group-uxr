@@ -1,0 +1,36 @@
+{
+  "name": "stripe-dashboard-uxr-prototype",
+  "version": "1.0.0",
+  "description": "UXR Prototype for Stripe Dashboard with shareable data functionality",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "prototype",
+    "uxr",
+    "stripe",
+    "dashboard",
+    "ui"
+  ],
+  "author": "UXR Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khoi-stripe/account-group-uxr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/khoi-stripe/account-group-uxr/issues"
+  },
+  "homepage": "https://github.com/khoi-stripe/account-group-uxr#readme",
+  "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
