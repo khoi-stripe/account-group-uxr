@@ -69,17 +69,59 @@
       box-shadow: 0px 4px 15px rgba(48,49,61,0.12);
     }
     
-    .drag-handle:active {
-      cursor: grabbing;
+    /* Enhanced drag handle styles */
+    .drag-handle {
+      transition: all 0.15s ease;
+      border-radius: 6px;
+      position: relative;
+      min-height: 40px; /* Expanded clickable area */
     }
     
-    /* Drag handle styles */
-    .drag-handle {
+    .drag-handle:hover {
+      background-color: var(--neutral-25, #f5f6f8);
+      cursor: grab;
+    }
+    
+    .drag-handle:active {
+      cursor: grabbing;
+      background-color: var(--neutral-50, #ebeef1);
+    }
+    
+    .drag-handle img {
       transition: opacity 0.15s ease;
     }
     
     .account-group-card:hover .drag-handle img {
       opacity: 0.6 !important;
+    }
+    
+    .drag-handle:hover img {
+      opacity: 0.8 !important;
+    }
+    
+    .drag-handle:active img {
+      opacity: 1.0 !important;
+    }
+    
+    /* Enhanced drag handle interaction area */
+    .drag-handle::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 8px;
+      background: transparent;
+      pointer-events: none;
+    }
+    
+    .drag-handle:hover::before {
+      background: var(--neutral-25, #f5f6f8);
+    }
+    
+    .drag-handle:active::before {
+      background: var(--neutral-50, #ebeef1);
     }
     
     /* Disable drag during kebab menu interactions */
@@ -1700,10 +1742,10 @@
           data-group-type="${groupType}"
           data-account-count="${accounts.length}"
           data-draggable="true"
-          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 8px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
+          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 4px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
           <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; width: 100%; min-height: 64px;">
             <!-- Drag handle -->
-            <div class="drag-handle" draggable="true" style="display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0; width: 16px; padding: 0; margin: 0; align-self: center;">
+            <div class="drag-handle" draggable="true" style="display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0; width: 32px; padding: 8px 4px; margin: 0; align-self: stretch;">
               <img src="./shared/svgs/dragHandle.svg" alt="Drag handle" width="12" height="12" style="opacity: 0.4;">
             </div>
             
