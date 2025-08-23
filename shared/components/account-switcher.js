@@ -2202,7 +2202,7 @@ class AccountSwitcher {
         
         const checkMarkHtml = `
           <div class="account-check">
-            <img src="shared/svgs/checkCircleFilled.svg?v=3" width="12" height="12" alt="Selected" style="filter: brightness(0) saturate(100%) invert(54%) sepia(8%) saturate(1157%) hue-rotate(169deg) brightness(95%) contrast(91%);">
+            <img src="shared/svgs/checkCircleFilled.svg?v=5" width="12" height="12" alt="Selected" style="filter: brightness(0) saturate(100%) invert(54%) sepia(8%) saturate(1157%) hue-rotate(169deg) brightness(95%) contrast(91%);">
           </div>
         `;
         item.insertAdjacentHTML('beforeend', checkMarkHtml);
