@@ -76,18 +76,6 @@
     /* Drag handle styles */
     .drag-handle {
       transition: opacity 0.15s ease;
-      /* Expanded drag area - covers full height of card */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px; /* Wider drag area */
-      align-self: stretch; /* Stretch to full card height */
-      border-radius: 12px 0 0 12px; /* Match card's left border radius */
-      flex-shrink: 0;
-    }
-    
-    .drag-handle:hover {
-      background-color: rgba(103, 93, 255, 0.04); /* Subtle hover background */
     }
     
     .account-group-card:hover .drag-handle img {
@@ -1712,16 +1700,14 @@
           data-group-type="${groupType}"
           data-account-count="${accounts.length}"
           data-draggable="true"
-          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: row; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 0; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
-          <!-- Drag handle - expanded grabbable area -->
-          <div class="drag-handle" draggable="true" style="cursor: grab; width: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: stretch; border-radius: 12px 0 0 12px;">
-            <img src="./shared/svgs/dragHandle.svg" alt="Drag handle" width="12" height="12" style="opacity: 0.4;">
-          </div>
-          
-          <!-- Card content container -->
-          <div style="display: flex; flex-direction: column; gap: 0; flex: 1; padding: 0;">
-            <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; width: 100%;">
-              <!-- Title + count container -->
+          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 8px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
+          <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; width: 100%; min-height: 64px;">
+            <!-- Drag handle -->
+            <div class="drag-handle" draggable="true" style="display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0; width: 16px; padding: 0; margin: 0; align-self: center;">
+              <img src="./shared/svgs/dragHandle.svg" alt="Drag handle" width="12" height="12" style="opacity: 0.4;">
+            </div>
+            
+            <!-- Title + count container -->
             <div class="group-card-title-count-container" style="display: flex; flex-direction: row; gap: 16px; align-items: flex-start; width: 240px;">
               <!-- Title and Created Date -->
               <div class="group-card-title-container" style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start; flex: 1;">
@@ -1785,7 +1771,6 @@
             </button>
               </div>
             </div>
-          </div>
       `;
     }
 
@@ -2490,7 +2475,7 @@
         container.style.width = '100%';
         // Hug contents: no forced min-height
         container.style.minHeight = 'auto';
-        container.style.padding = 'var(--Spacing-medium, 16px)';
+        container.style.padding = '0';
         container.style.boxSizing = 'border-box';
 
         container.innerHTML = `
