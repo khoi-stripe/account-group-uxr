@@ -76,12 +76,16 @@
     /* Drag handle styles */
     .drag-handle {
       transition: opacity 0.15s ease;
-      /* Expanded drag area - covers left side of card */
-      position: relative;
-      min-height: 64px; /* Match the card row height */
+      /* Expanded drag area - covers full left side of card */
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      bottom: 8px;
       width: 32px; /* Wider drag area */
-      padding: 8px; /* More padding for easier grabbing */
-      border-radius: 8px 0 0 8px; /* Rounded left edge */
+      border-radius: 8px; /* Rounded corners */
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .drag-handle:hover {
@@ -1710,10 +1714,10 @@
           data-group-type="${groupType}"
           data-account-count="${accounts.length}"
           data-draggable="true"
-          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 0px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
+          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 48px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box; position: relative;">
           <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; width: 100%; min-height: 64px;">
             <!-- Drag handle - expanded grabbable area -->
-            <div class="drag-handle" draggable="true" style="display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0;">
+            <div class="drag-handle" draggable="true" style="cursor: grab;">
               <img src="./shared/svgs/dragHandle.svg" alt="Drag handle" width="12" height="12" style="opacity: 0.4;">
             </div>
             
