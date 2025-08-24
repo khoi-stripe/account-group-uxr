@@ -69,17 +69,38 @@
       box-shadow: 0px 4px 15px rgba(48,49,61,0.12);
     }
     
-    .drag-handle:active {
-      cursor: grabbing;
+    /* Enhanced drag handle styles */
+    .drag-handle {
+      transition: all 0.15s ease;
+      border-radius: 6px 0 0 6px; /* Rounded left, straight right edge */
+      position: relative;
+      height: 100%; /* Full height */
     }
     
-    /* Drag handle styles */
-    .drag-handle {
+    .drag-handle:hover {
+      background-color: var(--brand-25, #f0f0ff);
+      cursor: grab;
+    }
+    
+    .drag-handle:active {
+      cursor: grabbing;
+      background-color: var(--brand-50, #e6e6ff);
+    }
+    
+    .drag-handle img {
       transition: opacity 0.15s ease;
     }
     
     .account-group-card:hover .drag-handle img {
       opacity: 0.6 !important;
+    }
+    
+    .drag-handle:hover img {
+      opacity: 0.8 !important;
+    }
+    
+    .drag-handle:active img {
+      opacity: 1.0 !important;
     }
     
     /* Disable drag during kebab menu interactions */
@@ -1079,7 +1100,7 @@
   /* color intentionally omitted to allow label override */
 }
 </style>
-  <!-- Force deployment v5 - cache bust account switcher -->
+  <!-- Force deployment v6 - cache bust drag handles and +more fix -->
 </head>
 <body>
   <div class="layout-container">
@@ -1700,75 +1721,77 @@
           data-group-type="${groupType}"
           data-account-count="${accounts.length}"
           data-draggable="true"
-          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 16px 16px 16px 8px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
-          <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 12px; width: 100%; min-height: 64px;">
+          style="backdrop-filter: blur(0px); background: #ffffff; display: flex; flex-direction: column; gap: 0; width: 100%; min-height: 96px; padding: 4px; border-radius: 12px; box-shadow: 0px 2px 5px 0px rgba(48,49,61,0.08), 0px 1px 1px 1px rgba(0,0,0,0.12); box-sizing: border-box;">
+          <div class="group-card-row" style="display: flex; flex-direction: row; align-items: flex-start; gap: 0; width: 100%; height: 100%;">
             <!-- Drag handle -->
-            <div class="drag-handle" draggable="true" style="display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0; width: 16px; padding: 0; margin: 0; align-self: center;">
+            <div class="drag-handle" draggable="true" style="display: flex; align-items: center; justify-content: center; cursor: grab; flex-shrink: 0; width: 24px; padding: 0 4px;">
               <img src="./shared/svgs/dragHandle.svg" alt="Drag handle" width="12" height="12" style="opacity: 0.4;">
             </div>
             
-            <!-- Title + count container -->
-            <div class="group-card-title-count-container" style="display: flex; flex-direction: row; gap: 16px; align-items: flex-start; width: 240px;">
-              <!-- Title and Created Date -->
-              <div class="group-card-title-container" style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start; flex: 1;">
-                <div class="group-card-title" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #353a44; letter-spacing: -0.15px; margin: 0;">
-                  ${group.name}
-                </div>
-                ${formattedCreatedDate ? `
-                  <div class="group-card-created-date" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 500; font-size: 11px; line-height: 16px; color: var(--neutral-400, #8A96A4); letter-spacing: -0.006px; margin: 0;">
-                    Updated ${formattedCreatedDate}
-                </div>
-                ` : ''}
-              </div>
-
-              <!-- Info + Count container -->
-              <div class="group-card-info-count-container" style="display: flex; flex-direction: row; gap: 8px; align-items: center; flex-shrink: 0;">
-                ${group.description ? `
-                  <div class="info-icon-container" style="position: relative; display: inline-flex;">
-                    <img src="./shared/svgs/note.svg" alt="Note" class="group-card-info-icon" width="12" height="12" style="flex-shrink: 0; cursor: pointer;">
-                    <div class="info-tooltip">
-                      ${group.description}
-            </div>
-            </div>
-                ` : ''}
-                
-                <!-- Count pill -->
-                <div class="group-card-count" title="${accounts.length} accounts" style="height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: rgba(103,93,255,0.10); color: #675dff; display: inline-flex; align-items: center; justify-content: center; font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; flex-shrink: 0;">
-                  ${accounts.length}
-                </div>
-              </div>
-              </div>
-              
-            <!-- Divider -->
-            <div class="group-card-divider" style="width: 1px; height: 100%; background: rgba(0, 39, 77, 0.08);"></div>
-
-            <!-- Badges and +N more -->
-            <div class="group-card-accounts-container" data-group-id="${group.id}" style="flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; align-content: flex-start; overflow: visible;">
-              ${showLoading ? `
-                <div class="accounts-loading-spinner">
-                  <div class="spinner"></div>
-                </div>
-              ` : `
-                ${accounts.map((account, index) => `
-                  <div class="group-card-account-badge" data-account-id="${account.id}" data-account-index="${index}" style="background: #f5f6f8; display: flex; flex-direction: row; gap: 6px; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 4px;">
-                    <div class="group-card-account-name" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: #353a44; letter-spacing: -0.024px; margin: 0;">
-                    ${account.name}
+                        <!-- Card content container -->
+            <div class="group-card-content-container" style="display: flex; flex-direction: row; gap: 12px; align-items: flex-start; flex: 1; height: 100%; padding: 12px;">
+              <!-- Title + count container -->
+              <div class="group-card-title-count-container" style="display: flex; flex-direction: row; gap: 16px; align-items: flex-start; width: 240px;">
+                <!-- Title and Created Date -->
+                <div class="group-card-title-container" style="display: flex; flex-direction: column; gap: 2px; align-items: flex-start; flex: 1;">
+                  <div class="group-card-title" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; color: #353a44; letter-spacing: -0.15px; margin: 0;">
+                    ${group.name}
+                  </div>
+                  ${formattedCreatedDate ? `
+                    <div class="group-card-created-date" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 500; font-size: 11px; line-height: 16px; color: var(--neutral-400, #8A96A4); letter-spacing: -0.006px; margin: 0;">
+                      Updated ${formattedCreatedDate}
                     </div>
-                  </div>
-                `).join('')}
-                <span class="group-card-more-link" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: var(--brand-600); text-decoration: none; padding: 4px 0; display: none; cursor: pointer;">+ more</span>
-              `}
-                  </div>
+                  ` : ''}
+                </div>
 
-            <!-- Kebab menu -->
-            <button class="group-card-kebab" aria-label="More options" data-group-id="${group.id}" data-is-saved="${isSavedGroup}" style="background: transparent; border: none; padding: 4px; margin-left: 8px; cursor: pointer; border-radius: 6px;">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="3" cy="8" r="1.25" fill="#596171"/>
-                <circle cx="8" cy="8" r="1.25" fill="#596171"/>
-                <circle cx="13" cy="8" r="1.25" fill="#596171"/>
-              </svg>
+                <!-- Info + Count container -->
+                <div class="group-card-info-count-container" style="display: flex; flex-direction: row; gap: 8px; align-items: center; flex-shrink: 0;">
+                  ${group.description ? `
+                    <div class="info-icon-container" style="position: relative; display: inline-flex;">
+                      <img src="./shared/svgs/note.svg" alt="Note" class="group-card-info-icon" width="12" height="12" style="flex-shrink: 0; cursor: pointer;">
+                      <div class="info-tooltip">
+                        ${group.description}
+              </div>
+              </div>
+                  ` : ''}
+                  
+                  <!-- Count pill -->
+                  <div class="group-card-count" title="${accounts.length} accounts" style="height: 20px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: rgba(103,93,255,0.10); color: #675dff; display: inline-flex; align-items: center; justify-content: center; font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; flex-shrink: 0;">
+                    ${accounts.length}
+                  </div>
+                </div>
+              </div>
+                
+              <!-- Divider -->
+              <div class="group-card-divider" style="width: 1px; height: 100%; background: rgba(0, 39, 77, 0.08);"></div>
 
-            </button>
+              <!-- Badges and +N more -->
+              <div class="group-card-accounts-container" data-group-id="${group.id}" style="flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start; align-content: flex-start; overflow: visible;">
+                ${showLoading ? `
+                  <div class="accounts-loading-spinner">
+                    <div class="spinner"></div>
+                  </div>
+                ` : `
+                  ${accounts.map((account, index) => `
+                    <div class="group-card-account-badge" data-account-id="${account.id}" data-account-index="${index}" style="background: #f5f6f8; display: flex; flex-direction: row; gap: 6px; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 4px;">
+                      <div class="group-card-account-name" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: #353a44; letter-spacing: -0.024px; margin: 0;">
+                      ${account.name}
+                      </div>
+                    </div>
+                  `).join('')}
+                  <span class="group-card-more-link" style="font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: var(--brand-600); text-decoration: none; padding: 4px 0; display: none; cursor: pointer;">+ more</span>
+                `}
+              </div>
+
+              <!-- Kebab menu -->
+              <button class="group-card-kebab" aria-label="More options" data-group-id="${group.id}" data-is-saved="${isSavedGroup}" style="background: transparent; border: none; padding: 4px; margin-left: 8px; cursor: pointer; border-radius: 6px; align-self: flex-start;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="3" cy="8" r="1.25" fill="#596171"/>
+                  <circle cx="8" cy="8" r="1.25" fill="#596171"/>
+                  <circle cx="13" cy="8" r="1.25" fill="#596171"/>
+                </svg>
+              </button>
+            </div>
               </div>
             </div>
       `;
@@ -2189,7 +2212,7 @@
         // Adjust card padding when drag handle is hidden
         const card = handle.closest('.account-group-card');
         if (card) {
-          card.style.padding = '16px'; // Equal padding on all sides when no drag handle
+          card.style.padding = '4px'; // Equal padding on all sides when no drag handle
         }
       });
     }
@@ -2212,7 +2235,7 @@
         // Restore original card padding when drag handle is shown
         const card = handle.closest('.account-group-card');
         if (card) {
-          card.style.padding = '16px 16px 16px 8px'; // Original padding with reduced left for drag handle
+          card.style.padding = '4px'; // Consistent 4px padding on all sides
         }
       });
     }
@@ -2915,8 +2938,10 @@
           });
           
           hiddenCount = badges.length - maxShown;
-          moreLink.style.display = 'inline-flex';
-          moreLink.textContent = `+${hiddenCount} more`;
+          if (hiddenCount > 0) {
+            moreLink.style.display = 'inline-flex';
+            moreLink.textContent = `+${hiddenCount} more`;
+          }
           
           // Fine-tune: if +N more causes overflow to 3rd row, reduce further
           let tries = 5;
@@ -2924,34 +2949,16 @@
             maxShown -= 1;
             badges[maxShown].style.display = 'none';
             hiddenCount = badges.length - maxShown;
-            moreLink.textContent = `+${hiddenCount} more`;
-          }
-        } else if (badges.length > (perRow * MAX_ROWS)) {
-          // All badges fit in <= 2 rows but we have more badges than 2 rows should hold
-          // This means the container is wide enough - try to fit more badges up to the estimated 2-row limit
-          
-          const estimatedCapacity = perRow * MAX_ROWS;
-          if (badges.length > estimatedCapacity) {
-            // Show as many as estimated to fit in 2 rows, with +N more
-            maxShown = Math.max(MIN_SHOWN, estimatedCapacity - 1);
-            
-            badges.forEach((badge, idx) => {
-              badge.style.display = idx < maxShown ? 'flex' : 'none';
-            });
-            
-            hiddenCount = badges.length - maxShown;
-            moreLink.style.display = 'inline-flex';
-            moreLink.textContent = `+${hiddenCount} more`;
-            
-            // Check if this causes overflow and adjust
-            let tries = 3;
-            while (tries-- > 0 && getBadgeRows() > MAX_ROWS && maxShown > MIN_SHOWN) {
-              maxShown -= 1;
-              badges[maxShown].style.display = 'none';
-              hiddenCount = badges.length - maxShown;
+            if (hiddenCount > 0) {
               moreLink.textContent = `+${hiddenCount} more`;
             }
           }
+        }
+        
+        // Final check: only show +more link if there are actually hidden badges
+        const actuallyHidden = badges.filter(b => b.style.display === 'none').length;
+        if (actuallyHidden === 0) {
+          moreLink.style.display = 'none';
         }
       };
 

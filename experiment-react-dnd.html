@@ -24,7 +24,7 @@
         .experiment-section {
             margin-bottom: 32px;
             padding: 24px;
-            border: 2px solid #e6e6e6;
+            border: 2px solid #675dff;
             border-radius: 8px;
             background: #fafbfc;
         }
@@ -143,25 +143,6 @@
             content: "✅ ";
             margin-right: 8px;
         }
-        
-        .loading-state {
-            padding: 20px;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            text-align: center;
-            color: #666;
-            margin: 20px 0;
-        }
-        
-        .debug-info {
-            background: #f0f0f0;
-            padding: 12px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            margin: 16px 0;
-            color: #666;
-        }
     </style>
 </head>
 <body>
@@ -172,14 +153,10 @@
         <div class="experiment-section">
             <h2>🎯 Interactive Test Area</h2>
             <div id="react-root">
-                <div class="loading-state">
+                <div style="padding: 20px; text-align: center; color: #666;">
                     <p>🔄 Loading React components...</p>
                     <p><small>If this message persists, check the browser console for errors.</small></p>
                 </div>
-            </div>
-            
-            <div class="debug-info" id="debug-info">
-                📊 Debug Info: Checking library loading...
             </div>
         </div>
         
@@ -210,77 +187,56 @@
         </div>
     </div>
 
-    <!-- React & ReactDOM from CDN for quick testing -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script crossorigin src="https://unpkg.com/@hello-pangea/dnd@16.3.0/dist/dnd.umd.js"></script>
+    <!-- React & ReactDOM from multiple CDNs for reliability -->
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/@hello-pangea/dnd@16.3.0/dist/dnd.umd.js"></script>
     
+    <!-- Fallback CDN if jsdelivr fails -->
     <script>
-        // Debug script loading
-        const debugInfo = document.getElementById('debug-info');
-        
-        function updateDebug(message) {
-            debugInfo.innerHTML += '<br>' + message;
+        if (typeof React === 'undefined') {
+            document.write('<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"><\/script>');
         }
-        
-        updateDebug('🔍 React loaded: ' + (typeof React !== 'undefined'));
-        updateDebug('🔍 ReactDOM loaded: ' + (typeof ReactDOM !== 'undefined'));
-        updateDebug('🔍 DND loaded: ' + (typeof window.DND !== 'undefined'));
-        
-        if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || typeof window.DND === 'undefined') {
-            updateDebug('❌ Missing libraries - check internet connection');
-            document.getElementById('react-root').innerHTML = `
-                <div class="loading-state" style="border-color: #ff6b6b; color: #ff6b6b;">
-                    <p>❌ Failed to load React libraries</p>
-                    <p><small>Check your internet connection and try refreshing the page.</small></p>
-                </div>
-            `;
-        } else {
-            updateDebug('✅ All libraries loaded successfully');
-            
-            // Wait a moment then initialize React
-            setTimeout(() => {
-                try {
-                    initializeReactApp();
-                    updateDebug('✅ React app initialized');
-                } catch (error) {
-                    updateDebug('❌ React app error: ' + error.message);
-                }
-            }, 100);
+        if (typeof ReactDOM === 'undefined') {
+            document.write('<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>');
+        }
+        if (typeof window.DND === 'undefined') {
+            document.write('<script crossorigin src="https://unpkg.com/@hello-pangea/dnd@16.3.0/dist/dnd.umd.js"><\/script>');
         }
     </script>
 
     <script>
+        // Initialize after all scripts load
+        window.addEventListener('load', function() {
+            console.log('🔍 Page loaded, checking libraries...');
+            console.log('🔍 React:', typeof React !== 'undefined');
+            console.log('🔍 ReactDOM:', typeof ReactDOM !== 'undefined');
+            console.log('🔍 DND:', typeof window.DND !== 'undefined');
+            
+            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && typeof window.DND !== 'undefined') {
+                initializeReactApp();
+            } else {
+                document.getElementById('react-root').innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #ff6b6b; border: 2px dashed #ff6b6b; border-radius: 8px;">
+                        <p>❌ Failed to load React libraries</p>
+                        <p><small>Check your internet connection and refresh the page.</small></p>
+                    </div>
+                `;
+            }
+        });
+
         function initializeReactApp() {
+            console.log('🚀 Initializing React app...');
+            
             const { useState } = React;
             const { DragDropContext, Droppable, Draggable } = window.DND;
 
             // Sample account groups data
             const initialGroups = [
-                {
-                    id: 'group_1',
-                    name: 'Test Group 1',
-                    accounts: 15,
-                    status: 'saved'
-                },
-                {
-                    id: 'group_2', 
-                    name: 'Marketing Accounts',
-                    accounts: 8,
-                    status: 'managed'
-                },
-                {
-                    id: 'group_3',
-                    name: 'Development Team',
-                    accounts: 12,
-                    status: 'saved'
-                },
-                {
-                    id: 'group_4',
-                    name: 'Sales Organization',
-                    accounts: 22,
-                    status: 'managed'
-                }
+                { id: 'group_1', name: 'Test Group 1', accounts: 15, status: 'saved' },
+                { id: 'group_2', name: 'Marketing Accounts', accounts: 8, status: 'managed' },
+                { id: 'group_3', name: 'Development Team', accounts: 12, status: 'saved' },
+                { id: 'group_4', name: 'Sales Organization', accounts: 22, status: 'managed' }
             ];
 
             function AccountGroupCard({ group, index }) {
@@ -298,7 +254,8 @@
                         React.createElement('div', {
                             key: 'handle',
                             ...provided.dragHandleProps,
-                            className: 'drag-handle'
+                            className: 'drag-handle',
+                            title: 'Drag to reorder'
                         }),
                         React.createElement('div', {
                             key: 'info',
@@ -325,9 +282,8 @@
                 const [groups, setGroups] = useState(initialGroups);
 
                 const handleDragEnd = (result) => {
-                    // Handle the drag end event
                     if (!result.destination) {
-                        console.log('🔄 Drag cancelled (no destination)');
+                        console.log('🔄 Drag cancelled');
                         return;
                     }
 
@@ -336,12 +292,7 @@
                     newGroups.splice(result.destination.index, 0, reorderedItem);
 
                     setGroups(newGroups);
-                    
-                    // Log the new order
                     console.log('🔄 New order:', newGroups.map(g => g.name));
-                    
-                    // Update debug info
-                    updateDebug(`🔄 Moved "${reorderedItem.name}" from position ${result.source.index + 1} to ${result.destination.index + 1}`);
                 };
 
                 return React.createElement(DragDropContext, {
@@ -350,11 +301,11 @@
                     React.createElement('div', null, [
                         React.createElement('h3', { 
                             key: 'title',
-                            style: { marginTop: 0, marginBottom: '16px' }
+                            style: { margin: '0 0 8px 0', color: '#675dff' }
                         }, '📋 Drag the cards to reorder them'),
                         React.createElement('p', {
                             key: 'instructions',
-                            style: { fontSize: '14px', color: '#666', marginBottom: '20px' }
+                            style: { fontSize: '14px', color: '#666', margin: '0 0 20px 0' }
                         }, '👆 Grab the ⋮⋮ handle on the left and drag up/down to reorder'),
                         React.createElement(Droppable, {
                             key: 'droppable',
@@ -381,6 +332,7 @@
             // Render the app
             const root = ReactDOM.createRoot(document.getElementById('react-root'));
             root.render(React.createElement(AccountGroupsList));
+            console.log('✅ React app rendered successfully');
         }
     </script>
 </body>
