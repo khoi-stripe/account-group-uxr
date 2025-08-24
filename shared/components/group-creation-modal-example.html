@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Creation Modal - Development Preview</title>
+    
+    <!-- Include shared styles -->
+    <link rel="stylesheet" href="../styles/variables.css">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/typography.css">
+    
+    <style>
+        body {
+            padding: 40px;
+            background: var(--neutral-25);
+            font-family: var(--font-family-ui);
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-section {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--neutral-100);
+        }
+        
+        .demo-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .demo-btn {
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid var(--brand-600);
+            background: var(--brand-600);
+            color: white;
+        }
+        
+        .demo-btn:hover {
+            background: var(--brand-700);
+            border-color: var(--brand-700);
+        }
+        
+        .demo-btn.secondary {
+            background: white;
+            color: var(--neutral-700);
+            border-color: var(--neutral-300);
+        }
+        
+        .demo-btn.secondary:hover {
+            background: var(--neutral-50);
+            border-color: var(--neutral-400);
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .feature-list li::before {
+            content: "✅";
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-in-development {
+            background: var(--yellow-100);
+            color: var(--yellow-800);
+        }
+        
+        .status-ready {
+            background: var(--green-100);
+            color: var(--green-800);
+        }
+
+        /* ===== GROUP CREATION MODAL STYLES ===== */
+        .group-creation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .group-creation-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        /* Small modal (Step 1) - Dynamic height with max */
+        .modal-content.small {
+            width: 640px;
+            max-height: 640px;
+        }
+
+        /* Large modal (Step 2) - Dynamic height with max */
+        .modal-content.large {
+            width: 960px;
+            max-height: 640px;
+        }
+
+        .group-creation-modal.show .modal-content {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Modal Header - Top section with flexible height */
+        .modal-header {
+            padding: 32px 32px 24px 32px;
+            border-bottom: none;
+            flex-shrink: 0;
+            position: relative;
+            background: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .modal-back-button {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            color: var(--neutral-600);
+            display: none;
+        }
+
+        .modal-back-button:hover {
+            background: var(--neutral-100);
+        }
+
+        .modal-header-content {
+            padding-right: 40px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            color: var(--neutral-600);
+        }
+
+        .modal-close:hover {
+            background: var(--neutral-100);
+        }
+
+        .modal-title {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--neutral-900);
+            line-height: 1.2;
+        }
+
+        .modal-header-content {
+            flex: 1;
+        }
+
+        .modal-subtitle {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--neutral-600);
+            line-height: 1.4;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: var(--neutral-500);
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--neutral-100);
+            color: var(--neutral-700);
+        }
+
+        /* Step Indicator - Hidden for cleaner look */
+        .step-indicator {
+            display: none;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--neutral-200);
+            color: var(--neutral-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .step.active .step-number {
+            background: var(--brand-600);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: var(--green-600);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--neutral-600);
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--neutral-900);
+        }
+
+        .step-divider {
+            width: 80px;
+            height: 2px;
+            background: var(--neutral-200);
+            margin: 0 24px;
+            align-self: flex-start;
+            margin-top: 15px;
+        }
+
+        /* Modal Body - Middle section with flexible content */
+        .modal-body {
+            flex: 1 1 auto;
+            padding: 0 32px;
+            overflow: hidden;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-content {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
+        }
+
+        /* Modal Footer - Bottom section, fixed height, always pinned to bottom */
+        .modal-footer {
+            padding: 24px 32px 32px 32px;
+            border-top: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            background: white;
+            min-height: 80px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .footer-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Form styles now handled by global components.css */
+
+        /* Step 2 - Dual Panel Layout */
+        .dual-panel-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            flex: 1 1 auto;
+            height: 100%;
+            max-height: 500px;
+
+        }
+
+        /* Account List Panel (Left) */
+        .account-list-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            overflow: hidden;
+
+        }
+
+        .search-container {
+            background: white;
+            z-index: 1;
+            position: relative;
+
+        }
+
+        .account-list {
+            flex: 1 1 0;
+            overflow: hidden;
+            padding: 0;
+            min-height: 0;
+            height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .account-items {
+            flex: 1 1 0;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            min-height: 0;
+            height: 0;
+        }
+
+        /* Select All Item */
+        .select-all-item {
+            display: flex;
+            align-items: center;
+            height: 36px;
+            width: 100%;
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            flex-shrink: 0;
+            background: white;
+            border-bottom: 1px solid var(--neutral-100);
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .select-all-item .checkbox-container {
+            width: 22px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: absolute;
+            left: 8px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .select-all-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 6px;
+            margin-left: 30px; /* Space for checkbox: 8px position + 22px width */
+            flex: 1;
+            box-sizing: border-box;
+            justify-content: space-between;
+        }
+
+        .select-all-text {
+            font-size: var(--font-size-14);
+            font-weight: var(--font-weight-regular);
+            line-height: var(--line-height-20);
+            letter-spacing: -0.005em;
+            color: var(--neutral-700);
+            margin-left: 30px; /* Align with account icons: 24px icon width + 6px gap */
+        }
+
+        .select-count {
+            font-size: var(--font-size-14);
+            font-weight: var(--font-weight-regular);
+            line-height: var(--line-height-20);
+            letter-spacing: -0.005em;
+            color: var(--neutral-500);
+        }
+
+        .select-all-item .checkbox-container input[type="checkbox"],
+        .account-item input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--neutral-300);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+            flex-shrink: 0;
+            outline: none;
+        }
+
+        .select-all-item .checkbox-container input[type="checkbox"]:checked,
+        .account-item input[type="checkbox"]:checked {
+            background: var(--brand-600);
+            border-color: var(--brand-600);
+        }
+
+        .select-all-item .checkbox-container input[type="checkbox"]:checked::after,
+        .account-item input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 4px;
+            height: 7px;
+            border: solid white;
+            border-width: 0 1px 1px 0;
+            transform: rotate(45deg);
+        }
+
+        .select-all-item .checkbox-container input[type="checkbox"]:indeterminate {
+            background: var(--brand-600);
+            border-color: var(--brand-600);
+        }
+
+        .select-all-item .checkbox-container input[type="checkbox"]:indeterminate::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 1px;
+            background: white;
+        }
+
+        .select-all-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .select-all-text {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--neutral-900);
+        }
+
+        .select-count {
+            font-size: 13px;
+            color: var(--neutral-600);
+            font-weight: 400;
+        }
+
+        /* Account Items - Matching account group filter styling */
+        .account-item {
+            display: flex;
+            align-items: center;
+            height: 36px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            user-select: none;
+            position: relative;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .account-item:hover {
+            background: var(--neutral-25);
+            border-radius: 6px;
+        }
+
+        .account-item .checkbox-container {
+            width: 22px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: absolute;
+            left: 8px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .account-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 6px;
+            margin-left: 30px; /* Space for checkbox: 8px position + 22px width */
+            flex: 1;
+            box-sizing: border-box;
+        }
+
+        .account-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: var(--font-weight-semibold);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .account-icon.deliveries {
+            background: var(--success-500);
+        }
+
+        .account-icon.eats {
+            background: var(--info-500);
+        }
+
+        .account-icon.rides {
+            background: #8b5cf6;
+        }
+
+        .account-name {
+            font-size: var(--font-size-14);
+            font-weight: var(--font-weight-regular);
+            line-height: var(--line-height-20);
+            letter-spacing: -0.005em;
+            color: var(--neutral-700);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Preview Panel (Right) */
+        .preview-panel {
+            display: flex;
+            padding: var(--Spacing-medium, 16px);
+            flex-direction: column;
+            align-items: flex-start;
+            flex: 1 0 0;
+            align-self: stretch;
+            border-radius: var(--Border-radius-large, 12px);
+            border: 1px solid var(--border-default, #D8DEE4);
+            background: var(--brand-25, #F7F5FD);
+
+        }
+
+        .preview-header {
+            padding: 16px 20px;
+            background: var(--neutral-50);
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .preview-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--neutral-900);
+        }
+
+        .preview-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .preview-placeholder {
+            color: var(--neutral-500);
+            font-size: 14px;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .preview-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .preview-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--neutral-25);
+            border-radius: 6px;
+        }
+
+        .preview-item .account-icon {
+            margin-right: 8px;
+        }
+
+        .preview-item .account-name {
+            font-size: 13px;
+        }
+
+        /* Legacy styles for backwards compatibility */
+        .step2-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            height: 400px;
+        }
+
+        /* Static Preview Styles */
+        .modal-header-preview {
+            margin-bottom: 24px;
+        }
+
+        .modal-header-preview .modal-title {
+            margin: 0 0 4px 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--neutral-900);
+        }
+
+        .modal-header-preview .modal-subtitle {
+            margin: 0;
+            font-size: 14px;
+            color: var(--neutral-600);
+        }
+
+        .step-indicator-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        /* Account Selection Panel (Left) */
+        .accounts-selection-panel {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--neutral-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            background: var(--neutral-50);
+            border-bottom: 1px solid var(--neutral-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--neutral-900);
+        }
+
+        .selection-summary {
+            font-size: 13px;
+            color: var(--neutral-600);
+        }
+
+        .selected-count {
+            font-weight: 600;
+            color: var(--brand-600);
+        }
+
+        /* Account Search */
+        .accounts-search {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--neutral-200);
+        }
+
+        /* Search input styles now handled by global components.css */
+
+        /* Accounts List */
+        .accounts-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .account-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--neutral-100);
+            transition: background-color 0.15s ease;
+        }
+
+        .account-option:hover {
+            background: var(--neutral-50);
+        }
+
+        .account-option.selected {
+            background: var(--brand-50);
+            border-left: 3px solid var(--brand-600);
+        }
+
+        .account-option input[type="checkbox"] {
+            margin-right: 12px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .account-info {
+            flex: 1;
+        }
+
+        .account-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--neutral-900);
+            margin-bottom: 2px;
+        }
+
+        .account-type {
+            font-size: 12px;
+            color: var(--neutral-600);
+        }
+
+        /* Group Preview Panel (Right) */
+        .group-preview-panel {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--neutral-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .group-preview-panel .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Selected Accounts Tree */
+        .selected-accounts-tree {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .tree-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tree-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--neutral-900);
+        }
+
+        .tree-count {
+            font-size: 13px;
+            color: var(--neutral-600);
+        }
+
+        .tree-content {
+            /* Tree visualization will be populated here */
+        }
+
+        .tree-item {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--neutral-700);
+            border-left: 2px solid var(--neutral-200);
+            padding-left: 16px;
+            margin-left: 8px;
+        }
+
+        .tree-item:first-child {
+            border-top-left-radius: 4px;
+        }
+
+        .tree-item:last-child {
+            border-bottom-left-radius: 4px;
+        }
+
+        /* Empty State */
+        .empty-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--neutral-500);
+            text-align: center;
+        }
+
+        .empty-selection-icon {
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-selection-text {
+            font-size: 14px;
+            color: var(--neutral-600);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+            
+            .step2-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                height: auto;
+            }
+            
+            .modal-header,
+            .modal-body {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            .modal-footer {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Group Creation Modal</h1>
+        <p style="color: var(--neutral-600); margin-bottom: 32px;">
+            A simplified 2-step flow for creating account groups without complexity.
+        </p>
+
+        <div class="demo-section">
+            <h2>Features</h2>
+            <span class="status-badge status-in-development">In Development</span>
+            
+            <ul class="feature-list">
+                <li>Clean 2-step flow: Name + Description → Account Selection</li>
+                <li>Dual-pane layout with account list and preview tree</li>
+                <li>Search functionality for finding accounts</li>
+                <li>Real-time selection counter and validation</li>
+                <li>Responsive design for mobile and desktop</li>
+                <li>Simplified flow (no group types complexity)</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>Preview Modal</h2>
+            <p style="color: var(--neutral-600); margin-bottom: 16px;">
+                Test the modal flow and interactions.
+            </p>
+            
+            <div class="demo-buttons">
+                <button class="demo-btn" onclick="showGroupCreationModal()">
+                    Open Group Creation Modal
+                </button>
+                <button class="demo-btn secondary" onclick="showStep2Demo()">
+                    Preview Step 2 (Account Selection)
+                </button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Step 1 Static Preview</h2>
+            <p style="color: var(--neutral-600);">
+                Live preview of the Step 1 layout for faster iteration without opening the modal.
+            </p>
+            
+            <!-- Static Modal Content Preview - Step 1 -->
+            <div class="modal-content small" style="position: static; transform: none; margin: 24px 0; border: 1px solid var(--neutral-200); overflow: visible;">
+                <div class="modal-header">
+                    <div class="modal-header-content">
+                        <h2 class="modal-title">Create account group</h2>
+                        <p class="modal-subtitle">Organize accounts with flexible groupings for filtering and reporting.</p>
+                    </div>
+                    <button class="modal-close" type="button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="step-content">
+                        <div class="form-section">
+                            <label class="form-label" for="static-group-name">Group name</label>
+                            <input 
+                              type="text" 
+                              id="static-group-name" 
+                              class="form-input" 
+                              placeholder="North America"
+                              value=""
+                              maxlength="50"
+                            >
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label" for="static-group-description">Description <span style="color: var(--neutral-500); font-weight: 400;">(optional)</span></label>
+                            <textarea 
+                              id="static-group-description" 
+                              class="form-textarea" 
+                              placeholder="Add a description to help others understand this group's purpose"
+                              rows="3"
+                              maxlength="150"
+                            ></textarea>
+                            <div class="form-help">
+                              <span id="static-char-count">0</span>/150 characters
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="footer-actions">
+                        <button class="btn btn-secondary step-back" style="display: none;">Back</button>
+                        <button class="btn btn-primary step-next">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Step 2 Static Preview</h2>
+            <p style="color: var(--neutral-600);">
+                Live preview of the Step 2 layout for faster iteration without opening the modal.
+            </p>
+            
+            <!-- Static Modal Content Preview -->
+            <div class="modal-content large" style="position: static; transform: none; margin: 24px 0; border: 1px solid var(--neutral-200); height: 640px;">
+                <div class="modal-header">
+                    <div class="modal-header-content">
+                        <h2 class="modal-title">Add accounts</h2>
+                        <p class="modal-subtitle">Lorem ipsum dolor</p>
+                    </div>
+                    <button class="modal-close" type="button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="step-content">
+                        <div class="dual-panel-container" id="static-preview">
+                            <div class="account-list-panel">
+                        <div class="search-container">
+                            <input type="text" class="search-input large" placeholder="Search" value="">
+                        </div>
+                        
+                        <div class="account-list">
+                            <div class="select-all-item">
+                                <div class="checkbox-container">
+                                    <input type="checkbox" class="select-all-checkbox">
+                                </div>
+                                <div class="select-all-content">
+                                    <span class="select-all-text">Select all</span>
+                                    <span class="select-count">0 selected</span>
+                                </div>
+                            </div>
+                             
+                             <div class="account-items">
+                             <div class="account-item" data-account-id="acc_1">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon deliveries">D</span>
+                                    <span class="account-name">Acme Deliveries CA</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_2">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon deliveries">D</span>
+                                    <span class="account-name">Acme Deliveries UK</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_3">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon deliveries">D</span>
+                                    <span class="account-name">Acme Deliveries US</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_4">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon eats">E</span>
+                                    <span class="account-name">Acme Eats CA</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_5">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon eats">E</span>
+                                        <span class="account-name">Acme Eats UK</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_6">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon eats">E</span>
+                                        <span class="account-name">Acme Eats US</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_7">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon rides">R</span>
+                                        <span class="account-name">Acme Rides CA</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_8">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon rides">R</span>
+                                        <span class="account-name">Acme Rides UK</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_9">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon rides">R</span>
+                                        <span class="account-name">Acme Rides US</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_10">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon deliveries">D</span>
+                                        <span class="account-name">Beta Deliveries CA</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_11">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon deliveries">D</span>
+                                        <span class="account-name">Beta Deliveries UK</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_12">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon deliveries">D</span>
+                                        <span class="account-name">Beta Deliveries US</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_13">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon eats">E</span>
+                                        <span class="account-name">Beta Eats CA</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_14">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon eats">E</span>
+                                        <span class="account-name">Beta Eats UK</span>
+                                </div>
+                            </div>
+                            
+                            <div class="account-item" data-account-id="acc_15">
+                                <div class="checkbox-container">
+                                    <input type="checkbox">
+                                </div>
+                                <div class="account-content">
+                                    <span class="account-icon eats">E</span>
+                                        <span class="account-name">Beta Eats US</span>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-panel">
+                        <div class="preview-header">
+                            <h3 class="preview-title">Demo Group</h3>
+                        </div>
+                        <div class="preview-content">
+                            <div class="preview-placeholder">Select an account</div>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <div class="footer-actions">
+                        <button class="btn btn-secondary step-back">Back</button>
+                        <button class="btn btn-primary step-next">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Development Notes</h2>
+            <ul style="color: var(--neutral-600); line-height: 1.6;">
+                <li><strong>Modal Structure:</strong> Fixed positioning with backdrop blur</li>
+                <li><strong>Step Indicator:</strong> Visual progress with active/completed states</li>
+                <li><strong>Form Validation:</strong> Real-time validation with visual feedback</li>
+                <li><strong>Account List:</strong> Similar to account groups filter component</li>
+                <li><strong>Tree Preview:</strong> Right panel shows selected accounts in tree format</li>
+                <li><strong>Responsive:</strong> Stacks panels vertically on mobile</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Include the group creation modal component -->
+    <script src="./group-creation-modal.js"></script>
+    
+    <script>
+        // Demo functions to test the modal
+        function showGroupCreationModal() {
+            if (window.GroupCreationModal) {
+                window.GroupCreationModal.show({
+                    onComplete: (groupData) => {
+                        console.log('Group created:', groupData);
+                        alert('Group created successfully: ' + groupData.name);
+                    }
+                });
+            } else {
+                console.error('GroupCreationModal not loaded yet');
+            }
+        }
+        
+        function showStep2Demo() {
+            if (window.GroupCreationModal) {
+                // Manually advance to step 2 for demo
+                window.GroupCreationModal.show();
+                setTimeout(() => {
+                    window.GroupCreationModal.currentStep = 2;
+                    window.GroupCreationModal.groupData = {
+                        name: 'Demo Group',
+                        description: 'A sample group for testing',
+                        selectedAccounts: []
+                    };
+                    window.GroupCreationModal.renderStep2();
+                    window.GroupCreationModal.updateModalHeader();
+                }, 100);
+            } else {
+                console.error('GroupCreationModal not loaded yet');
+            }
+        }
+
+        // Mock data for development
+        window.mockAccountData = [
+            { id: 'acc_1', name: 'Acme Technologies', type: 'Standard' },
+            { id: 'acc_2', name: 'Beta Solutions', type: 'Express' },
+            { id: 'acc_3', name: 'Gamma Corp', type: 'Standard' },
+            { id: 'acc_4', name: 'Delta Digital', type: 'Connected' },
+            { id: 'acc_5', name: 'Echo Enterprises', type: 'Standard' },
+            { id: 'acc_6', name: 'Foxtrot Labs', type: 'Express' },
+            { id: 'acc_7', name: 'Golf Industries', type: 'Standard' },
+            { id: 'acc_8', name: 'Hotel Partners', type: 'Connected' }
+        ];
+    </script>
+</body>
+</html>
