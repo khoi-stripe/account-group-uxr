@@ -2264,6 +2264,9 @@
       dragImage.style.top = '-1000px';
       dragImage.style.left = '-1000px';
       dragImage.style.width = card.offsetWidth + 'px';
+      dragImage.style.height = card.offsetHeight + 'px';
+      dragImage.style.display = 'flex';
+      dragImage.style.flexDirection = 'column';
       dragImage.style.zIndex = '10000';
       
       document.body.appendChild(dragImage);
