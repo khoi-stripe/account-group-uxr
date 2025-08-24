@@ -404,7 +404,7 @@ class AccountGroupsFilter {
     // Calculate accounts list height with padding (accounts-list has 8px bottom padding)
     const accountsListContentHeight = visibleAccountCount * accountItemHeight;
     const accountsListPadding = 8; // 8px bottom padding from CSS
-    const accountsListHeight = Math.max(200, accountsListContentHeight + accountsListPadding);
+    const accountsListHeight = accountsListContentHeight + accountsListPadding;
     
     // Calculate ideal height based on content
     const contentBasedHeight = searchContainerHeight + selectAllHeight + accountsListHeight + footerHeight + groupsSectionPadding;
