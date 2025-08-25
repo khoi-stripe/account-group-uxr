@@ -51,15 +51,13 @@ class SpreadsheetDataLoader {
           });
         }
         
-        // For duplicate names, append a counter to the display name
-        const displayName = nameCount > 1 ? `${accountName} (${nameCount})` : accountName;
-        
+        // Keep original name for display, but ensure unique IDs and colors
         organizations.get(orgName).accounts.push({
           id: accountId,
-          name: displayName,
+          name: accountName, // Use original name without numbering
           originalName: accountName, // Store the original name for reference
           type: "Account", // Default type for all accounts
-          color: this.generateAccountColor(accountName, accountId)
+          color: this.generateAccountColor(accountName, accountId) // Unique color based on unique ID
         });
       }
       
