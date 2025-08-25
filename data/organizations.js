@@ -23,6 +23,8 @@ class SpreadsheetDataLoader {
       }
       
       const organizations = new Map();
+      // Track account name counters per organization to handle duplicates
+      const accountNameCounters = new Map();
       
       // Expected format: Organization,Account Name
       for (let i = 1; i < rows.length; i++) {
@@ -31,7 +33,14 @@ class SpreadsheetDataLoader {
         
         const orgName = row[0];
         const accountName = row[1];
-        const accountId = this.generateAccountId(orgName, accountName);
+        
+        // Track how many accounts with this name we've seen in this org
+        const orgAccountKey = `${orgName}_${accountName}`;
+        const nameCount = (accountNameCounters.get(orgAccountKey) || 0) + 1;
+        accountNameCounters.set(orgAccountKey, nameCount);
+        
+        // Generate unique ID that includes the occurrence count for duplicates
+        const accountId = this.generateAccountId(orgName, accountName, nameCount);
         
         if (!organizations.has(orgName)) {
           organizations.set(orgName, {
@@ -42,9 +51,13 @@ class SpreadsheetDataLoader {
           });
         }
         
+        // For duplicate names, append a counter to the display name
+        const displayName = nameCount > 1 ? `${accountName} (${nameCount})` : accountName;
+        
         organizations.get(orgName).accounts.push({
           id: accountId,
-          name: accountName,
+          name: displayName,
+          originalName: accountName, // Store the original name for reference
           type: "Account", // Default type for all accounts
           color: this.generateAccountColor(accountName, accountId)
         });
@@ -58,13 +71,13 @@ class SpreadsheetDataLoader {
     }
   }
 
-  generateAccountId(orgName, accountName) {
+  generateAccountId(orgName, accountName, nameCount = 1) {
     // Generate deterministic IDs that remain stable across page loads
     const orgClean = orgName.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 4);
     const accClean = accountName.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8);
     
-    // Use a more robust hash of the combined string for better uniqueness
-    const combined = `${orgName}_${accountName}`;
+    // Include nameCount in the hash to ensure uniqueness for duplicate names
+    const combined = `${orgName}_${accountName}_${nameCount}`;
     let hash = 0;
     for (let i = 0; i < combined.length; i++) {
       const char = combined.charCodeAt(i);
@@ -75,7 +88,10 @@ class SpreadsheetDataLoader {
     // Use longer hash for better uniqueness (6 chars instead of 3)
     const hashStr = Math.abs(hash).toString(36).slice(0, 6);
     
-    return `${orgClean}_${accClean}_${hashStr}`;
+    // Include nameCount suffix for duplicate accounts (but not for the first occurrence)
+    const suffix = nameCount > 1 ? `_${nameCount}` : '';
+    
+    return `${orgClean}_${accClean}_${hashStr}${suffix}`;
   }
 
   generateAccountColor(accountName, accountId) {
