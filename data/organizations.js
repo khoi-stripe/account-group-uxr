@@ -130,6 +130,7 @@ class SpreadsheetDataLoader {
 TechSaaS Corp,Mobile App
 TechSaaS Corp,Web Platform
 TechSaaS Corp,API Services
+TechSaaS Corp,Mobile App
 TechSaaS Corp,Analytics Dashboard
 TechSaaS Corp,Development Environment
 TechSaaS Corp,Staging Environment
@@ -138,12 +139,14 @@ GlobalCommerce Ltd,North America B2B
 GlobalCommerce Ltd,North America B2C
 GlobalCommerce Ltd,Europe B2B
 GlobalCommerce Ltd,Europe B2C
+GlobalCommerce Ltd,North America B2B
 GlobalCommerce Ltd,Marketplace Platform
 GlobalCommerce Ltd,Payment Processing
 FinanceFirst Bank,Personal Banking
 FinanceFirst Bank,Commercial Banking
 FinanceFirst Bank,Investment & Wealth
-FinanceFirst Bank,Digital Banking`;
+FinanceFirst Bank,Digital Banking
+FinanceFirst Bank,Personal Banking`;
   }
 
   getDefaultData() {
