@@ -356,14 +356,17 @@
   font-weight: 700;
   font-size: 12px;
   line-height: 16px;
-  color: #6c7688 !important;
+  color: #533afd !important;
   letter-spacing: -0.024px;
   text-decoration: none;
   cursor: pointer;
   transition: color var(--transition-fast);
 }
 
-.breadcrumb-link:hover {
+.breadcrumb-link:hover,
+.breadcrumb-link:visited,
+.breadcrumb-link:active,
+.breadcrumb-link:focus {
   color: #533afd !important;
   text-decoration: none;
 }
