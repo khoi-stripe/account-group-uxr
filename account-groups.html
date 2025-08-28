@@ -60,9 +60,14 @@
     }
     
     .account-group-card.drag-over {
-      outline: 1px dashed #675dff;
+      outline: 1px dashed var(--brand-300, #c2c2ff);
       outline-offset: -1px;
       background: rgba(103, 93, 255, 0.05);
+    }
+    
+    /* Visual indicator for drag constraints */
+    #groups-container.drag-active {
+      position: relative;
     }
     
     .account-group-card:hover {
@@ -313,7 +318,7 @@
     .sort-menu-checkmark {
       flex-shrink: 0;
       margin-left: auto;
-      /* Force SVG to be neutral-500 color (#6D7C8C) */
+      /* Force SVG to be neutral-500 color (#6C7688) */
       filter: brightness(0) saturate(100%) invert(54%) sepia(8%) saturate(1157%) hue-rotate(169deg) brightness(95%) contrast(91%) !important;
     }
 
@@ -1347,9 +1352,9 @@
          <!-- Page Header Section -->
          <div style="display: flex; flex-direction: column; gap: 4px; padding: 6px 0;">
            <!-- Breadcrumb Navigation -->
-           <div style="display: flex; align-items: center; gap: 8px;">
-             <a href="./settings.html" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; color: #6c7688; letter-spacing: -0.024px; text-decoration: none; cursor: pointer;" onmouseover="this.style.color='#533afd'; this.style.textDecoration='underline'" onmouseout="this.style.color='#6c7688'; this.style.textDecoration='none'">Organization settings</a>
-             <div style="width: 8px; height: 8px; display: flex; align-items: center; justify-content: center;">
+           <div class="breadcrumb" style="margin: 0;">
+             <a href="./settings.html" class="breadcrumb-link">Organization settings</a>
+             <div class="breadcrumb-separator">
                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                  <path d="M2 1.5L5.5 4L2 6.5" stroke="#6c7688" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -1357,7 +1362,7 @@
             </div>
             
            <!-- Page Title -->
-           <div style="display: flex; align-items: flex-start; justify-content: space-between; width: 100%;">
+           <div style="display: flex; align-items: flex-start; justify-content: space-between; width: 100%; margin: 0;">
              <div style="flex: 1;">
                <h1 style="font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; font-size: 28px; line-height: 36px; color: #353a44; letter-spacing: 0.38px; margin: 0;">Account groups</h1>
                 </div>
@@ -2132,6 +2137,10 @@
     // Drag and Drop functionality
     let draggedElement = null;
     let dragOverElement = null;
+    let isDragging = false;
+    let dragPreview = null;
+    let mouseOffset = { x: 0, y: 0 };
+    let containerBounds = null;
     
     function initializeDragAndDrop() {
       console.log('🔄 initializeDragAndDrop called');
@@ -2158,17 +2167,8 @@
     }
     
     function attachDragListeners() {
-      const dragHandles = document.querySelectorAll('.drag-handle[draggable="true"]');
-      console.log('🔄 attachDragListeners: Found', dragHandles.length, 'draggable handles');
-      
-      if (dragHandles.length === 0) {
-        console.log('❌ No draggable handles found! Checking for .drag-handle elements...');
-        const allHandles = document.querySelectorAll('.drag-handle');
-        console.log('🔍 Found', allHandles.length, 'total .drag-handle elements');
-        allHandles.forEach((handle, index) => {
-          console.log(`🔍 Handle ${index + 1}:`, handle.getAttribute('draggable'), handle.style.display);
-        });
-      }
+      const dragHandles = document.querySelectorAll('.drag-handle');
+      console.log('🔄 attachDragListeners: Found', dragHandles.length, 'drag handles');
       
       dragHandles.forEach((handle, index) => {
         const card = handle.closest('.account-group-card');
@@ -2177,27 +2177,27 @@
           return;
         }
         console.log('🔄 Attaching listeners to handle', index + 1, ':', card.dataset.groupId);
-        handle.addEventListener('dragstart', handleDragStart);
-        card.addEventListener('dragenter', handleDragEnter);
-        card.addEventListener('dragover', handleDragOver);
-        card.addEventListener('dragleave', handleDragLeave);
-        card.addEventListener('drop', handleDrop);
-        handle.addEventListener('dragend', handleDragEnd);
+        
+        // Remove HTML5 drag attributes and add custom mouse handlers
+        handle.removeAttribute('draggable');
+        handle.addEventListener('mousedown', handleMouseDown);
       });
+      
+      // Add global mouse listeners
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
     }
     
     function detachDragListeners() {
-      const dragHandles = document.querySelectorAll('.drag-handle[draggable="true"]');
+      const dragHandles = document.querySelectorAll('.drag-handle');
       
       dragHandles.forEach(handle => {
-        const card = handle.closest('.account-group-card');
-        handle.removeEventListener('dragstart', handleDragStart);
-        card.removeEventListener('dragenter', handleDragEnter);
-        card.removeEventListener('dragover', handleDragOver);
-        card.removeEventListener('dragleave', handleDragLeave);
-        card.removeEventListener('drop', handleDrop);
-        handle.removeEventListener('dragend', handleDragEnd);
+        handle.removeEventListener('mousedown', handleMouseDown);
       });
+      
+      // Remove global mouse listeners
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     }
     
     function disableDragHandles() {
@@ -2206,7 +2206,6 @@
       dragHandles.forEach(handle => {
         // Hide the drag handle completely when only one group exists
         handle.style.display = 'none';
-        handle.removeAttribute('draggable');
         handle.style.cursor = 'default';
         
         // Adjust card padding when drag handle is hidden
@@ -2223,7 +2222,6 @@
       dragHandles.forEach(handle => {
         // Show and re-enable drag handles for multiple groups
         handle.style.display = 'flex';
-        handle.setAttribute('draggable', 'true');
         handle.style.cursor = 'grab';
         
         // Reset any opacity changes
@@ -2240,104 +2238,161 @@
       });
     }
     
-    function handleDragStart(e) {
-      // 'this' is now the drag handle, get the card
+    function handleMouseDown(e) {
+      e.preventDefault();
+      
+      // 'this' is the drag handle, get the card
       const card = this.closest('.account-group-card');
-      console.log('🔄 handleDragStart called on:', card.dataset.groupId);
-      draggedElement = card;
-      card.classList.add('dragging');
+      console.log('🔄 handleMouseDown called on:', card.dataset.groupId);
       
-      // Calculate click position relative to the card
+      const container = document.getElementById('groups-container');
+      const containerRect = container.getBoundingClientRect();
       const cardRect = card.getBoundingClientRect();
-      const offsetX = e.clientX - cardRect.left;
-      const offsetY = e.clientY - cardRect.top;
       
-      // Create drag image
-      const dragImage = card.cloneNode(true);
-      dragImage.style.transform = 'rotate(2deg)';
-      dragImage.style.opacity = '0.9';
-      dragImage.style.boxShadow = '0 8px 20px rgba(103, 93, 255, 0.4)';
-      dragImage.style.border = '1px solid #675dff';
-      dragImage.style.borderRadius = '8px';
-      dragImage.style.backgroundColor = '#ffffff';
-      dragImage.style.position = 'absolute';
-      dragImage.style.top = '-1000px';
-      dragImage.style.left = '-1000px';
-      dragImage.style.width = card.offsetWidth + 'px';
-      dragImage.style.zIndex = '10000';
+      // Store references and state
+      draggedElement = card;
+      isDragging = true;
       
-      document.body.appendChild(dragImage);
-      e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+      // Calculate the actual card area bounds (container minus padding)
+      const containerStyle = window.getComputedStyle(container);
+      const paddingLeft = parseInt(containerStyle.paddingLeft) || 0;
+      const paddingRight = parseInt(containerStyle.paddingRight) || 0;
       
-      // Clean up drag image after a short delay
-      setTimeout(() => {
-        if (document.body.contains(dragImage)) {
-          document.body.removeChild(dragImage);
-        }
-      }, 0);
+      containerBounds = {
+        left: containerRect.left + paddingLeft,
+        right: containerRect.right - paddingRight,
+        top: containerRect.top,
+        bottom: containerRect.bottom,
+        width: containerRect.width - paddingLeft - paddingRight
+      };
       
-      // Set drag data
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/html', card.outerHTML);
-      e.dataTransfer.setData('text/plain', card.dataset.groupId);
+      // Calculate mouse offset relative to card
+      mouseOffset = {
+        x: e.clientX - cardRect.left,
+        y: e.clientY - cardRect.top
+      };
       
-      console.log('🔄 Drag started for group:', card.dataset.groupId);
+      // Create drag preview
+      createDragPreview(card);
+      
+      // Add visual state
+      card.classList.add('dragging');
+      container.classList.add('drag-active');
+      document.body.style.cursor = 'grabbing';
+      document.body.style.userSelect = 'none';
+      
+      console.log('🔄 Custom drag started for group:', card.dataset.groupId);
     }
     
-    function handleDragEnter(e) {
-      console.log('🔄 handleDragEnter called on:', this.dataset.groupId);
-      if (this !== draggedElement) {
-        console.log('🔄 Adding drag-over class to:', this.dataset.groupId);
-        this.classList.add('drag-over');
-        dragOverElement = this;
+    function createDragPreview(card) {
+      dragPreview = card.cloneNode(true);
+      dragPreview.style.position = 'fixed';
+      dragPreview.style.pointerEvents = 'none';
+      dragPreview.style.zIndex = '10000';
+      dragPreview.style.opacity = '0.9';
+      dragPreview.style.boxShadow = '0 8px 20px rgba(103, 93, 255, 0.4)';
+      dragPreview.style.border = '1px solid #675dff';
+      dragPreview.style.borderRadius = '8px';
+      dragPreview.style.backgroundColor = '#ffffff';
+      dragPreview.style.width = card.offsetWidth + 'px';
+      dragPreview.style.height = card.offsetHeight + 'px';
+      dragPreview.style.top = '-1000px';
+      dragPreview.style.left = '-1000px';
+      
+      document.body.appendChild(dragPreview);
+    }
+    
+    function handleMouseMove(e) {
+      if (!isDragging || !dragPreview) return;
+      
+      // Calculate constrained position
+      let x = e.clientX - mouseOffset.x;
+      let y = e.clientY - mouseOffset.y;
+      
+      // Constrain to column bounds
+      if (containerBounds) {
+        const previewWidth = dragPreview.offsetWidth;
+        const minX = containerBounds.left;
+        const maxX = containerBounds.right - previewWidth;
+        
+        x = Math.max(minX, Math.min(maxX, x));
+      }
+      
+      // Update preview position
+      dragPreview.style.left = x + 'px';
+      dragPreview.style.top = y + 'px';
+      
+      // Find drop target
+      updateDropTarget(e.clientX, e.clientY);
+    }
+    
+    function updateDropTarget(mouseX, mouseY) {
+      // Hide preview temporarily to get element underneath
+      if (dragPreview) {
+        dragPreview.style.display = 'none';
+      }
+      
+      const elementBelow = document.elementFromPoint(mouseX, mouseY);
+      const targetCard = elementBelow?.closest('.account-group-card');
+      
+      // Show preview again
+      if (dragPreview) {
+        dragPreview.style.display = 'flex';
+      }
+      
+      // Clear previous drag-over state
+      if (dragOverElement && dragOverElement !== targetCard) {
+        dragOverElement.classList.remove('drag-over');
+      }
+      
+      // Check if within column bounds and is valid drop target
+      const isWithinBounds = containerBounds && 
+        mouseX >= containerBounds.left && 
+        mouseX <= containerBounds.right;
+      
+      if (isWithinBounds && targetCard && targetCard !== draggedElement) {
+        targetCard.classList.add('drag-over');
+        dragOverElement = targetCard;
+      } else {
+        dragOverElement = null;
       }
     }
     
-    function handleDragOver(e) {
-      if (e.preventDefault) {
-        e.preventDefault(); // Allow drop
-      }
+    function handleMouseUp(e) {
+      if (!isDragging) return;
       
-      e.dataTransfer.dropEffect = 'move';
-      return false;
-    }
-    
-    function handleDragLeave(e) {
-      // Only remove drag-over class if we're actually leaving the element
-      if (!this.contains(e.relatedTarget)) {
-        this.classList.remove('drag-over');
-      }
-    }
-    
-    function handleDrop(e) {
-      if (e.stopPropagation) {
-        e.stopPropagation(); // Stops some browsers from redirecting
-      }
+      console.log('🔄 handleMouseUp called');
       
-      if (draggedElement !== this) {
-        // Get all group cards in current order
+      // Check if we have a valid drop target
+      if (dragOverElement && draggedElement && dragOverElement !== draggedElement) {
+        // Check if drop is within column bounds
+        const isWithinBounds = containerBounds && 
+          e.clientX >= containerBounds.left && 
+          e.clientX <= containerBounds.right;
+          
+        if (isWithinBounds) {
+          // Perform the drop
         const container = document.getElementById('groups-container');
         const allCards = Array.from(container.querySelectorAll('.account-group-card'));
         
-        // Find indices
         const draggedIndex = allCards.indexOf(draggedElement);
-        const targetIndex = allCards.indexOf(this);
+          const targetIndex = allCards.indexOf(dragOverElement);
         
         console.log('🔄 Dropping group at position:', draggedIndex, '→', targetIndex);
-        
-        // Update order
         updateGroupOrder(draggedIndex, targetIndex);
+        } else {
+          console.log('🚫 Drop cancelled - outside column bounds');
+        }
       }
       
-      return false;
+      // Clean up drag state
+      cleanupDrag();
     }
     
-    function handleDragEnd(e) {
-      // 'this' is now the drag handle, get the card
-      const card = this.closest('.account-group-card');
-      
-      // Clean up
-      card.classList.remove('dragging');
+    function cleanupDrag() {
+      if (draggedElement) {
+        draggedElement.classList.remove('dragging');
+      }
       
       if (dragOverElement) {
         dragOverElement.classList.remove('drag-over');
@@ -2349,9 +2404,29 @@
         el.classList.remove('drag-over');
       });
       
-      draggedElement = null;
+      // Remove drag preview
+      if (dragPreview && document.body.contains(dragPreview)) {
+        document.body.removeChild(dragPreview);
+        dragPreview = null;
+      }
       
-      console.log('🔄 Drag ended');
+      // Clean up visual indicators
+      const container = document.getElementById('groups-container');
+      if (container) {
+        container.classList.remove('drag-active');
+      }
+      
+      // Reset body styles
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      
+      // Reset state
+      draggedElement = null;
+      isDragging = false;
+      containerBounds = null;
+      mouseOffset = { x: 0, y: 0 };
+      
+      console.log('🔄 Drag cleanup completed');
     }
 
     // Function to refresh account group filters when order changes
