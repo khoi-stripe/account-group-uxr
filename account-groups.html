@@ -1352,7 +1352,7 @@
          <!-- Page Header Section -->
          <div style="display: flex; flex-direction: column; gap: 4px; padding: 6px 0;">
            <!-- Breadcrumb Navigation -->
-           <div class="breadcrumb">
+           <div class="breadcrumb" style="margin: 0;">
              <a href="./settings.html" class="breadcrumb-link">Organization settings</a>
              <div class="breadcrumb-separator">
                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1362,7 +1362,7 @@
             </div>
             
            <!-- Page Title -->
-           <div style="display: flex; align-items: flex-start; justify-content: space-between; width: 100%;">
+           <div style="display: flex; align-items: flex-start; justify-content: space-between; width: 100%; margin: 0;">
              <div style="flex: 1;">
                <h1 style="font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; font-size: 28px; line-height: 36px; color: #353a44; letter-spacing: 0.38px; margin: 0;">Account groups</h1>
                 </div>
@@ -2372,14 +2372,14 @@
           
         if (isWithinBounds) {
           // Perform the drop
-          const container = document.getElementById('groups-container');
-          const allCards = Array.from(container.querySelectorAll('.account-group-card'));
-          
-          const draggedIndex = allCards.indexOf(draggedElement);
+        const container = document.getElementById('groups-container');
+        const allCards = Array.from(container.querySelectorAll('.account-group-card'));
+        
+        const draggedIndex = allCards.indexOf(draggedElement);
           const targetIndex = allCards.indexOf(dragOverElement);
-          
-          console.log('🔄 Dropping group at position:', draggedIndex, '→', targetIndex);
-          updateGroupOrder(draggedIndex, targetIndex);
+        
+        console.log('🔄 Dropping group at position:', draggedIndex, '→', targetIndex);
+        updateGroupOrder(draggedIndex, targetIndex);
         } else {
           console.log('🚫 Drop cancelled - outside column bounds');
         }
