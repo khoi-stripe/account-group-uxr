@@ -23,8 +23,6 @@ class SpreadsheetDataLoader {
       }
       
       const organizations = new Map();
-      // Track account name counters per organization to handle duplicates
-      const accountNameCounters = new Map();
       
       // Expected format: Organization,Account Name
       for (let i = 1; i < rows.length; i++) {
@@ -33,14 +31,7 @@ class SpreadsheetDataLoader {
         
         const orgName = row[0];
         const accountName = row[1];
-        
-        // Track how many accounts with this name we've seen in this org
-        const orgAccountKey = `${orgName}_${accountName}`;
-        const nameCount = (accountNameCounters.get(orgAccountKey) || 0) + 1;
-        accountNameCounters.set(orgAccountKey, nameCount);
-        
-        // Generate unique ID that includes the occurrence count for duplicates
-        const accountId = this.generateAccountId(orgName, accountName, nameCount);
+        const accountId = this.generateAccountId(orgName, accountName);
         
         if (!organizations.has(orgName)) {
           organizations.set(orgName, {
@@ -51,13 +42,11 @@ class SpreadsheetDataLoader {
           });
         }
         
-        // Keep original name for display, but ensure unique IDs and colors
         organizations.get(orgName).accounts.push({
           id: accountId,
-          name: accountName, // Use original name without numbering
-          originalName: accountName, // Store the original name for reference
+          name: accountName,
           type: "Account", // Default type for all accounts
-          color: this.generateAccountColor(accountName, accountId) // Unique color based on unique ID
+          color: this.generateAccountColor(accountName, accountId)
         });
       }
       
@@ -69,13 +58,13 @@ class SpreadsheetDataLoader {
     }
   }
 
-  generateAccountId(orgName, accountName, nameCount = 1) {
+  generateAccountId(orgName, accountName) {
     // Generate deterministic IDs that remain stable across page loads
     const orgClean = orgName.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 4);
     const accClean = accountName.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8);
     
-    // Include nameCount in the hash to ensure uniqueness for duplicate names
-    const combined = `${orgName}_${accountName}_${nameCount}`;
+    // Use a more robust hash of the combined string for better uniqueness
+    const combined = `${orgName}_${accountName}`;
     let hash = 0;
     for (let i = 0; i < combined.length; i++) {
       const char = combined.charCodeAt(i);
@@ -86,10 +75,7 @@ class SpreadsheetDataLoader {
     // Use longer hash for better uniqueness (6 chars instead of 3)
     const hashStr = Math.abs(hash).toString(36).slice(0, 6);
     
-    // Include nameCount suffix for duplicate accounts (but not for the first occurrence)
-    const suffix = nameCount > 1 ? `_${nameCount}` : '';
-    
-    return `${orgClean}_${accClean}_${hashStr}${suffix}`;
+    return `${orgClean}_${accClean}_${hashStr}`;
   }
 
   generateAccountColor(accountName, accountId) {
@@ -128,7 +114,6 @@ class SpreadsheetDataLoader {
 TechSaaS Corp,Mobile App
 TechSaaS Corp,Web Platform
 TechSaaS Corp,API Services
-TechSaaS Corp,Mobile App
 TechSaaS Corp,Analytics Dashboard
 TechSaaS Corp,Development Environment
 TechSaaS Corp,Staging Environment
@@ -137,14 +122,12 @@ GlobalCommerce Ltd,North America B2B
 GlobalCommerce Ltd,North America B2C
 GlobalCommerce Ltd,Europe B2B
 GlobalCommerce Ltd,Europe B2C
-GlobalCommerce Ltd,North America B2B
 GlobalCommerce Ltd,Marketplace Platform
 GlobalCommerce Ltd,Payment Processing
 FinanceFirst Bank,Personal Banking
 FinanceFirst Bank,Commercial Banking
 FinanceFirst Bank,Investment & Wealth
-FinanceFirst Bank,Digital Banking
-FinanceFirst Bank,Personal Banking`;
+FinanceFirst Bank,Digital Banking`;
   }
 
   getDefaultData() {

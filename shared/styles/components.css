@@ -343,42 +343,6 @@
   color: var(--neutral-400);
 }
 
-/* ===== BREADCRUMB NAVIGATION ===== */
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 0;
-}
-
-.breadcrumb-link {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-  color: #533afd !important;
-  letter-spacing: -0.024px;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-
-.breadcrumb-link:hover,
-.breadcrumb-link:visited,
-.breadcrumb-link:active,
-.breadcrumb-link:focus {
-  color: #533afd !important;
-  text-decoration: none;
-}
-
-.breadcrumb-separator {
-  width: 8px;
-  height: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* ===== SEARCH INPUTS ===== */
 /* Consolidated search input system with modifiers for specific contexts */
 

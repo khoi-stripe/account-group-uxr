@@ -1,0 +1,15 @@
+[submodule "account-groups-uxr"]
+	path = account-groups-uxr
+	url = https://github.com/khoi-stripe/account-group-uxr.git
+
+[submodule "stripe-dash"]
+	path = stripe-dash
+	url = https://github.com/khoi-stripe/stripe-dash.git
+
+[submodule "nav-experiment"]
+	path = nav-experiment
+	url = https://github.com/khoi-stripe/nav-experiment.git
+
+[submodule "new-nav-71325"]
+	path = new-nav-71325
+	url = https://github.com/khoi-stripe/new-nav-71325.git
