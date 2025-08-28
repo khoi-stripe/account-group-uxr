@@ -428,9 +428,24 @@ class OrganizationDataManager {
   }
 
   createAccountGroup(groupData) {
+    // Validate that group name is not empty
+    if (!groupData.name || !groupData.name.trim()) {
+      throw new Error('Group name is required');
+    }
+    
+    // Check for duplicate group names (case-insensitive)
+    const trimmedName = groupData.name.trim();
+    const existingGroup = this.accountGroups.find(group => 
+      group.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+    
+    if (existingGroup) {
+      throw new Error(`An account group named "${trimmedName}" already exists. Please choose a different name.`);
+    }
+    
     const group = {
       id: `group_${Date.now()}`,
-      name: groupData.name,
+      name: trimmedName,
       type: groupData.type,
       accountIds: groupData.accountIds || [],
       createdAt: new Date().toISOString(),
@@ -448,16 +463,37 @@ class OrganizationDataManager {
 
   updateAccountGroup(groupId, updates) {
     const index = this.accountGroups.findIndex(g => g.id === groupId);
-    if (index !== -1) {
-      this.accountGroups[index] = { 
-        ...this.accountGroups[index], 
-        ...updates,
-        updatedAt: new Date().toISOString()
-      };
-      this.saveAccountGroups();
-      return this.accountGroups[index];
+    if (index === -1) {
+      return null;
     }
-    return null;
+    
+    // If updating the name, validate it doesn't conflict with other groups
+    if (updates.name !== undefined) {
+      if (!updates.name || !updates.name.trim()) {
+        throw new Error('Group name is required');
+      }
+      
+      const trimmedName = updates.name.trim();
+      const existingGroup = this.accountGroups.find(group => 
+        group.id !== groupId && // Exclude current group from check
+        group.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+      
+      if (existingGroup) {
+        throw new Error(`An account group named "${trimmedName}" already exists. Please choose a different name.`);
+      }
+      
+      // Trim the name in the updates
+      updates.name = trimmedName;
+    }
+    
+    this.accountGroups[index] = { 
+      ...this.accountGroups[index], 
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    this.saveAccountGroups();
+    return this.accountGroups[index];
   }
 
   deleteAccountGroup(groupId) {

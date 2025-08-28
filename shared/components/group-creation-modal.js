@@ -571,7 +571,7 @@ class GroupCreationModal {
       
     } catch (error) {
       console.error('Error creating group:', error);
-      this.showError('Failed to create account group');
+      this.showError(error.message || 'Failed to create account group');
     }
   }
 

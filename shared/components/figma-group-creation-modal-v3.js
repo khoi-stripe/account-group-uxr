@@ -860,7 +860,7 @@ class FigmaGroupCreationModalV3 {
 
         } catch (error) {
             console.error('Failed to save group:', error);
-            alert('Failed to save group. Please try again.');
+            alert(error.message || 'Failed to save group. Please try again.');
         }
     }
 

@@ -716,7 +716,7 @@ class FigmaGroupCreationModalV3 {
             localStorage.setItem(storageKey, JSON.stringify(existingGroups));
         } catch (error) {
             console.error('Failed to save group:', error);
-            alert('Failed to save group. Please try again.');
+            alert(error.message || 'Failed to save group. Please try again.');
         }
     }
 
