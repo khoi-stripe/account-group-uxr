@@ -252,7 +252,7 @@ class AccountSwitcher {
                   
                       // Add divider after "All accounts" if there are more accounts
                       if (index < sortedAccounts.length - 1) {
-                        accountItemHtml += `<div class="account-divider" style="border-bottom: 1px solid var(--neutral-50); margin: 8px 16px;"></div>`;
+                        accountItemHtml += `<div class="account-divider" style="border-bottom: 1px solid var(--neutral-100); margin: 8px 16px;"></div>`;
                       }
                     } else {
                       accountItemHtml = `
@@ -744,7 +744,7 @@ class AccountSwitcher {
       
       .account-list {
         padding: 16px 8px; /* Additional 8px top and bottom padding (16px total), 8px sides */
-        border-bottom: 1px solid var(--color-border-subtle);
+        border-bottom: 1px solid var(--neutral-100);
         flex: 1; /* Allow to grow and fill available space */
         display: flex;
         flex-direction: column;
