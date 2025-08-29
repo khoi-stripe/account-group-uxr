@@ -1905,31 +1905,48 @@
       
       if (isAggregateView) {
         // Show all accounts in organization view
-        breakdown.innerHTML = accountData.map(account => `
+        breakdown.innerHTML = accountData.map(account => {
+          const revenue = account.revenue || 0;
+          const transactions = account.transactions || 0;
+          const growth = account.growth || '0';
+          const growthValue = parseFloat(growth);
+          
+          return `
           <div style="display: grid; grid-template-columns: 1fr 120px 120px 120px; gap: 24px; align-items: center; padding: 24px; border-radius: 6px; margin-bottom: 16px; background: var(--neutral-25);">
             <div>
               <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px; font-size: 18px;">${account.name}</div>
               <div style="font-size: 14px; color: var(--neutral-500);">Primary Account Metrics</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${account.revenue.toLocaleString()}</div>
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${revenue.toLocaleString()}</div>
               <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Total Revenue</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${account.transactions.toLocaleString()}</div>
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${transactions.toLocaleString()}</div>
               <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Transactions</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 600; font-size: 20px; color: ${parseFloat(account.growth) >= 0 ? 'var(--green-600)' : 'var(--red-600)'};">
-                ${parseFloat(account.growth) >= 0 ? '+' : ''}${account.growth}%
+              <div style="font-weight: 600; font-size: 20px; color: ${growthValue >= 0 ? 'var(--green-600)' : 'var(--red-600)'};">
+                ${growthValue >= 0 ? '+' : ''}${growth}%
               </div>
               <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Growth Rate</div>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       } else {
         // Show single account view with more detailed breakdown
         const account = accountData[0];
+        const revenue = account.revenue || 0;
+        const transactions = account.transactions || 0;
+        const growth = account.growth || '0';
+        const growthValue = parseFloat(growth);
+        
+        // Calculate derived metrics with safe division
+        const avgTransaction = transactions > 0 ? Math.round(revenue / transactions) : 0;
+        const revenuePerDay = Math.round(revenue / 30);
+        const transactionsPerDay = Math.round(transactions / 30);
+        
         breakdown.innerHTML = `
           <div style="display: grid; grid-template-columns: 1fr 120px 120px 120px; gap: 24px; align-items: center; padding: 24px; border-radius: 6px; background: var(--neutral-25);">
             <div>
@@ -1937,16 +1954,16 @@
               <div style="font-size: 14px; color: var(--neutral-500);">Primary Account Metrics</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${account.revenue.toLocaleString()}</div>
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${revenue.toLocaleString()}</div>
               <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Total Revenue</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${account.transactions.toLocaleString()}</div>
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${transactions.toLocaleString()}</div>
               <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Transactions</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 600; font-size: 20px; color: ${parseFloat(account.growth) >= 0 ? 'var(--green-600)' : 'var(--red-600)'};">
-                ${parseFloat(account.growth) >= 0 ? '+' : ''}${account.growth}%
+              <div style="font-weight: 600; font-size: 20px; color: ${growthValue >= 0 ? 'var(--green-600)' : 'var(--red-600)'};">
+                ${growthValue >= 0 ? '+' : ''}${growth}%
               </div>
               <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Growth Rate</div>
             </div>
@@ -1955,15 +1972,15 @@
             <div style="font-size: 14px; color: var(--neutral-700); margin-bottom: 8px; font-weight: 500;">Account Details</div>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px;">
               <div>
-                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${Math.round(account.revenue / account.transactions).toLocaleString()}</div>
+                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${avgTransaction.toLocaleString()}</div>
                 <div style="color: var(--neutral-500);">Average Transaction</div>
               </div>
               <div>
-                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${Math.round(account.revenue / 30).toLocaleString()}</div>
+                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${revenuePerDay.toLocaleString()}</div>
                 <div style="color: var(--neutral-500);">Revenue per Day</div>
               </div>
               <div>
-                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${Math.round(account.transactions / 30)} per day</div>
+                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${transactionsPerDay} per day</div>
                 <div style="color: var(--neutral-500);">Transaction Volume</div>
               </div>
             </div>
@@ -1972,8 +1989,8 @@
       }
       
       // Calculate and update totals (aggregated from all accounts)
-      const totalRevenue = accountData.reduce((sum, acc) => sum + acc.revenue, 0);
-      const totalTransactions = accountData.reduce((sum, acc) => sum + acc.transactions, 0);
+      const totalRevenue = accountData.reduce((sum, acc) => sum + (acc.revenue || 0), 0);
+      const totalTransactions = accountData.reduce((sum, acc) => sum + (acc.transactions || 0), 0);
       
       document.getElementById('total-revenue').textContent = `$${totalRevenue.toLocaleString()}`;
       document.getElementById('total-transactions').textContent = totalTransactions.toLocaleString();
@@ -2680,17 +2697,17 @@
           .filter(data => data); // Remove any undefined values
       }
       
-      // Calculate totals
-      const totalRevenue = filteredData.reduce((sum, account) => sum + account.revenue, 0);
-      const totalTransactions = filteredData.reduce((sum, account) => sum + account.transactions, 0);
+      // Calculate totals with null checks
+      const totalRevenue = filteredData.reduce((sum, account) => sum + (account.revenue || 0), 0);
+      const totalTransactions = filteredData.reduce((sum, account) => sum + (account.transactions || 0), 0);
       const activeAccountsCount = filteredData.length;
       
-      // Calculate average growth rates
+      // Calculate average growth rates with null checks
       const avgRevenueGrowth = filteredData.length > 0 
-        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.revenueGrowth), 0) / filteredData.length).toFixed(1)
+        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.revenueGrowth || '0'), 0) / filteredData.length).toFixed(1)
         : 0;
       const avgTransactionGrowth = filteredData.length > 0 
-        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.transactionGrowth), 0) / filteredData.length).toFixed(1)
+        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.transactionGrowth || '0'), 0) / filteredData.length).toFixed(1)
         : 0;
       
       // Update metrics cards
@@ -2765,19 +2782,24 @@
       }
       
       const breakdownHTML = accountsData.map(account => {
-        const revenueGrowth = parseFloat(account.revenueGrowth);
-        const transactionGrowth = parseFloat(account.transactionGrowth);
+        // Add null checks for missing financial data
+        const transactions = account.transactions || 0;
+        const revenue = account.revenue || 0;
+        const revenueGrowthValue = account.revenueGrowth || '0';
+        const transactionGrowthValue = account.transactionGrowth || '0';
+        const revenueGrowth = parseFloat(revenueGrowthValue);
+        const transactionGrowth = parseFloat(transactionGrowthValue);
         
         return `
           <div class="account-breakdown-row">
             <div>
               <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px;">${account.name}</div>
-              <div style="font-size: 12px; color: var(--neutral-500);">${account.transactions.toLocaleString()} transactions</div>
+              <div style="font-size: 12px; color: var(--neutral-500);">${transactions.toLocaleString()} transactions</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px;">$${account.revenue.toLocaleString()}</div>
+              <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px;">$${revenue.toLocaleString()}</div>
               <div style="font-size: 12px; color: ${revenueGrowth >= 0 ? 'var(--success-600)' : 'var(--danger-600)'};">
-                ${revenueGrowth >= 0 ? '+' : ''}${account.revenueGrowth}%
+                ${revenueGrowth >= 0 ? '+' : ''}${revenueGrowthValue}%
               </div>
             </div>
           </div>
