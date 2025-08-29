@@ -1051,6 +1051,7 @@ class AccountGroupsFilter {
   // Handle select all checkbox changes
   handleSelectAllChange() {
     this.updateSelectionCount();
+    this.updateSelectAllState();
   }
   
   // Get a human-readable display name for a group key
