@@ -30,7 +30,7 @@ class AccountGroupsFilter {
     this.retryCount = 0; // Track initialization retries
     this.maxRetries = 3; // Maximum number of initialization retries
     this.loadingRetryCount = 0; // Track data loading retries
-    this.maxLoadingRetries = 20; // Max retries waiting for data (increased for slower GitHub deployment)
+    this.maxLoadingRetries = 10; // Max retries waiting for data
     this.isLoading = false; // Loading state for trigger label
     this.lastGroupKey = null; // Persisted last selected group key
     this.isClosingAfterApply = false; // Flag to prevent restoring selection when closing after apply
@@ -400,8 +400,7 @@ class AccountGroupsFilter {
     }
 
     this.loadingRetryCount += 1;
-    // Use longer delays for potentially slower GitHub deployment
-    const delay = Math.min(200 * this.loadingRetryCount, 2000);
+    const delay = Math.min(100 * this.loadingRetryCount, 800);
     console.log(`🔄 Retrying in ${delay}ms...`);
     setTimeout(() => this.retryInitializeData(), delay);
   }

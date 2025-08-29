@@ -1,4 +1,6 @@
-// Netlify Debug Script - Add to any page having filtering issues
+// Temporary Netlify Debug Script - Remove after filtering issue is resolved
+// Add to any page having filtering issues by including: <script src="/debug-netlify.js"></script>
+
 console.log('🔍 Netlify Debug Check:', {
   timestamp: new Date().toISOString(),
   userAgent: navigator.userAgent,
