@@ -1158,15 +1158,15 @@ class AccountGroupsFilter {
     // Save the current selection state before updating trigger
     this.saveAppliedSelectionState();
     
+    console.log('🎯 🏷️ About to update trigger label...');
+    // Update trigger label based on current selection state (sets isCustomMode)
+    this.updateTriggerBasedOnSelection();
+    
     // Call custom hook for page-specific logic (if implemented) 
     if (typeof this.onApplySelection === 'function') {
       console.log('🎯 🔌 Calling custom onApplySelection hook...');
       this.onApplySelection(checkedCheckboxes);
     }
-    
-    console.log('🎯 🏷️ About to update trigger label...');
-    // Update trigger label based on current selection state
-    this.updateTriggerBasedOnSelection();
 
     // Guard: if label becomes empty due to a transient render, restore current group label
     const triggerOption = document.getElementById(this.options.triggerOptionId);
