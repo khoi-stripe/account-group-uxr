@@ -924,7 +924,7 @@ class AccountGroupsFilter {
     // Make entire select all row clickable
     document.querySelectorAll(`#${this.options.selectAllContainerId} .select-all-item`).forEach(item => {
       item.addEventListener('click', (e) => {
-        if (e.target.type === 'checkbox') {
+        if (e.target.type === 'checkbox' || e.target.tagName.toLowerCase() === 'label') {
           return;
         }
         
