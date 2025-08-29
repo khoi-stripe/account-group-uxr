@@ -35,6 +35,7 @@ class AccountGroupsFilter {
     this.lastGroupKey = null; // Persisted last selected group key
     this.isClosingAfterApply = false; // Flag to prevent restoring selection when closing after apply
     this.appliedAccountSelection = new Map(); // Store applied account selection state by account ID
+    this.loadAppliedSelectionState(); // Load previously saved selection state from localStorage
     
     this.init();
     
@@ -165,6 +166,13 @@ class AccountGroupsFilter {
     return `agf:last_group:${ns}:${orgName}`;
   }
 
+  // Build a storage key for applied selection state
+  getSelectionStorageKey() {
+    const orgName = window.OrgDataManager?.getCurrentOrganization()?.name || 'default_org';
+    const ns = this.options.namespace || 'default';
+    return `agf:selection:${ns}:${orgName}`;
+  }
+
   getLastGroupKey() {
     try {
       return localStorage.getItem(this.getStorageKey());
@@ -176,6 +184,40 @@ class AccountGroupsFilter {
       localStorage.setItem(this.getStorageKey(), groupKey);
       this.lastGroupKey = groupKey;
     } catch (_) {}
+  }
+
+  loadAppliedSelectionState() {
+    try {
+      const savedState = localStorage.getItem(this.getSelectionStorageKey());
+      if (savedState) {
+        const stateArray = JSON.parse(savedState);
+        this.appliedAccountSelection = new Map(stateArray);
+        console.log('🔄 Loaded applied selection state from localStorage:', Array.from(this.appliedAccountSelection.entries()));
+      }
+    } catch (e) {
+      console.warn('Failed to load applied selection state:', e);
+      this.appliedAccountSelection = new Map();
+    }
+  }
+
+  persistAppliedSelectionState() {
+    try {
+      const stateArray = Array.from(this.appliedAccountSelection.entries());
+      localStorage.setItem(this.getSelectionStorageKey(), JSON.stringify(stateArray));
+      console.log('💾 Persisted applied selection state to localStorage:', stateArray);
+    } catch (e) {
+      console.warn('Failed to persist applied selection state:', e);
+    }
+  }
+
+  clearAppliedSelectionState() {
+    try {
+      localStorage.removeItem(this.getSelectionStorageKey());
+      this.appliedAccountSelection = new Map();
+      console.log('🧹 Cleared applied selection state');
+    } catch (e) {
+      console.warn('Failed to clear applied selection state:', e);
+    }
   }
 
   // Decide which group to show first: last saved (if valid) else 'all'
@@ -1012,7 +1054,8 @@ class AccountGroupsFilter {
       }
     });
     
-    console.log('💾 Saved applied selection state:', Array.from(this.appliedAccountSelection.entries()));
+    // Persist to localStorage
+    this.persistAppliedSelectionState();
   }
   
   // Update trigger label based on current selection
@@ -1349,12 +1392,13 @@ class AccountGroupsFilter {
         // Debug log to show state restoration
         const checkedAccounts = allAccounts.filter(acc => acc.checked).map(acc => acc.name);
         const uncheckedAccounts = allAccounts.filter(acc => !acc.checked).map(acc => acc.name);
-        if (this.appliedAccountSelection.size > 0) {
-          console.log('🔄 Restored account selection state:', {
-            checked: checkedAccounts,
-            unchecked: uncheckedAccounts
-          });
-        }
+        console.log('🔄 Created all accounts group:', {
+          totalAccounts: allAccounts.length,
+          appliedSelectionSize: this.appliedAccountSelection.size,
+          checkedAccounts: checkedAccounts,
+          uncheckedAccounts: uncheckedAccounts,
+          appliedSelectionEntries: Array.from(this.appliedAccountSelection.entries())
+        });
       }
     }
   }
