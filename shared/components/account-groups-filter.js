@@ -202,13 +202,29 @@ class AccountGroupsFilter {
     try {
       const storageKey = this.getSelectionStorageKey();
       const savedState = localStorage.getItem(storageKey);
-      console.log('🔄 Attempting to load selection state with key:', storageKey);
-      console.log('🔄 Raw localStorage value:', savedState);
+      const currentOrg = window.OrgDataManager?.getCurrentOrganization();
+      
+      console.log('🎯 loadAppliedSelectionState() called');
+      console.log('🎯 Storage key:', storageKey);
+      console.log('🎯 Current organization:', currentOrg?.name);
+      console.log('🎯 Raw localStorage value:', savedState);
       
       if (savedState) {
         const stateArray = JSON.parse(savedState);
         this.appliedAccountSelection = new Map(stateArray);
         console.log('✅ Loaded applied selection state from localStorage:', Array.from(this.appliedAccountSelection.entries()));
+        
+        // Show which accounts this maps to
+        if (currentOrg && currentOrg.accounts) {
+          console.log('🎯 All organization accounts:', currentOrg.accounts.map(acc => `${acc.name} (${acc.id})`));
+          
+          const accountMappings = [];
+          this.appliedAccountSelection.forEach((checked, accountId) => {
+            const account = currentOrg.accounts.find(acc => acc.id === accountId);
+            accountMappings.push(`${account?.name || 'Unknown'} (${accountId}): ${checked}`);
+          });
+          console.log('🎯 Account mappings from loaded state:', accountMappings);
+        }
       } else {
         console.log('ℹ️ No saved selection state found in localStorage');
         this.appliedAccountSelection = new Map();
@@ -222,10 +238,21 @@ class AccountGroupsFilter {
   persistAppliedSelectionState() {
     try {
       const stateArray = Array.from(this.appliedAccountSelection.entries());
-      localStorage.setItem(this.getSelectionStorageKey(), JSON.stringify(stateArray));
-      console.log('💾 Persisted applied selection state to localStorage:', stateArray);
+      const storageKey = this.getSelectionStorageKey();
+      
+      console.log('🎯 persistAppliedSelectionState() called');
+      console.log('🎯 Storage key:', storageKey);
+      console.log('🎯 State to persist:', stateArray);
+      
+      localStorage.setItem(storageKey, JSON.stringify(stateArray));
+      
+      // Verify it was actually saved
+      const verifyValue = localStorage.getItem(storageKey);
+      console.log('🎯 Verification - localStorage now contains:', verifyValue);
+      
+      console.log('💾 Successfully persisted applied selection state to localStorage');
     } catch (e) {
-      console.warn('Failed to persist applied selection state:', e);
+      console.warn('❌ Failed to persist applied selection state:', e);
     }
   }
 
@@ -240,6 +267,10 @@ class AccountGroupsFilter {
   }
 
   applySelectionStateToDOM() {
+    console.log('🎯 applySelectionStateToDOM() called');
+    console.log('🎯 Applied selection state size:', this.appliedAccountSelection.size);
+    console.log('🎯 Applied selection entries:', Array.from(this.appliedAccountSelection.entries()));
+    
     if (this.appliedAccountSelection.size === 0) {
       console.log('ℹ️ No applied selection state to restore to DOM');
       return;
@@ -253,22 +284,33 @@ class AccountGroupsFilter {
 
     let updatedCount = 0;
     const accountItems = document.querySelectorAll(`#${this.options.accountsListId} .account-item`);
+    console.log('🎯 Found', accountItems.length, 'account items in DOM for restoration');
     
-    accountItems.forEach(item => {
+    accountItems.forEach((item, index) => {
       const checkbox = item.querySelector('input[type="checkbox"]');
       const label = item.querySelector('label');
       
       if (checkbox && label) {
         const accountName = label.textContent.trim();
+        const currentChecked = checkbox.checked;
+        console.log(`🎯 DOM Item ${index}: ${accountName} = ${currentChecked}`);
+        
         // Find the account ID from organization data
         const matchingAccount = currentOrg.accounts.find(acc => acc.name === accountName);
         
         if (matchingAccount && this.appliedAccountSelection.has(matchingAccount.id)) {
           const savedState = this.appliedAccountSelection.get(matchingAccount.id);
+          console.log(`🎯 Account ${accountName} (${matchingAccount.id}): current=${currentChecked}, saved=${savedState}`);
+          
           if (checkbox.checked !== savedState) {
             checkbox.checked = savedState;
             updatedCount++;
+            console.log(`🎯 ✅ Updated ${accountName}: ${currentChecked} → ${savedState}`);
+          } else {
+            console.log(`🎯 ✅ ${accountName}: already matches saved state (${savedState})`);
           }
+        } else {
+          console.log(`🎯 ⚠️ No saved state found for ${accountName} (${matchingAccount?.id || 'no match'})`);
         }
       }
     });
@@ -616,20 +658,25 @@ class AccountGroupsFilter {
         window.GlobalPopoverManager.currentOpenMenu = null;
       }
     } else {
+      console.log('🎯🔥 Opening filter popover...');
+      
       // Use the global popover manager to close other menus first
       if (window.GlobalPopoverManager) {
         window.GlobalPopoverManager.openMenu(this.popoverManagerId);
       }
       
+      console.log('🎯 📥 Loading latest applied selection state...');
       // Load the latest applied selection state before opening 
       this.loadAppliedSelectionState();
       
+      console.log('🎯 🔄 Rebuilding accounts with current state...');
       // Rebuild accounts with current state
       if (!this.accountGroups['all']) {
         this.createAllAccountsGroup();
       }
       this.renderAccounts(this.currentGroup);
       
+      console.log('🎯 🎨 Applying visual selection state to DOM...');
       // Apply the visual selection state to the DOM after rendering
       this.applySelectionStateToDOM();
       
@@ -1091,11 +1138,15 @@ class AccountGroupsFilter {
   
   // Public method to apply selection (can be overridden)
   applySelection() {
+    console.log('🎯🔥 applySelection() called!');
+    
     // Check if at least one account is selected
     const checkedCheckboxes = document.querySelectorAll(`#${this.options.accountsListId} .account-item input[type="checkbox"]:checked`);
+    console.log('🎯 Found', checkedCheckboxes.length, 'checked accounts');
     
     if (checkedCheckboxes.length === 0) {
       // Don't apply if no accounts are selected
+      console.log('🎯 ❌ No accounts selected - showing validation error');
       this.showValidationError();
       return;
     }
@@ -1103,9 +1154,11 @@ class AccountGroupsFilter {
     // Hide validation error if it was showing
     this.hideValidationError();
     
+    console.log('🎯 💾 About to save applied selection state...');
     // Save the current selection state before updating trigger
     this.saveAppliedSelectionState();
     
+    console.log('🎯 🏷️ About to update trigger label...');
     // Update trigger label based on current selection state
     this.updateTriggerBasedOnSelection();
 
@@ -1129,24 +1182,39 @@ class AccountGroupsFilter {
   
   // Save the current selection state for persistence across filter reopens
   saveAppliedSelectionState() {
+    console.log('🎯 saveAppliedSelectionState() called');
     const accountItems = document.querySelectorAll(`#${this.options.accountsListId} .account-item`);
+    console.log('🎯 Found', accountItems.length, 'account items in DOM');
     
-    accountItems.forEach(item => {
+    const beforeSize = this.appliedAccountSelection.size;
+    
+    accountItems.forEach((item, index) => {
       const checkbox = item.querySelector('input[type="checkbox"]');
       const label = item.querySelector('label');
       
       if (checkbox && label) {
         const accountName = label.textContent.trim();
+        const isChecked = checkbox.checked;
+        console.log(`🎯 Item ${index}: ${accountName} = ${isChecked}`);
+        
         // Find the account ID from the current organization data
         const currentOrg = window.OrgDataManager?.getCurrentOrganization();
         if (currentOrg && currentOrg.accounts) {
           const matchingAccount = currentOrg.accounts.find(acc => acc.name === accountName);
           if (matchingAccount) {
-            this.appliedAccountSelection.set(matchingAccount.id, checkbox.checked);
+            console.log(`🎯 Saving state for account ID ${matchingAccount.id}: ${isChecked}`);
+            this.appliedAccountSelection.set(matchingAccount.id, isChecked);
+          } else {
+            console.warn('🎯 No matching account found for:', accountName);
           }
+        } else {
+          console.warn('🎯 No organization data available');
         }
       }
     });
+    
+    console.log(`🎯 Applied selection map size changed from ${beforeSize} to ${this.appliedAccountSelection.size}`);
+    console.log('🎯 Final applied selection state:', Array.from(this.appliedAccountSelection.entries()));
     
     // Persist to localStorage
     this.persistAppliedSelectionState();
@@ -1482,17 +1550,29 @@ class AccountGroupsFilter {
     if (window.OrgDataManager) {
       const currentOrg = window.OrgDataManager.getCurrentOrganization();
       if (currentOrg && currentOrg.accounts) {
+        console.log('🎯 createAllAccountsGroup() - building accounts with applied selection state');
+        console.log('🎯 Applied selection state size:', this.appliedAccountSelection.size);
+        console.log('🎯 Applied selection entries:', Array.from(this.appliedAccountSelection.entries()));
+        
         const allAccounts = currentOrg.accounts
           .filter(acc => !acc.isAggregate)
-          .map((acc, index) => ({
-            name: acc.name,
-            initials: this.generateInitials(acc.name),
-            color: this.convertHexToColorClass(acc.color) || (index % 2 === 0 ? 'blue' : 'green'),
-            backgroundColor: acc.color,
-            checked: this.appliedAccountSelection.has(acc.id) ? this.appliedAccountSelection.get(acc.id) : true,
-            id: acc.id,
-            type: acc.type || 'Account'
-          }))
+          .map((acc, index) => {
+            const hasAppliedState = this.appliedAccountSelection.has(acc.id);
+            const appliedState = this.appliedAccountSelection.get(acc.id);
+            const finalChecked = hasAppliedState ? appliedState : true;
+            
+            console.log(`🎯 Building account ${acc.name} (${acc.id}): hasState=${hasAppliedState}, appliedState=${appliedState}, final=${finalChecked}`);
+            
+            return {
+              name: acc.name,
+              initials: this.generateInitials(acc.name),
+              color: this.convertHexToColorClass(acc.color) || (index % 2 === 0 ? 'blue' : 'green'),
+              backgroundColor: acc.color,
+              checked: finalChecked,
+              id: acc.id,
+              type: acc.type || 'Account'
+            };
+          })
           .sort((a, b) => a.name.localeCompare(b.name));
         
         this.accountGroups['all'] = allAccounts;
