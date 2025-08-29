@@ -885,8 +885,10 @@ class AccountGroupsFilter {
         const checkbox = item.querySelector('input[type="checkbox"]');
         if (checkbox) {
           checkbox.checked = !checkbox.checked;
-          // Trigger change to update counts/state
-          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          // Trigger change to update counts/state with small delay to ensure state is updated
+          setTimeout(() => {
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          }, 0);
         }
       });
 
@@ -930,7 +932,9 @@ class AccountGroupsFilter {
         const checkbox = selectAllItem.querySelector('input[type="checkbox"]');
         if (checkbox) {
           checkbox.checked = !checkbox.checked;
-          checkbox.dispatchEvent(new Event('change'));
+          setTimeout(() => {
+            checkbox.dispatchEvent(new Event('change'));
+          }, 0);
         }
       });
     });
