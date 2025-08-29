@@ -34,6 +34,7 @@ class AccountGroupsFilter {
     this.isLoading = false; // Loading state for trigger label
     this.lastGroupKey = null; // Persisted last selected group key
     this.isClosingAfterApply = false; // Flag to prevent restoring selection when closing after apply
+    this.appliedAccountSelection = new Map(); // Store applied account selection state by account ID
     
     this.init();
     
@@ -966,6 +967,9 @@ class AccountGroupsFilter {
     // Hide validation error if it was showing
     this.hideValidationError();
     
+    // Save the current selection state before updating trigger
+    this.saveAppliedSelectionState();
+    
     // Update trigger label based on current selection state
     this.updateTriggerBasedOnSelection();
 
@@ -985,6 +989,30 @@ class AccountGroupsFilter {
     this.isClosingAfterApply = true;
     this.togglePopover();
     // Override this method in implementations for custom behavior
+  }
+  
+  // Save the current selection state for persistence across filter reopens
+  saveAppliedSelectionState() {
+    const accountItems = document.querySelectorAll(`#${this.options.accountsListId} .account-item`);
+    
+    accountItems.forEach(item => {
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      const label = item.querySelector('label');
+      
+      if (checkbox && label) {
+        const accountName = label.textContent.trim();
+        // Find the account ID from the current organization data
+        const currentOrg = window.OrgDataManager?.getCurrentOrganization();
+        if (currentOrg && currentOrg.accounts) {
+          const matchingAccount = currentOrg.accounts.find(acc => acc.name === accountName);
+          if (matchingAccount) {
+            this.appliedAccountSelection.set(matchingAccount.id, checkbox.checked);
+          }
+        }
+      }
+    });
+    
+    console.log('💾 Saved applied selection state:', Array.from(this.appliedAccountSelection.entries()));
   }
   
   // Update trigger label based on current selection
@@ -1310,13 +1338,23 @@ class AccountGroupsFilter {
             initials: this.generateInitials(acc.name),
             color: this.convertHexToColorClass(acc.color) || (index % 2 === 0 ? 'blue' : 'green'),
             backgroundColor: acc.color,
-            checked: true,
+            checked: this.appliedAccountSelection.has(acc.id) ? this.appliedAccountSelection.get(acc.id) : true,
             id: acc.id,
             type: acc.type || 'Account'
           }))
           .sort((a, b) => a.name.localeCompare(b.name));
         
         this.accountGroups['all'] = allAccounts;
+        
+        // Debug log to show state restoration
+        const checkedAccounts = allAccounts.filter(acc => acc.checked).map(acc => acc.name);
+        const uncheckedAccounts = allAccounts.filter(acc => !acc.checked).map(acc => acc.name);
+        if (this.appliedAccountSelection.size > 0) {
+          console.log('🔄 Restored account selection state:', {
+            checked: checkedAccounts,
+            unchecked: uncheckedAccounts
+          });
+        }
       }
     }
   }
