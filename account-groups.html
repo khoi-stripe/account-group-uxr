@@ -29,6 +29,35 @@
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
+    /* Breadcrumb navigation styles */
+    .breadcrumb {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      flex-wrap: nowrap !important;
+      white-space: nowrap !important;
+    }
+
+    .breadcrumb-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: #533afd;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .breadcrumb-link:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-separator {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
 
 
     /* Tooltip hover styles */
