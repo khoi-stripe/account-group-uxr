@@ -37,3 +37,4 @@ console.log('🔍 Netlify Debug Check:', {
 window.addEventListener('error', (e) => {
   console.error('🚨 Netlify Error:', e.error?.message, e.filename, e.lineno);
 });
+

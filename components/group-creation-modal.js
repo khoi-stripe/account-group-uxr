@@ -173,6 +173,8 @@ class GroupCreationModal {
   renderStep2() {
     const stepContent = this.modal.querySelector('.step-content');
     const eligibleAccounts = window.OrgDataManager.getEligibleAccounts(this.groupData.type);
+    // Sort accounts alphabetically for better UX
+    eligibleAccounts.sort((a, b) => a.name.localeCompare(b.name));
     const selectedIds = new Set(this.groupData.accountIds);
 
     stepContent.innerHTML = `

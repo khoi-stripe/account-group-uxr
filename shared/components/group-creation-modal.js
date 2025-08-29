@@ -345,27 +345,30 @@ class GroupCreationModal {
   }
 
   getAvailableAccounts() {
+    let accounts = [];
+    
     // Try to get accounts from various sources
     if (window.mockAccountData) {
-      return window.mockAccountData;
-    }
-    
-    if (window.OrgDataManager && typeof window.OrgDataManager.getAllSubAccounts === 'function') {
-      const accounts = window.OrgDataManager.getAllSubAccounts();
-      return accounts.filter(acc => !acc.isAggregate);
+      accounts = window.mockAccountData;
+    } else if (window.OrgDataManager && typeof window.OrgDataManager.getAllSubAccounts === 'function') {
+      const allAccounts = window.OrgDataManager.getAllSubAccounts();
+      accounts = allAccounts.filter(acc => !acc.isAggregate);
+    } else {
+      // Fallback demo data matching the reference design
+      accounts = [
+        { id: 'acc_1', name: 'Acme Deliveries CA', type: 'deliveries' },
+        { id: 'acc_2', name: 'Acme Deliveries UK', type: 'deliveries' },
+        { id: 'acc_3', name: 'Acme Deliveries US', type: 'deliveries' },
+        { id: 'acc_4', name: 'Acme Eats CA', type: 'eats' },
+        { id: 'acc_5', name: 'Acme Eats UK', type: 'eats' },
+        { id: 'acc_6', name: 'Acme Eats US', type: 'eats' },
+        { id: 'acc_7', name: 'Acme Rides CA', type: 'rides' },
+        { id: 'acc_8', name: 'Acme Rides UK', type: 'rides' }
+      ];
     }
 
-    // Fallback demo data matching the reference design
-    return [
-      { id: 'acc_1', name: 'Acme Deliveries CA', type: 'deliveries' },
-      { id: 'acc_2', name: 'Acme Deliveries UK', type: 'deliveries' },
-      { id: 'acc_3', name: 'Acme Deliveries US', type: 'deliveries' },
-      { id: 'acc_4', name: 'Acme Eats CA', type: 'eats' },
-      { id: 'acc_5', name: 'Acme Eats UK', type: 'eats' },
-      { id: 'acc_6', name: 'Acme Eats US', type: 'eats' },
-      { id: 'acc_7', name: 'Acme Rides CA', type: 'rides' },
-      { id: 'acc_8', name: 'Acme Rides UK', type: 'rides' }
-    ];
+    // Sort accounts alphabetically by name for better UX in step 2
+    return accounts.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   updateModalHeader() {

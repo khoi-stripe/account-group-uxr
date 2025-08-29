@@ -15,19 +15,24 @@ class FigmaGroupCreationModalV3 {
     }
 
     getActiveOrganizationAccounts() {
+        let accounts = [];
+        
         // Get accounts from the current active organization
         if (window.OrgDataManager && window.OrgDataManager.getCurrentOrganization()) {
             const currentOrg = window.OrgDataManager.getCurrentOrganization();
             // Filter out the aggregate view account
-            return currentOrg.accounts.filter(account => !account.isAggregate);
+            accounts = currentOrg.accounts.filter(account => !account.isAggregate);
+        } else {
+            // Fallback to mock accounts if no organization is loaded
+            accounts = this.getMockAccounts();
         }
         
-        // Fallback to mock accounts if no organization is loaded
-        return this.getMockAccounts();
+        // Sort accounts alphabetically by name for better UX in step 2
+        return accounts.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     getMockAccounts() {
-        return [
+        const accounts = [
             { id: 'acme_del_ca', name: 'Acme Deliveries CA', type: 'deliveries' },
             { id: 'acme_del_uk', name: 'Acme Deliveries UK', type: 'deliveries' },
             { id: 'acme_del_us', name: 'Acme Deliveries US', type: 'deliveries' },
@@ -38,6 +43,9 @@ class FigmaGroupCreationModalV3 {
             { id: 'acme_rides_uk', name: 'Acme Rides UK', type: 'rides' },
             { id: 'acme_rides_us', name: 'Acme Rides US', type: 'rides' },
         ];
+        
+        // Sort accounts alphabetically by name for better UX in step 2
+        return accounts.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     show(options = {}) {
