@@ -35,7 +35,6 @@ class AccountGroupsFilter {
     this.lastGroupKey = null; // Persisted last selected group key
     this.isClosingAfterApply = false; // Flag to prevent restoring selection when closing after apply
     this.appliedAccountSelection = new Map(); // Store applied account selection state by account ID
-    this.loadAppliedSelectionState(); // Load previously saved selection state from localStorage
     
     this.init();
     
@@ -144,12 +143,25 @@ class AccountGroupsFilter {
       this.setTriggerLoadingState(true);
       this.retryInitializeData();
     } else {
+      // Load applied selection state now that we have account data
+      this.loadAppliedSelectionState();
+      
       const initialGroup = this.getInitialGroupKey();
       this.currentGroup = initialGroup;
       this.renderAccounts(initialGroup);
-      // Set default trigger label to All with folder icon (brand-600)
-      this.isCustomMode = false;
-      this.updateTriggerLabel(initialGroup);
+      
+      // Determine custom mode based on applied selection state
+      if (this.appliedAccountSelection.size > 0) {
+        const allGroup = this.accountGroups['all'];
+        const allAccounts = allGroup?.accounts || allGroup || [];
+        const totalAccounts = allAccounts.length;
+        const selectedCount = allAccounts.filter(acc => acc.checked).length;
+        this.isCustomMode = selectedCount < totalAccounts; // Custom mode if not all accounts selected
+      } else {
+        this.isCustomMode = false;
+      }
+      
+      this.updateTriggerLabel(this.isCustomMode ? 'custom' : initialGroup);
       this.addScrollEffect();
     }
     
@@ -188,14 +200,21 @@ class AccountGroupsFilter {
 
   loadAppliedSelectionState() {
     try {
-      const savedState = localStorage.getItem(this.getSelectionStorageKey());
+      const storageKey = this.getSelectionStorageKey();
+      const savedState = localStorage.getItem(storageKey);
+      console.log('🔄 Attempting to load selection state with key:', storageKey);
+      console.log('🔄 Raw localStorage value:', savedState);
+      
       if (savedState) {
         const stateArray = JSON.parse(savedState);
         this.appliedAccountSelection = new Map(stateArray);
-        console.log('🔄 Loaded applied selection state from localStorage:', Array.from(this.appliedAccountSelection.entries()));
+        console.log('✅ Loaded applied selection state from localStorage:', Array.from(this.appliedAccountSelection.entries()));
+      } else {
+        console.log('ℹ️ No saved selection state found in localStorage');
+        this.appliedAccountSelection = new Map();
       }
     } catch (e) {
-      console.warn('Failed to load applied selection state:', e);
+      console.warn('❌ Failed to load applied selection state:', e);
       this.appliedAccountSelection = new Map();
     }
   }
@@ -257,11 +276,26 @@ class AccountGroupsFilter {
 
     if (this.hasAccountData()) {
       this.setTriggerLoadingState(false);
+      
+      // Load applied selection state now that we have account data
+      this.loadAppliedSelectionState();
+      
       const initialGroup = this.getInitialGroupKey();
       this.currentGroup = initialGroup;
       this.renderAccounts(initialGroup);
-      this.isCustomMode = false;
-      this.updateTriggerLabel(initialGroup);
+      
+      // Determine custom mode based on applied selection state
+      if (this.appliedAccountSelection.size > 0) {
+        const allGroup = this.accountGroups['all'];
+        const allAccounts = allGroup?.accounts || allGroup || [];
+        const totalAccounts = allAccounts.length;
+        const selectedCount = allAccounts.filter(acc => acc.checked).length;
+        this.isCustomMode = selectedCount < totalAccounts; // Custom mode if not all accounts selected
+      } else {
+        this.isCustomMode = false;
+      }
+      
+      this.updateTriggerLabel(this.isCustomMode ? 'custom' : initialGroup);
       this.addScrollEffect();
       this.loadingRetryCount = 0;
       return;
@@ -542,6 +576,15 @@ class AccountGroupsFilter {
       if (window.GlobalPopoverManager) {
         window.GlobalPopoverManager.openMenu(this.popoverManagerId);
       }
+      
+      // Load the latest applied selection state before opening 
+      this.loadAppliedSelectionState();
+      
+      // Rebuild accounts with current state
+      if (!this.accountGroups['all']) {
+        this.createAllAccountsGroup();
+      }
+      this.renderAccounts(this.currentGroup);
       
       // Capture current selection state before opening
       this.captureCommittedSelection();
@@ -1216,12 +1259,26 @@ class AccountGroupsFilter {
           this.setTriggerLoadingState(false);
         }
 
+        // Load applied selection state now that we have fresh account data
+        this.loadAppliedSelectionState();
+
         // Use persisted last group or fall back to 'all'
         const initialGroup = this.getInitialGroupKey();
         this.currentGroup = initialGroup;
         this.renderAccounts(initialGroup);
-        this.isCustomMode = false;
-        this.updateTriggerLabel(initialGroup);
+        
+        // Determine custom mode based on applied selection state
+        if (this.appliedAccountSelection.size > 0) {
+          const allGroup = this.accountGroups['all'];
+          const allAccounts = allGroup?.accounts || allGroup || [];
+          const totalAccounts = allAccounts.length;
+          const selectedCount = allAccounts.filter(acc => acc.checked).length;
+          this.isCustomMode = selectedCount < totalAccounts; // Custom mode if not all accounts selected
+        } else {
+          this.isCustomMode = false;
+        }
+        
+        this.updateTriggerLabel(this.isCustomMode ? 'custom' : initialGroup);
       } catch (error) {
         console.error('Error refreshing account groups:', error);
       }
@@ -1389,6 +1446,13 @@ class AccountGroupsFilter {
         
         this.accountGroups['all'] = allAccounts;
         
+        // Update custom mode based on whether we have a partial selection
+        if (this.appliedAccountSelection.size > 0) {
+          const totalAccounts = allAccounts.length;
+          const selectedCount = allAccounts.filter(acc => acc.checked).length;
+          this.isCustomMode = selectedCount < totalAccounts; // Custom mode if not all accounts selected
+        }
+        
         // Debug log to show state restoration
         const checkedAccounts = allAccounts.filter(acc => acc.checked).map(acc => acc.name);
         const uncheckedAccounts = allAccounts.filter(acc => !acc.checked).map(acc => acc.name);
@@ -1397,6 +1461,7 @@ class AccountGroupsFilter {
           appliedSelectionSize: this.appliedAccountSelection.size,
           checkedAccounts: checkedAccounts,
           uncheckedAccounts: uncheckedAccounts,
+          isCustomMode: this.isCustomMode,
           appliedSelectionEntries: Array.from(this.appliedAccountSelection.entries())
         });
       }
