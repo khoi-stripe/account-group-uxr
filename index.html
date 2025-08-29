@@ -2301,15 +2301,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Customize apply behavior to update dashboard metrics but keep trigger/menu behavior identical to reporting
         dashboardFilter.applySelection = function() {
-          console.log('🎯🔥 Dashboard applySelection() override called!');
+          console.log('🎯🔥 Dashboard applySelection() called!');
           
           // Check if at least one account is selected
           const checkedCheckboxes = document.querySelectorAll('#dashboardAccountsList .account-item input[type="checkbox"]:checked');
-          console.log('🎯 Found', checkedCheckboxes.length, 'checked accounts');
           
           if (checkedCheckboxes.length === 0) {
             // Don't apply if no accounts are selected
-            console.log('🎯 ❌ No accounts selected - showing validation error');
             this.showValidationError();
             return;
           }
@@ -2327,19 +2325,16 @@ document.addEventListener('DOMContentLoaded', function() {
               if (match) selectedIds.push(match.id);
             });
 
+          // Save the current selection state for persistence across filter reopens
+          this.saveAppliedSelectionState();
+
           // Update metrics grid to reflect selected accounts
           updateMetricsGrid(selectedIds);
-
-          // **CRITICAL:** Save the current selection state before updating trigger
-          console.log('🎯 💾 About to save applied selection state...');
-          this.saveAppliedSelectionState();
-          console.log('🎯 💾 About to persist applied selection state...');
-          this.persistAppliedSelectionState();
 
           // Match reporting behavior: update trigger label using component logic
           this.updateTriggerBasedOnSelection();
           
-          // Set flag to prevent restoring selection when closing
+          // Set flag to indicate we're closing after applying (don't restore selection)
           this.isClosingAfterApply = true;
           
           // Close like reporting (without restoring selection)
