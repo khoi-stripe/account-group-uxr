@@ -239,6 +239,50 @@ class AccountGroupsFilter {
     }
   }
 
+  applySelectionStateToDOM() {
+    if (this.appliedAccountSelection.size === 0) {
+      console.log('ℹ️ No applied selection state to restore to DOM');
+      return;
+    }
+
+    const currentOrg = window.OrgDataManager?.getCurrentOrganization();
+    if (!currentOrg || !currentOrg.accounts) {
+      console.warn('❌ No organization data available for DOM state restoration');
+      return;
+    }
+
+    let updatedCount = 0;
+    const accountItems = document.querySelectorAll(`#${this.options.accountsListId} .account-item`);
+    
+    accountItems.forEach(item => {
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      const label = item.querySelector('label');
+      
+      if (checkbox && label) {
+        const accountName = label.textContent.trim();
+        // Find the account ID from organization data
+        const matchingAccount = currentOrg.accounts.find(acc => acc.name === accountName);
+        
+        if (matchingAccount && this.appliedAccountSelection.has(matchingAccount.id)) {
+          const savedState = this.appliedAccountSelection.get(matchingAccount.id);
+          if (checkbox.checked !== savedState) {
+            checkbox.checked = savedState;
+            updatedCount++;
+          }
+        }
+      }
+    });
+
+    if (updatedCount > 0) {
+      console.log(`✅ Applied selection state to DOM - updated ${updatedCount} checkboxes`);
+      // Update the UI components after restoring state
+      this.updateSelectionCount();
+      this.updateSelectAllState();
+    } else {
+      console.log('ℹ️ No checkboxes needed updating - DOM already matches saved state');
+    }
+  }
+
   // Decide which group to show first: last saved (if valid) else 'all'
   getInitialGroupKey() {
     const candidate = this.lastGroupKey;
@@ -586,6 +630,9 @@ class AccountGroupsFilter {
       }
       this.renderAccounts(this.currentGroup);
       
+      // Apply the visual selection state to the DOM after rendering
+      this.applySelectionStateToDOM();
+      
       // Capture current selection state before opening
       this.captureCommittedSelection();
       popover.style.display = 'flex';
@@ -607,6 +654,10 @@ class AccountGroupsFilter {
         const groupKey = this.getInitialGroupKey();
         this.currentGroup = groupKey;
         this.renderAccounts(groupKey);
+        
+        // Apply the visual selection state after defensive rebuild
+        this.applySelectionStateToDOM();
+        
         this.updateTriggerLabel(groupKey);
       }
     }
