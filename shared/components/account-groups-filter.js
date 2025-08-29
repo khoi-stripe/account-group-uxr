@@ -1158,6 +1158,12 @@ class AccountGroupsFilter {
     // Save the current selection state before updating trigger
     this.saveAppliedSelectionState();
     
+    // Call custom hook for page-specific logic (if implemented) 
+    if (typeof this.onApplySelection === 'function') {
+      console.log('🎯 🔌 Calling custom onApplySelection hook...');
+      this.onApplySelection(checkedCheckboxes);
+    }
+    
     console.log('🎯 🏷️ About to update trigger label...');
     // Update trigger label based on current selection state
     this.updateTriggerBasedOnSelection();
@@ -1177,7 +1183,6 @@ class AccountGroupsFilter {
     // Set flag to indicate we're closing after applying (don't restore selection)
     this.isClosingAfterApply = true;
     this.togglePopover();
-    // Override this method in implementations for custom behavior
   }
   
   // Save the current selection state for persistence across filter reopens

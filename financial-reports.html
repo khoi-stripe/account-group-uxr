@@ -2811,18 +2811,20 @@
           reportsFilter.refresh();
         }, 100);
         
-        // Override the apply method to filter content
-        reportsFilter.applySelection = function() {
+        // Use hook pattern to customize reports behavior while keeping base state persistence
+        reportsFilter.onApplySelection = function(checkedCheckboxes) {
+          console.log('🎯🔥 Reports onApplySelection hook called!');
+          
           // Get selected account IDs
           const selectedAccountIds = [];
-          document.querySelectorAll('#reportsAccountsList .account-item input[type="checkbox"]:checked').forEach(checkbox => {
+          checkedCheckboxes.forEach(checkbox => {
             const accountItem = checkbox.closest('.account-item');
             const accountLabel = accountItem.querySelector('label');
             if (accountLabel) {
               // Find matching account by name
               const accountName = accountLabel.textContent;
-    if (managerRef) {
-      const accounts = managerRef.getAllSubAccounts();
+              if (managerRef) {
+                const accounts = managerRef.getAllSubAccounts();
                 const matchingAccount = accounts.find(acc => acc.name === accountName);
                 if (matchingAccount) {
                   selectedAccountIds.push(matchingAccount.id);
@@ -2837,13 +2839,7 @@
           // Filter content based on selection
           filterReportsContent(selectedAccountIds.length > 0 ? selectedAccountIds : null);
           
-          // Update trigger label based on current selection state
-          this.updateTriggerBasedOnSelection();
-          
-          // Close the popover
-          this.togglePopover();
-          
-          console.log('Applied filter with accounts:', selectedAccountIds);
+          console.log('🎯 Reports-specific logic completed, selected IDs:', selectedAccountIds);
         };
         
         // Override the close method to reset content to show all accounts

@@ -2299,21 +2299,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Expose globally for Cancel/Apply handlers in markup
         window.dashboardFilter = dashboardFilter;
 
-        // Customize apply behavior to update dashboard metrics but keep trigger/menu behavior identical to reporting
-        dashboardFilter.applySelection = function() {
-          console.log('🎯🔥 Dashboard applySelection() called!');
-          
-          // Check if at least one account is selected
-          const checkedCheckboxes = document.querySelectorAll('#dashboardAccountsList .account-item input[type="checkbox"]:checked');
-          
-          if (checkedCheckboxes.length === 0) {
-            // Don't apply if no accounts are selected
-            this.showValidationError();
-            return;
-          }
-          
-          // Hide validation error if it was showing
-          this.hideValidationError();
+        // Use hook pattern to customize dashboard behavior while keeping base state persistence
+        dashboardFilter.onApplySelection = function(checkedCheckboxes) {
+          console.log('🎯🔥 Dashboard onApplySelection hook called!');
           
           const selectedIds = [];
           checkedCheckboxes.forEach(cb => {
@@ -2325,20 +2313,10 @@ document.addEventListener('DOMContentLoaded', function() {
               if (match) selectedIds.push(match.id);
             });
 
-          // Save the current selection state for persistence across filter reopens
-          this.saveAppliedSelectionState();
-
           // Update metrics grid to reflect selected accounts
           updateMetricsGrid(selectedIds);
-
-          // Match reporting behavior: update trigger label using component logic
-          this.updateTriggerBasedOnSelection();
           
-          // Set flag to indicate we're closing after applying (don't restore selection)
-          this.isClosingAfterApply = true;
-          
-          // Close like reporting (without restoring selection)
-          this.togglePopover();
+          console.log('🎯 Dashboard-specific logic completed, selected IDs:', selectedIds);
         };
 
         // Initial refresh to load groups
