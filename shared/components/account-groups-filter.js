@@ -30,7 +30,7 @@ class AccountGroupsFilter {
     this.retryCount = 0; // Track initialization retries
     this.maxRetries = 3; // Maximum number of initialization retries
     this.loadingRetryCount = 0; // Track data loading retries
-    this.maxLoadingRetries = 10; // Max retries waiting for data
+    this.maxLoadingRetries = 20; // Max retries waiting for data (increased for slower GitHub deployment)
     this.isLoading = false; // Loading state for trigger label
     this.lastGroupKey = null; // Persisted last selected group key
     this.isClosingAfterApply = false; // Flag to prevent restoring selection when closing after apply
@@ -345,19 +345,24 @@ class AccountGroupsFilter {
 
   // Retry generating data until OrgDataManager or generator provides accounts
   retryInitializeData() {
+    console.log(`🔄 retryInitializeData attempt ${this.loadingRetryCount + 1}/${this.maxLoadingRetries}`);
+    console.log(`🔄 OrgDataManager available: ${!!window.OrgDataManager}, ready: ${window.OrgDataManager?.isReady || false}`);
+    
     // Try to (re)generate account groups
     try {
       if (this.options.generateAccountGroups) {
         const next = this.options.generateAccountGroups();
         if (next && Object.keys(next).length > 0) {
           this.accountGroups = next;
+          console.log('🔄 Generated account groups from function:', Object.keys(next));
         }
       } else if (!this.accountGroups['all']) {
         // Try to build from OrgDataManager if available
+        console.log('🔄 Attempting to create all accounts group from OrgDataManager');
         this.createAllAccountsGroup();
       }
     } catch (e) {
-      // swallow and retry
+      console.warn('🔄 Error during data retry:', e);
     }
 
     if (this.hasAccountData()) {
@@ -389,12 +394,15 @@ class AccountGroupsFilter {
 
     if (this.loadingRetryCount >= this.maxLoadingRetries) {
       // Give up gracefully and leave trigger blank
+      console.warn(`❌ AccountGroupsFilter: Failed to load data after ${this.maxLoadingRetries} retries. OrgDataManager available: ${!!window.OrgDataManager}, ready: ${window.OrgDataManager?.isReady || false}`);
       this.setTriggerLoadingState(false, true);
       return;
     }
 
     this.loadingRetryCount += 1;
-    const delay = Math.min(100 * this.loadingRetryCount, 800);
+    // Use longer delays for potentially slower GitHub deployment
+    const delay = Math.min(200 * this.loadingRetryCount, 2000);
+    console.log(`🔄 Retrying in ${delay}ms...`);
     setTimeout(() => this.retryInitializeData(), delay);
   }
 
@@ -1558,6 +1566,12 @@ class AccountGroupsFilter {
   createAllAccountsGroup() {
     // Create an "all" group containing all available accounts from OrgDataManager
     if (window.OrgDataManager) {
+      // Check if OrgDataManager is ready, if not, let the retry mechanism handle it
+      if (!window.OrgDataManager.isReady) {
+        console.log('🔄 OrgDataManager not ready yet, will retry via loading mechanism');
+        return;
+      }
+      
       const currentOrg = window.OrgDataManager.getCurrentOrganization();
       if (currentOrg && currentOrg.accounts) {
         console.log('🎯 createAllAccountsGroup() - building accounts with applied selection state');
