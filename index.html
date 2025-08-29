@@ -2301,9 +2301,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Customize apply behavior to update dashboard metrics but keep trigger/menu behavior identical to reporting
         dashboardFilter.applySelection = function() {
+          console.log('🎯🔥 Dashboard applySelection() override called!');
+          
+          // Check if at least one account is selected
+          const checkedCheckboxes = document.querySelectorAll('#dashboardAccountsList .account-item input[type="checkbox"]:checked');
+          console.log('🎯 Found', checkedCheckboxes.length, 'checked accounts');
+          
+          if (checkedCheckboxes.length === 0) {
+            // Don't apply if no accounts are selected
+            console.log('🎯 ❌ No accounts selected - showing validation error');
+            this.showValidationError();
+            return;
+          }
+          
+          // Hide validation error if it was showing
+          this.hideValidationError();
+          
           const selectedIds = [];
-          document.querySelectorAll('#dashboardAccountsList .account-item input[type="checkbox"]:checked')
-            .forEach(cb => {
+          checkedCheckboxes.forEach(cb => {
               const item = cb.closest('.account-item');
               const label = item?.querySelector('label');
               if (!label) return;
@@ -2315,8 +2330,18 @@ document.addEventListener('DOMContentLoaded', function() {
           // Update metrics grid to reflect selected accounts
           updateMetricsGrid(selectedIds);
 
+          // **CRITICAL:** Save the current selection state before updating trigger
+          console.log('🎯 💾 About to save applied selection state...');
+          this.saveAppliedSelectionState();
+          console.log('🎯 💾 About to persist applied selection state...');
+          this.persistAppliedSelectionState();
+
           // Match reporting behavior: update trigger label using component logic
           this.updateTriggerBasedOnSelection();
+          
+          // Set flag to prevent restoring selection when closing
+          this.isClosingAfterApply = true;
+          
           // Close like reporting (without restoring selection)
           this.togglePopover();
         };
