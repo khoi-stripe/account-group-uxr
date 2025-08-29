@@ -1917,19 +1917,20 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       if (badgeElement && badgeContainer) {
-        // Check if we're in a filtered state (similar to reporting page logic)
+        // Check if we're in a filtered state (custom mode or non-all group)
         const currentGroup = window.dashboardFilter?.currentGroup;
+        const isCustomMode = window.dashboardFilter?.isCustomMode;
         const isAllGroup = !currentGroup || currentGroup === 'all';
         
         // Get total account count (excluding aggregates) to check if all are selected
         const allRealAccounts = window.OrgDataManager?.getAllSubAccounts?.().filter(acc => !acc.isAggregate) || [];
         const allAccountsSelected = count === allRealAccounts.length;
         
-        // Only show filtered badge if:
-        // 1. We have a filter applied (isFiltered = true)
-        // 2. We're not in the 'all' group
+        // Show filtered badge if:
+        // 1. We have a filter applied (isFiltered = true) AND
+        // 2. Either we're in custom mode OR not in the 'all' group AND  
         // 3. Not all accounts are selected
-        if (isFiltered && !isAllGroup && !allAccountsSelected) {
+        if (isFiltered && (isCustomMode || !isAllGroup) && !allAccountsSelected) {
           badgeElement.textContent = 'Filtered';
           badgeContainer.style.display = 'inline-flex';
         } else {

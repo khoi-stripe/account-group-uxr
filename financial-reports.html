@@ -2713,9 +2713,10 @@
       }
       
       if (badgeElement && badgeContainer) {
-        // Check if we're in a filtered state (not 'all' group and has selected accounts)
+        // Check if we're in a filtered state (custom mode or non-all group)
         const currentGroup = window.reportsFilter?.currentGroup;
-        const isFilteredGroup = currentGroup && currentGroup !== 'all';
+        const isCustomMode = window.reportsFilter?.isCustomMode;
+        const isFilteredGroup = (currentGroup && currentGroup !== 'all') || isCustomMode;
         
         if (filterType === 'Filtered' && isFilteredGroup) {
           badgeElement.textContent = 'Filtered';
