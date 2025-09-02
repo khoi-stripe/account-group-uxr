@@ -147,8 +147,20 @@ FinanceFirst Bank,Digital Banking
 FinanceFirst Bank,Personal Banking`;
   }
 
-  getDefaultData() {
-    // Parse the sample CSV to ensure consistency
+  async getDefaultData() {
+    try {
+      // Try to load CSV from repository first
+      const response = await fetch('./data/organizations.csv');
+      if (response.ok) {
+        const csvContent = await response.text();
+        console.log('✅ Loaded organizations.csv from repository');
+        return this.loadFromCSV(csvContent);
+      }
+    } catch (error) {
+      console.warn('Could not load repository CSV, using sample data:', error);
+    }
+    
+    // Fallback to sample CSV
     return this.loadFromCSV(this.getSampleCSV());
   }
 }
