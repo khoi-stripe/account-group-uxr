@@ -76,12 +76,12 @@ class StaticDataLoader {
 
   async loadDefaultData() {
     // Load the existing organizations data as fallback
-    if (window.organizationData && window.organizationData.organizations && window.organizationData.organizations.length > 0) {
-      const firstOrg = window.organizationData.organizations[0];
+    if (window.OrgDataManager && window.OrgDataManager.organizations && window.OrgDataManager.organizations.length > 0) {
+      const currentOrg = window.OrgDataManager.getCurrentOrganization() || window.OrgDataManager.organizations[0];
       this.currentData = {
         scenarioName: "Default",
-        organizationName: firstOrg.name,
-        accounts: firstOrg.accounts || [],
+        organizationName: currentOrg.name,
+        accounts: currentOrg.accounts || [],
         metadata: {
           createdAt: new Date().toISOString(),
           scenario: "default",
@@ -112,28 +112,39 @@ class StaticDataLoader {
   // Generate a participant data file from current state
   async generateParticipantData() {
     console.log('generateParticipantData called');
-    console.log('window.organizationData:', window.organizationData);
+    console.log('window.OrgDataManager:', window.OrgDataManager);
     console.log('window.selectedOrganizationName:', window.selectedOrganizationName);
     
-    if (!window.organizationData) {
-      throw new Error('No organization data available to generate participant file');
+    // Use OrgDataManager instead of window.organizationData
+    if (!window.OrgDataManager) {
+      throw new Error('Organization Data Manager not available. Please refresh the page.');
     }
 
-    const selectedOrgName = window.selectedOrganizationName || 'Default Organization';
-    console.log('Looking for organization:', selectedOrgName);
-    console.log('Available organizations:', window.organizationData.organizations?.map(org => org.name));
+    const currentOrg = window.OrgDataManager.getCurrentOrganization();
+    const selectedOrgName = window.selectedOrganizationName || currentOrg?.name || 'Default Organization';
     
-    const selectedOrg = window.organizationData.organizations.find(org => org.name === selectedOrgName);
+    console.log('Looking for organization:', selectedOrgName);
+    console.log('Current organization from OrgDataManager:', currentOrg);
+    console.log('Available organizations:', window.OrgDataManager.organizations?.map(org => org.name));
+    
+    // Get the organization from OrgDataManager
+    const selectedOrg = window.OrgDataManager.getOrganizationByName(selectedOrgName);
     
     if (!selectedOrg) {
-      throw new Error(`Selected organization '${selectedOrgName}' not found. Available: ${window.organizationData.organizations?.map(org => org.name).join(', ')}`);
+      const available = window.OrgDataManager.organizations?.map(org => org.name).join(', ') || 'None';
+      throw new Error(`Selected organization '${selectedOrgName}' not found. Available: ${available}`);
     }
 
     const participantId = this.generateParticipantId();
+    
+    // Get accounts from the selected organization
+    const orgAccounts = selectedOrg.accounts || [];
+    console.log('Organization accounts:', orgAccounts);
+    
     const participantData = {
       scenarioName: selectedOrg.name,
       organizationName: selectedOrg.name,
-      accounts: selectedOrg.accounts || [],
+      accounts: orgAccounts,
       metadata: {
         createdAt: new Date().toISOString(),
         participantId: participantId,
@@ -207,6 +218,7 @@ class StaticDataLoader {
       // Update the global organization data to match our loaded data
       window.selectedOrganizationName = this.currentData.organizationName;
       
+      // Create a compatibility layer for window.organizationData
       if (!window.organizationData) {
         window.organizationData = { organizations: [] };
       }
@@ -229,6 +241,18 @@ class StaticDataLoader {
 
       // Set as current organization
       window.selectedOrganizationName = this.currentData.organizationName;
+      
+      // If OrgDataManager exists, try to integrate with it too
+      if (window.OrgDataManager && this.currentData.organizationName !== 'Demo Company') {
+        try {
+          const existingOrg = window.OrgDataManager.getOrganizationByName(this.currentData.organizationName);
+          if (existingOrg) {
+            window.OrgDataManager.setCurrentOrganization(existingOrg);
+          }
+        } catch (error) {
+          console.warn('Could not integrate with OrgDataManager:', error);
+        }
+      }
       
       console.log(`Integrated data for organization: ${this.currentData.organizationName}`);
     }

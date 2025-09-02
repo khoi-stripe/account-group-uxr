@@ -1689,7 +1689,7 @@ class PrototypeControlPanel {
       }
       
       // Ensure organization data is available
-      if (!window.organizationData || !window.organizationData.organizations) {
+      if (!window.OrgDataManager || !window.OrgDataManager.organizations || window.OrgDataManager.organizations.length === 0) {
         throw new Error('Organization data not loaded. Please refresh the page.');
       }
       
