@@ -1583,6 +1583,9 @@ document.addEventListener('DOMContentLoaded', function() {
   <script src="./shared/components/account-switcher.js"></script>
   
   <!-- UXR Data Management -->
+  <!-- Static data loader for participant mode -->
+  <script src="./js/static-data-loader.js"></script>
+  
   <script src="./data/organizations.js"></script>
   <script src="./components/group-creation-modal.js"></script>
   <script src="./components/prototype-control-panel.js"></script>
@@ -1593,7 +1596,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   <!-- Prototype Sharing -->
   <script src="./shared/utils/share.js"></script>
-  <script src="../../api/share.js"></script>
   <script type="module">
     import { showPageSpinner, hidePageSpinner } from './shared/utils/helpers.js';
     document.addEventListener('DOMContentLoaded', async () => {
