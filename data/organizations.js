@@ -198,7 +198,42 @@ class OrganizationDataManager {
   }
 
   async init() {
-    // Try to load from saved organizations data (with colors), then CSV, then defaults
+    // 🔧 PARTICIPANT MODE: Check for participant data first
+    const participantMode = sessionStorage.getItem('participant_mode') === 'true';
+    const participantOrgData = sessionStorage.getItem('participant_organization_data');
+    
+    if (participantMode && participantOrgData) {
+      try {
+        const participantData = JSON.parse(participantOrgData);
+        console.log('🎯 Loading participant organization data:', participantData.organizationName);
+        
+        // Use only the participant organization
+        this.organizations = [{
+          name: participantData.organizationName,
+          accounts: participantData.accounts
+        }];
+        
+        // Skip normal data loading and go straight to setup
+        this.ensureAccountColors();
+        this.isReady = true;
+        
+        // Set current organization to the participant data
+        this.setCurrentOrganization(this.organizations[0]);
+        
+        // Set aggregate view as current sub-account
+        const aggregateAccount = participantData.accounts.find(acc => acc.isAggregate);
+        if (aggregateAccount) {
+          this.setCurrentSubAccount(aggregateAccount);
+        }
+        
+        console.log('✅ Participant mode: Organization data loaded successfully');
+        return;
+      } catch (error) {
+        console.warn('Failed to load participant data, falling back to normal flow:', error);
+      }
+    }
+    
+    // NORMAL MODE: Try to load from saved organizations data (with colors), then CSV, then defaults
     const savedOrganizationsData = localStorage.getItem('uxr_organizations_data');
     const savedCsvData = localStorage.getItem('uxr_csv_data');
     

@@ -13,23 +13,79 @@ class StaticDataLoader {
 
   checkParticipantMode() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.has('mode') && urlParams.get('mode') === 'participant';
+    const urlHasParticipantMode = urlParams.has('mode') && urlParams.get('mode') === 'participant';
+    
+    // Check URL parameters first
+    if (urlHasParticipantMode) {
+      // Store participant context in sessionStorage for persistence across pages
+      const participantData = urlParams.get('data');
+      const scenario = urlParams.get('scenario');
+      
+      if (participantData) {
+        sessionStorage.setItem('participant_mode', 'true');
+        sessionStorage.setItem('participant_data_id', participantData);
+        console.log(`🔄 Stored participant mode: ${participantData}`);
+      } else if (scenario) {
+        sessionStorage.setItem('participant_mode', 'true');
+        sessionStorage.setItem('participant_scenario', scenario);
+        console.log(`🔄 Stored participant mode: scenario ${scenario}`);
+      }
+      
+      return true;
+    }
+    
+    // Check sessionStorage for persisted participant mode
+    const storedParticipantMode = sessionStorage.getItem('participant_mode') === 'true';
+    if (storedParticipantMode) {
+      console.log(`✅ Restored participant mode from sessionStorage`);
+      return true;
+    }
+    
+    return false;
   }
 
   async init() {
     try {
-      // Load data based on URL parameters
+      // Load data based on URL parameters or sessionStorage
       const urlParams = new URLSearchParams(window.location.search);
       const dataParam = urlParams.get('data');
       const scenarioParam = urlParams.get('scenario');
 
       if (dataParam) {
-        // Load participant-specific data
+        // Load participant-specific data from URL
         await this.loadParticipantData(dataParam);
       } else if (scenarioParam) {
-        // Load predefined scenario
+        // Load predefined scenario from URL
         await this.loadScenario(scenarioParam);
-      } else if (!this.isParticipantMode) {
+      } else if (this.isParticipantMode) {
+        // Check sessionStorage for participant data when URL params not available
+        const storedDataId = sessionStorage.getItem('participant_data_id');
+        const storedScenario = sessionStorage.getItem('participant_scenario');
+        
+        if (storedDataId) {
+          console.log('✅ Loading participant data from sessionStorage:', storedDataId);
+          await this.loadParticipantData(storedDataId);
+        } else if (storedScenario) {
+          console.log('✅ Loading scenario from sessionStorage:', storedScenario);
+          await this.loadScenario(storedScenario);
+        } else {
+          // Try to restore from sessionStorage if available
+          const storedOrgData = sessionStorage.getItem('participant_organization_data');
+          if (storedOrgData) {
+            try {
+              const participantData = JSON.parse(storedOrgData);
+              this.currentData = participantData;
+              console.log('✅ Restored participant data from sessionStorage:', participantData.organizationName);
+            } catch (error) {
+              console.warn('Failed to restore participant data from sessionStorage:', error);
+              await this.loadDefaultData();
+            }
+          } else {
+            console.log('⚠️ Participant mode but no stored data, loading default');
+            await this.loadDefaultData();
+          }
+        }
+      } else {
         // Load default data for researcher mode
         await this.loadDefaultData();
       }
@@ -233,6 +289,14 @@ class StaticDataLoader {
       // 🔧 FIX: In participant mode, force override all existing data
       if (this.isParticipantMode) {
         console.log(`🔄 Participant mode: Force loading ${this.currentData.organizationName} data`);
+        
+        // Store participant data in sessionStorage for cross-page persistence
+        sessionStorage.setItem('participant_organization_data', JSON.stringify({
+          organizationName: this.currentData.organizationName,
+          accounts: this.currentData.accounts,
+          metadata: this.currentData.metadata,
+          scenarioName: this.currentData.scenarioName
+        }));
         
         // Clear any cached organization data that might conflict
         localStorage.removeItem('uxr_organizations_data');
