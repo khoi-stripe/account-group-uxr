@@ -212,10 +212,8 @@ class PrototypeControlPanel {
         
         <!-- Share Prototype Tab -->
         <div id="share-tab" class="tab-content">
-          <!-- Custom Organization Share -->
           <div class="section">
             <div class="section-content">
-              <h4 class="section-title">Custom Organization Share</h4>
               <div class="form-group">
                 <label class="form-label" for="share-org-selector">Organization to Share</label>
                 <select id="share-org-selector" class="form-input">
