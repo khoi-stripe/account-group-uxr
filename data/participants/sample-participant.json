@@ -1,0 +1,16 @@
+{
+  "scenarioName": "Sample Organization",
+  "organizationName": "Sample Organization", 
+  "accounts": [
+    { "id": "all_accounts", "name": "Sample Organization", "type": "Aggregate view", "isAggregate": true },
+    { "id": "sample_account_1", "name": "Marketing", "type": "Account", "color": "#3B82F6" },
+    { "id": "sample_account_2", "name": "Sales", "type": "Account", "color": "#10B981" },
+    { "id": "sample_account_3", "name": "Engineering", "type": "Account", "color": "#F59E0B" }
+  ],
+  "metadata": {
+    "createdAt": "2024-09-02T15:30:00.000Z",
+    "participantId": "sample-participant",
+    "scenario": "custom",
+    "description": "Sample participant data for testing"
+  }
+}
