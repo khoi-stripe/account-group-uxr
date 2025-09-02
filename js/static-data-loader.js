@@ -53,6 +53,10 @@ class StaticDataLoader {
 
       if (dataParam) {
         // Load participant-specific data from URL
+        // Clear any cached participant data to ensure fresh load
+        sessionStorage.removeItem('participant_organization_data');
+        sessionStorage.removeItem('participant_data_id');
+        sessionStorage.removeItem('participant_scenario');
         await this.loadParticipantData(dataParam);
       } else if (scenarioParam) {
         // Load predefined scenario from URL
