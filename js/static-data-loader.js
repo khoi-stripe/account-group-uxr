@@ -105,15 +105,20 @@ class StaticDataLoader {
 
   async loadParticipantData(participantId) {
     try {
-      const response = await fetch(`/account-group-uxr/data/participants/${participantId}.json`);
+      console.log(`🔍 Attempting to load participant data: ${participantId}`);
+      const url = `/account-group-uxr/data/participants/${participantId}.json`;
+      console.log(`🔍 Fetching URL: ${url}`);
+      const response = await fetch(url);
+      console.log(`🔍 Fetch response status: ${response.status}`);
       if (!response.ok) {
         throw new Error(`Failed to load participant data: ${response.status}`);
       }
       this.currentData = await response.json();
-      console.log(`Loaded participant data for: ${participantId}`);
+      console.log(`✅ Successfully loaded participant data for: ${participantId}`, this.currentData.organizationName);
       return this.currentData;
     } catch (error) {
-      console.error('Error loading participant data:', error);
+      console.error('❌ Error loading participant data:', error);
+      console.log('🔄 Falling back to enterprise scenario');
       // Fallback to a default scenario
       return await this.loadScenario('enterprise');
     }
@@ -121,12 +126,13 @@ class StaticDataLoader {
 
   async loadScenario(scenarioName) {
     try {
+      console.log(`🔍 Loading scenario: ${scenarioName}`);
       const response = await fetch(`/account-group-uxr/data/scenarios/${scenarioName}.json`);
       if (!response.ok) {
         throw new Error(`Failed to load scenario: ${response.status}`);
       }
       this.currentData = await response.json();
-      console.log(`Loaded scenario: ${scenarioName}`);
+      console.log(`✅ Loaded scenario: ${scenarioName}`, this.currentData.organizationName);
       return this.currentData;
     } catch (error) {
       console.error('Error loading scenario:', error);
