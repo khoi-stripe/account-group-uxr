@@ -1,0 +1,761 @@
+{
+  "scenarioName": "Caesars",
+  "organizationName": "Caesars",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Caesars",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "caes_urvcac_9tspwa",
+      "name": "UrV - CAC",
+      "originalName": "UrV - CAC",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "caes_urvubc_5ewbr7",
+      "name": "UrV - UBC",
+      "originalName": "UrV - UBC",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "caes_urvflv_qdjq7d",
+      "name": "UrV - FLV",
+      "originalName": "UrV - FLV",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_urvclv_uaphiy",
+      "name": "UrV - CLV",
+      "originalName": "UrV - CLV",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "caes_urvche_tl15yi",
+      "name": "UrV - CHE",
+      "originalName": "UrV - CHE",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "caes_urvuha_lfqxv3",
+      "name": "UrV - UHA",
+      "originalName": "UrV - UHA",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_urvgbi_h7cb5k",
+      "name": "UrV - GBI",
+      "originalName": "UrV - GBI",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "caes_urvlau_0qg3ww",
+      "name": "UrV - LAU",
+      "originalName": "UrV - LAU",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "caes_urvcvr_0mwqzw",
+      "name": "UrV - CVR",
+      "originalName": "UrV - CVR",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "caes_urvhlv_ehegwt",
+      "name": "UrV - HLV",
+      "originalName": "UrV - HLV",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "caes_urvblv_i7ermd",
+      "name": "UrV - BLV",
+      "originalName": "UrV - BLV",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_urvtah_qtrlh2",
+      "name": "UrV - TAH",
+      "originalName": "UrV - TAH",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "caes_urvilc_3lya70",
+      "name": "UrV - ILC",
+      "originalName": "UrV - ILC",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "caes_urvnor_u7oauh",
+      "name": "UrV - NOR",
+      "originalName": "UrV - NOR",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "caes_urvplv_hktsau",
+      "name": "UrV - PLV",
+      "originalName": "UrV - PLV",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_urvrin_tqtbtk",
+      "name": "UrV - RIN",
+      "originalName": "UrV - RIN",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "caes_urvphv_iz8k1j",
+      "name": "UrV - PHV",
+      "originalName": "UrV - PHV",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "caes_urvilv_anyl3w",
+      "name": "UrV - ILV",
+      "originalName": "UrV - ILV",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "caes_urvdlv_6q723j",
+      "name": "UrV - DLV",
+      "originalName": "UrV - DLV",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "caes_urvtrw_bdzaxv",
+      "name": "UrV - TRW",
+      "originalName": "UrV - TRW",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "caes_urvtla_86gf03",
+      "name": "UrV - TLA",
+      "originalName": "UrV - TLA",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_urvtac_8gq9og",
+      "name": "UrV - TAC",
+      "originalName": "UrV - TAC",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "caes_urvutu_u6sm33",
+      "name": "UrV - UTU",
+      "originalName": "UrV - UTU",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "caes_urvakc_iplsw5",
+      "name": "UrV - AKC",
+      "originalName": "UrV - AKC",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_urvatl_z17fw6",
+      "name": "UrV - ATL",
+      "originalName": "UrV - ATL",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "caes_urvcda_437y78",
+      "name": "UrV - CDA",
+      "originalName": "UrV - CDA",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_runtrizu_7o8qfp",
+      "name": "Runtriz - UBA",
+      "originalName": "Runtriz - UBA",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "caes_runtrizc_7josi3",
+      "name": "Runtriz - CAC",
+      "originalName": "Runtriz - CAC",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_runtrizw_8u8pl0",
+      "name": "Runtriz - WCL",
+      "originalName": "Runtriz - WCL",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "caes_runtrizc_7vf3v5",
+      "name": "Runtriz - CLV",
+      "originalName": "Runtriz - CLV",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "caes_runtrizd_jmqws1",
+      "name": "Runtriz - DLV",
+      "originalName": "Runtriz - DLV",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "caes_runtrizf_qcw5ep",
+      "name": "Runtriz - FLV",
+      "originalName": "Runtriz - FLV",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "caes_runtrizg_ecbmz9",
+      "name": "Runtriz - GBI",
+      "originalName": "Runtriz - GBI",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_runtriza_udmgi4",
+      "name": "Runtriz - ATL",
+      "originalName": "Runtriz - ATL",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "caes_runtrizc_30phcf",
+      "name": "Runtriz - CHE",
+      "originalName": "Runtriz - CHE",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "caes_runtrizh_cbm1pz",
+      "name": "Runtriz - HLV",
+      "originalName": "Runtriz - HLV",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "caes_runtrizl_i7u2qf",
+      "name": "Runtriz - LAU",
+      "originalName": "Runtriz - LAU",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "caes_runtrizm_jnnpcf",
+      "name": "Runtriz - MET",
+      "originalName": "Runtriz - MET",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "caes_runtrizb_3yd2ep",
+      "name": "Runtriz - BLV",
+      "originalName": "Runtriz - BLV",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "caes_runtrizh_mq21nn",
+      "name": "Runtriz - HBR",
+      "originalName": "Runtriz - HBR",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "caes_runtrizi_acwqsm",
+      "name": "Runtriz - ILC",
+      "originalName": "Runtriz - ILC",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_runtrizh_dn75f3",
+      "name": "Runtriz - HHP",
+      "originalName": "Runtriz - HHP",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "caes_runtrizu_hguxaw",
+      "name": "Runtriz - UIN",
+      "originalName": "Runtriz - UIN",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_runtrizi_bqhzp1",
+      "name": "Runtriz - IBE",
+      "originalName": "Runtriz - IBE",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "caes_runtrizt_ddg91z",
+      "name": "Runtriz - TAH",
+      "originalName": "Runtriz - TAH",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "caes_runtrizn_ertvba",
+      "name": "Runtriz - NKC",
+      "originalName": "Runtriz - NKC",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "caes_runtrizi_7aa7pq",
+      "name": "Runtriz - ILV",
+      "originalName": "Runtriz - ILV",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "caes_runtrizp_u2ubrs",
+      "name": "Runtriz - PLV",
+      "originalName": "Runtriz - PLV",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "caes_runtrizn_3k5ikf",
+      "name": "Runtriz - NOR",
+      "originalName": "Runtriz - NOR",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "caes_runtrizp_g11932",
+      "name": "Runtriz - PHV",
+      "originalName": "Runtriz - PHV",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "caes_runtrizt_bryqqm",
+      "name": "Runtriz - TAC",
+      "originalName": "Runtriz - TAC",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "caes_runtrizt_6hrk9s",
+      "name": "Runtriz - TRW",
+      "originalName": "Runtriz - TRW",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_runtrizu_7ba4am",
+      "name": "Runtriz - UTU",
+      "originalName": "Runtriz - UTU",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "caes_runtrizt_yzntus",
+      "name": "Runtriz - TLA",
+      "originalName": "Runtriz - TLA",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "caes_runtrizi_g6txu7",
+      "name": "Runtriz - IBV",
+      "originalName": "Runtriz - IBV",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "caes_runtrizi_zeswc3",
+      "name": "Runtriz - IPB",
+      "originalName": "Runtriz - IPB",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_runtrizi_ec7mmi",
+      "name": "Runtriz - IBH",
+      "originalName": "Runtriz - IBH",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "caes_runtrizu_ta2lf0",
+      "name": "Runtriz - UEL",
+      "originalName": "Runtriz - UEL",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "caes_runtrizu_5jaf14",
+      "name": "Runtriz - UBC",
+      "originalName": "Runtriz - UBC",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "caes_runtrizc_jecp6v",
+      "name": "Runtriz - COU",
+      "originalName": "Runtriz - COU",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_runtrizr_04pe06",
+      "name": "Runtriz - RIN",
+      "originalName": "Runtriz - RIN",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "caes_runtrizh_5q2ei0",
+      "name": "Runtriz - HNE",
+      "originalName": "Runtriz - HNE",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_runtrizj_zfm3sy",
+      "name": "Runtriz - JOL",
+      "originalName": "Runtriz - JOL",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "caes_runtrizc_5j47np",
+      "name": "Runtriz - CDA",
+      "originalName": "Runtriz - CDA",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_otcac_08f5xq",
+      "name": "OT - CAC",
+      "originalName": "OT - CAC",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "caes_otclv_37vrpu",
+      "name": "OT - CLV",
+      "originalName": "OT - CLV",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "caes_otdlv_wsf9td",
+      "name": "OT - DLV",
+      "originalName": "OT - DLV",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "caes_otflv_tit64y",
+      "name": "OT - FLV",
+      "originalName": "OT - FLV",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "caes_otatl_w89c2d",
+      "name": "OT - ATL",
+      "originalName": "OT - ATL",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "caes_otblv_hbiot7",
+      "name": "OT - BLV",
+      "originalName": "OT - BLV",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "caes_othlv_xbmsuo",
+      "name": "OT - HLV",
+      "originalName": "OT - HLV",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_otplv_x0ytr8",
+      "name": "OT - PLV",
+      "originalName": "OT - PLV",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "caes_otilv_tdk8o3",
+      "name": "OT - ILV",
+      "originalName": "OT - ILV",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "caes_otrin_5dayhj",
+      "name": "OT - RIN",
+      "originalName": "OT - RIN",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_otphv_k21h9y",
+      "name": "OT - PHV",
+      "originalName": "OT - PHV",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "caes_ottrw_iq51fl",
+      "name": "OT - TRW",
+      "originalName": "OT - TRW",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_ottac_j8ghov",
+      "name": "OT - TAC",
+      "originalName": "OT - TAC",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_otuel_w0uku5",
+      "name": "OT - UEL",
+      "originalName": "OT - UEL",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "caes_ottah_waivcx",
+      "name": "OT - TAH",
+      "originalName": "OT - TAH",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "caes_otnkc_44akth",
+      "name": "OT - NKC",
+      "originalName": "OT - NKC",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "caes_otche_1i3v3c",
+      "name": "OT - CHE",
+      "originalName": "OT - CHE",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "caes_otibh_fzvjxw",
+      "name": "OT - IBH",
+      "originalName": "OT - IBH",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "caes_otlau_04h5kl",
+      "name": "OT - LAU",
+      "originalName": "OT - LAU",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "caes_ottla_ydih2r",
+      "name": "OT - TLA",
+      "originalName": "OT - TLA",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_otilc_y57cr4",
+      "name": "OT - ILC",
+      "originalName": "OT - ILC",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "caes_otnor_77ofj7",
+      "name": "OT - NOR",
+      "originalName": "OT - NOR",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "caes_otgbi_5se1ko",
+      "name": "OT - GBI",
+      "originalName": "OT - GBI",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "caes_otakc_5660bt",
+      "name": "OT - AKC",
+      "originalName": "OT - AKC",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "caes_otmet_pj6eld",
+      "name": "OT - MET",
+      "originalName": "OT - MET",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "caes_otjol_mtzfav",
+      "name": "OT - JOL",
+      "originalName": "OT - JOL",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "caes_otwcl_jhxmbo",
+      "name": "OT - WCL",
+      "originalName": "OT - WCL",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "caes_otuha_bf2yjx",
+      "name": "OT - UHA",
+      "originalName": "OT - UHA",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "caes_otuin_2w6oya",
+      "name": "OT - UIN",
+      "originalName": "OT - UIN",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "caes_othhp_1b2j2w",
+      "name": "OT - HHP",
+      "originalName": "OT - HHP",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "caes_otubc_elm4qo",
+      "name": "OT - UBC",
+      "originalName": "OT - UBC",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "caes_othbr_eff9ov",
+      "name": "OT - HBR",
+      "originalName": "OT - HBR",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "caes_otcou_uwopi4",
+      "name": "OT - COU",
+      "originalName": "OT - COU",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_otuba_xe25tn",
+      "name": "OT - UBA",
+      "originalName": "OT - UBA",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "caes_otesd_yhiyyi",
+      "name": "OT - ESD",
+      "originalName": "OT - ESD",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "caes_otipb_msp6pd",
+      "name": "OT - IPB",
+      "originalName": "OT - IPB",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "caes_othbv_k706mm",
+      "name": "OT - HBV",
+      "originalName": "OT - HBV",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_othne_e20kdi",
+      "name": "OT - HNE",
+      "originalName": "OT - HNE",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_otcda_qdcg0p",
+      "name": "OT - CDA",
+      "originalName": "OT - CDA",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "caes_dominiqu_imhqqk",
+      "name": "Dominique Ansel - Caesars Palace",
+      "originalName": "Dominique Ansel - Caesars Palace",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "caes_dominiqu_wd62mq",
+      "name": "Dominique Ansel - PLV",
+      "originalName": "Dominique Ansel - PLV",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "caes_squeezcl_45vwbg",
+      "name": "Squeez - CLV",
+      "originalName": "Squeez - CLV",
+      "type": "Account",
+      "color": "#F59E0B"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-02T19:00:17.094Z",
+    "scenario": "csv-caesars",
+    "description": "CSV-generated participant data for Caesars",
+    "participantFile": true,
+    "generatedFrom": "csv-upload-script"
+  }
+}
