@@ -1,0 +1,17 @@
+{
+  "scenarioName": "Tech Startup",
+  "organizationName": "StartupCo",
+  "accounts": [
+    { "id": "all_accounts", "name": "StartupCo", "type": "Aggregate view", "isAggregate": true },
+    { "id": "star_production_abc123", "name": "Production", "type": "Account", "color": "#10B981" },
+    { "id": "star_staging_def456", "name": "Staging", "type": "Account", "color": "#F59E0B" },
+    { "id": "star_development_ghi789", "name": "Development", "type": "Account", "color": "#3B82F6" },
+    { "id": "star_testing_jkl012", "name": "Testing", "type": "Account", "color": "#8B5CF6" },
+    { "id": "star_sandbox_mno345", "name": "Sandbox", "type": "Account", "color": "#84CC16" }
+  ],
+  "metadata": {
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "scenario": "startup",
+    "description": "Small tech startup with environment-based accounts"
+  }
+}

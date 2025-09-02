@@ -211,8 +211,29 @@ class PrototypeControlPanel {
         
         <!-- Share Prototype Tab -->
         <div id="share-tab" class="tab-content">
+          <!-- Quick Scenarios Section -->
           <div class="section">
             <div class="section-content">
+              <h4 class="section-title">Quick Share - Predefined Scenarios</h4>
+              <div class="scenario-buttons">
+                <button class="btn btn-outline scenario-btn" onclick="window.prototypePanel.shareScenario('enterprise')">
+                  🏢 Enterprise
+                </button>
+                <button class="btn btn-outline scenario-btn" onclick="window.prototypePanel.shareScenario('startup')">
+                  🚀 Startup
+                </button>
+                <button class="btn btn-outline scenario-btn" onclick="window.prototypePanel.shareScenario('agency')">
+                  🎨 Agency
+                </button>
+              </div>
+              <p class="help-text">Share predefined scenarios instantly - no setup required!</p>
+            </div>
+          </div>
+
+          <!-- Custom Organization Share -->
+          <div class="section">
+            <div class="section-content">
+              <h4 class="section-title">Custom Organization Share</h4>
               <div class="form-group">
                 <label class="form-label" for="share-org-selector">Organization to Share</label>
                 <select id="share-org-selector" class="form-input">
@@ -230,7 +251,14 @@ class PrototypeControlPanel {
                     </svg>
                   </button>
                 </div>
-                <p class="help-text">This link includes all data for the selected organization and any account groups you've created.</p>
+                <div class="workflow-help">
+                  <p class="help-text"><strong>Static File Workflow:</strong></p>
+                  <ol class="workflow-steps">
+                    <li>Select organization and click to generate participant file</li>
+                    <li>Upload the downloaded .json file to <code>data/participants/</code></li>
+                    <li>Share the generated link with participants</li>
+                  </ol>
+                </div>
               </div>
               
               <div id="share-status" class="share-status" style="display: none;"></div>
@@ -750,6 +778,65 @@ class PrototypeControlPanel {
         cursor: default !important;
       }
       
+      /* Scenario sharing styles */
+      .section-title {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--neutral-900);
+      }
+      
+      .scenario-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      
+      .scenario-btn {
+        flex: 1;
+        padding: 8px 12px;
+        font-size: 13px;
+        border: 1px solid var(--neutral-300);
+        background: white;
+        color: var(--neutral-700);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .scenario-btn:hover {
+        border-color: var(--neutral-400);
+        background: var(--neutral-50);
+        color: var(--neutral-800);
+      }
+      
+      .workflow-help {
+        margin-top: 8px;
+        padding: 12px;
+        background: var(--neutral-50);
+        border: 1px solid var(--neutral-200);
+        border-radius: 6px;
+      }
+      
+      .workflow-steps {
+        margin: 8px 0 0 0;
+        padding-left: 16px;
+        font-size: 13px;
+        color: var(--neutral-700);
+        line-height: 1.4;
+      }
+      
+      .workflow-steps li {
+        margin-bottom: 4px;
+      }
+      
+      .workflow-steps code {
+        background: var(--neutral-200);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-family: 'Monaco', 'Consolas', monospace;
+      }
 
     `;
     
@@ -1582,34 +1669,38 @@ class PrototypeControlPanel {
     }
     
     try {
-      this.showShareStatus('Generating share link...', 'loading');
+      this.showShareStatus('Generating participant data file...', 'loading');
       
-      // Temporarily switch to the selected organization to export its data
-      const originalOrg = window.OrgDataManager?.getCurrentOrganization();
+      // Get the selected organization data
       const targetOrg = window.OrgDataManager?.getOrganizationByName(selectedOrgName);
       
       if (!targetOrg) {
         throw new Error('Organization not found');
       }
       
-      // Temporarily switch to target org
-      window.OrgDataManager.setCurrentOrganization(targetOrg);
+      // Use static data loader to generate participant file
+      if (!window.staticDataLoader) {
+        throw new Error('Static data loader not available');
+      }
       
-      // Generate share link using existing share functionality
-      const share = new window.PrototypeShare();
-      const result = await share.sharePrototype();
+      // Temporarily set the organization data for export
+      const originalOrg = window.selectedOrganizationName;
+      window.selectedOrganizationName = selectedOrgName;
+      
+      // Generate participant data and file
+      const result = await window.staticDataLoader.generateParticipantData();
       
       // Restore original organization
       if (originalOrg) {
-        window.OrgDataManager.setCurrentOrganization(originalOrg);
+        window.selectedOrganizationName = originalOrg;
       }
       
-      if (result.success) {
+      if (result.shareUrl) {
         shareLinkField.value = result.shareUrl;
         shareLinkField.placeholder = '';
-        this.showShareStatus('✅ Share link generated successfully!', 'success');
+        this.showShareStatus(`✅ Participant file generated! Upload ${result.participantId}.json to data/participants/ then share the link.`, 'success');
       } else {
-        throw new Error(result.error || 'Failed to generate share link');
+        throw new Error('Failed to generate participant data');
       }
       
     } catch (error) {
@@ -1672,6 +1763,34 @@ class PrototypeControlPanel {
     if (!shareStatus) return;
     
     shareStatus.style.display = 'none';
+  }
+
+  // Share a predefined scenario
+  async shareScenario(scenarioName) {
+    const shareLinkField = document.getElementById('share-link-field');
+    
+    try {
+      // Generate the scenario URL
+      const scenarioUrl = `${window.location.origin}${window.location.pathname}?scenario=${scenarioName}&mode=participant`;
+      
+      if (shareLinkField) {
+        shareLinkField.value = scenarioUrl;
+        shareLinkField.placeholder = '';
+      }
+      
+      // Copy to clipboard automatically
+      await navigator.clipboard.writeText(scenarioUrl);
+      this.showShareStatus(`✅ ${scenarioName.charAt(0).toUpperCase() + scenarioName.slice(1)} scenario link copied to clipboard!`, 'success');
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        this.hideShareStatus();
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Failed to share scenario:', error);
+      this.showShareStatus(`❌ Failed to share ${scenarioName} scenario`, 'error');
+    }
   }
 
   // Add visual indicator for participant mode

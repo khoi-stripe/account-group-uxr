@@ -1607,6 +1607,10 @@
 
   <!-- Include account switcher component -->
   <script src="./shared/components/account-switcher.js"></script>
+  
+  <!-- Static data loader (replaces API-based sharing) -->
+  <script src="./js/static-data-loader.js"></script>
+  
   <!-- Include account groups data provider -->
   <script src="./shared/components/account-groups-data.js"></script>
   <!-- Include account groups filter global component -->
@@ -1617,9 +1621,8 @@
 <script src="./components/group-creation-modal.js"></script>
 <script src="./components/prototype-control-panel.js"></script>
 
-<!-- Prototype Sharing -->
+<!-- Prototype Sharing (static file approach) -->
 <script src="./shared/utils/share.js"></script>
-<script src="../../api/share.js"></script>
   <script type="module">
     import { showPageSpinner, hidePageSpinner } from './shared/utils/helpers.js';
     // Global page spinner during initial data readiness
