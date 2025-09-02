@@ -1,0 +1,75 @@
+{
+  "scenarioName": "Enterprise Corporation",
+  "organizationName": "Enterprise Corp",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Enterprise Corp",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "ente_us_north_abc123",
+      "name": "US North",
+      "originalName": "US North",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "ente_us_south_def456",
+      "name": "US South",
+      "originalName": "US South",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "ente_europe_ghi789",
+      "name": "Europe",
+      "originalName": "Europe",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "ente_apac_jkl012",
+      "name": "APAC",
+      "originalName": "APAC",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "ente_canada_mno345",
+      "name": "Canada",
+      "originalName": "Canada",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "ente_dev_ops_pqr678",
+      "name": "DevOps",
+      "originalName": "DevOps",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "ente_marketing_stu901",
+      "name": "Marketing",
+      "originalName": "Marketing",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "ente_sales_vwx234",
+      "name": "Sales",
+      "originalName": "Sales",
+      "type": "Account",
+      "color": "#EC4899"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-02-02T12:01:40.000Z",
+    "scenario": "enterprise",
+    "description": "Large enterprise with regional and departmental accounts",
+    "participantFile": true,
+    "generatedFrom": "scenario-data"
+  }
+}

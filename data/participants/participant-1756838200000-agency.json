@@ -1,0 +1,61 @@
+{
+  "scenarioName": "Digital Agency",
+  "organizationName": "Creative Agency LLC",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Creative Agency LLC",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "agen_client_apple_abc123",
+      "name": "Apple Project",
+      "originalName": "Apple Project",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "agen_client_nike_def456",
+      "name": "Nike Campaign",
+      "originalName": "Nike Campaign",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "agen_client_tesla_ghi789",
+      "name": "Tesla Launch",
+      "originalName": "Tesla Launch",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "agen_client_airbnb_jkl012",
+      "name": "Airbnb Redesign",
+      "originalName": "Airbnb Redesign",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "agen_internal_ops_mno345",
+      "name": "Internal Operations",
+      "originalName": "Internal Operations",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "agen_rd_projects_pqr678",
+      "name": "R&D Projects",
+      "originalName": "R&D Projects",
+      "type": "Account",
+      "color": "#84CC16"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-02-02T12:03:20.000Z",
+    "scenario": "agency",
+    "description": "Digital agency with client-based account structure",
+    "participantFile": true,
+    "generatedFrom": "scenario-data"
+  }
+}
