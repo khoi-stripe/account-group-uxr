@@ -27,13 +27,12 @@ class PrototypeControlPanel {
   checkParticipantMode() {
     // Check for static file approach participant mode
     const urlParams = new URLSearchParams(window.location.search);
-    const hasParticipantMode = urlParams.has('mode') && urlParams.get('mode') === 'participant';
+    const urlHasParticipantMode = urlParams.has('mode') && urlParams.get('mode') === 'participant';
     
-    // Also check if we have scenario or data parameters (indicates shared link)
-    const hasScenario = urlParams.has('scenario');
-    const hasDataParam = urlParams.has('data');
+    // Check sessionStorage for persisted participant mode
+    const storedParticipantMode = sessionStorage.getItem('participant_mode') === 'true';
     
-    return hasParticipantMode || (hasScenario || hasDataParam);
+    return urlHasParticipantMode || storedParticipantMode;
   }
 
   init() {
@@ -1827,9 +1826,9 @@ class PrototypeControlPanel {
       this.existingParticipantId = result.participantId;
       
       // Update UI
-      shareLinkField.value = result.shareUrl;
+        shareLinkField.value = result.shareUrl;
       shareLinkField.title = result.shareUrl; // Add hover tooltip with full URL
-      shareLinkField.placeholder = '';
+        shareLinkField.placeholder = '';
       copyBtn.disabled = false;
       
       this.showShareStatus(`✅ Generated: ${result.participantId}.json - Upload this file to data/participants/ folder, deploy, then copy link.`, 'success');

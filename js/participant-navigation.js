@@ -167,35 +167,7 @@
    * Add participant mode indicator to the page
    */
   function addParticipantModeIndicator() {
-    if (!isParticipantMode()) {
-      return;
-    }
-    
-    // Check if indicator already exists
-    if (document.getElementById('participant-mode-indicator')) {
-      return;
-    }
-    
-    const indicator = document.createElement('div');
-    indicator.id = 'participant-mode-indicator';
-    indicator.innerHTML = '👤 Participant Mode';
-    indicator.style.cssText = `
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: #10B981;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      z-index: 10000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    `;
-    
-    document.body.appendChild(indicator);
-    console.log('🎯 Added participant mode indicator');
+    // Intentionally disabled; using bottom View Mode indicator from prototype control panel
   }
   
   // Initialize when DOM is ready

@@ -1176,8 +1176,8 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 
-<!-- Chart.js for stacked area chart (local copy for security) -->
-<script src="./chart.min.js"></script>
+<!-- Chart.js for stacked area chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="layout-container">
@@ -1582,10 +1582,6 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- Include account switcher component -->
   <script src="./shared/components/account-switcher.js"></script>
   
-  <!-- Static data loader (replaces API-based sharing) -->
-  <script src="./js/static-data-loader.js"></script>
-  <script src="./js/participant-navigation.js"></script>
-  
   <!-- UXR Data Management -->
   <script src="./data/organizations.js"></script>
   <script src="./components/group-creation-modal.js"></script>
@@ -1595,8 +1591,9 @@ document.addEventListener('DOMContentLoaded', function() {
   <!-- Account Groups Filter component (for dashboard filter) -->
   <script src="./shared/components/account-groups-filter.js"></script>
   
-  <!-- Prototype Sharing (static file approach) -->
+  <!-- Prototype Sharing -->
   <script src="./shared/utils/share.js"></script>
+  <script src="../../api/share.js"></script>
   <script type="module">
     import { showPageSpinner, hidePageSpinner } from './shared/utils/helpers.js';
     document.addEventListener('DOMContentLoaded', async () => {
