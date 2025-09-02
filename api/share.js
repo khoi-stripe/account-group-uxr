@@ -20,10 +20,12 @@ function generateShareId() {
 if (typeof exports !== 'undefined') {
   exports.handler = async (event, context) => {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://account-group-uxr.netlify.app',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json'
+    'Access-Control-Allow-Credentials': 'false',
+    'Content-Type': 'application/json',
+    'X-Content-Type-Options': 'nosniff'
   };
 
   // Handle CORS preflight
@@ -34,7 +36,27 @@ if (typeof exports !== 'undefined') {
   try {
     if (event.httpMethod === 'POST') {
       // Store data and return share ID
-      const data = JSON.parse(event.body);
+      const rawData = JSON.parse(event.body);
+      
+      // Basic input validation and sanitization
+      if (!rawData || typeof rawData !== 'object') {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid data format' })
+        };
+      }
+      
+      // Limit data size (1MB max)
+      if (JSON.stringify(rawData).length > 1024 * 1024) {
+        return {
+          statusCode: 413,
+          headers,
+          body: JSON.stringify({ error: 'Data too large' })
+        };
+      }
+      
+      const data = rawData; // You could add more sanitization here if needed
       const shareId = generateShareId();
       
       // Add metadata
