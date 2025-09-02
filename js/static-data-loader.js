@@ -111,6 +111,14 @@ class StaticDataLoader {
 
   // Generate a participant data file from current state
   async generateParticipantData() {
+    // 🚨 GUARD: Prevent double execution within 1 second
+    const now = Date.now();
+    if (this._lastGenerationTime && (now - this._lastGenerationTime) < 1000) {
+      console.log('⚠️ generateParticipantData called too quickly, ignoring to prevent race condition');
+      return this._lastGenerationResult;
+    }
+    this._lastGenerationTime = now;
+    
     console.log('generateParticipantData called');
     console.log('window.OrgDataManager:', window.OrgDataManager);
     console.log('window.selectedOrganizationName:', window.selectedOrganizationName);
@@ -135,7 +143,9 @@ class StaticDataLoader {
       throw new Error(`Selected organization '${selectedOrgName}' not found. Available: ${available}`);
     }
 
+    // 🔧 FIX: Generate participantId only once to avoid race conditions
     const participantId = this.generateParticipantId();
+    console.log('Generated consistent participantId:', participantId);
     
     // Get accounts from the selected organization
     const orgAccounts = selectedOrg.accounts || [];
@@ -157,11 +167,16 @@ class StaticDataLoader {
     // For now, we'll use a blob download as a temporary solution
     await this.downloadParticipantFile(participantId, participantData);
     
-    return {
+    const result = {
       participantId,
       shareUrl: `${window.location.origin}${window.location.pathname}?data=${participantId}&mode=participant`,
       data: participantData
     };
+    
+    // 🔧 CACHE: Store result to prevent race conditions
+    this._lastGenerationResult = result;
+    
+    return result;
   }
 
   generateParticipantId() {

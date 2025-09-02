@@ -1658,6 +1658,17 @@ class PrototypeControlPanel {
 
   // Generate share link for selected organization
   async generateShareLink() {
+    // 🚨 DEBOUNCE: Prevent rapid successive calls that cause race conditions
+    if (this._generateLinkTimeout) {
+      clearTimeout(this._generateLinkTimeout);
+    }
+    
+    this._generateLinkTimeout = setTimeout(async () => {
+      await this._doGenerateShareLink();
+    }, 300); // 300ms debounce
+  }
+  
+  async _doGenerateShareLink() {
     const shareOrgSelector = document.getElementById('share-org-selector');
     const shareLinkField = document.getElementById('share-link-field');
     const shareStatus = document.getElementById('share-status');
