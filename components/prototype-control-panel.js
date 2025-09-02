@@ -242,6 +242,10 @@ class PrototypeControlPanel {
               </div>
               
               <div id="share-status" class="share-status" style="display: none;"></div>
+              
+              <div id="participant-timestamp" class="participant-timestamp" style="display: none;">
+                <small class="timestamp-text"></small>
+              </div>
             </div>
           </div>
         </div>
@@ -1661,6 +1665,7 @@ class PrototypeControlPanel {
       shareLinkField.title = ''; // Clear tooltip
       shareLinkField.placeholder = 'Select organization to check for existing participant data...';
       this.hideShareStatus();
+      this.hideParticipantTimestamp();
       this.existingParticipantId = null;
       return;
     }
@@ -1681,6 +1686,7 @@ class PrototypeControlPanel {
         shareLinkField.placeholder = '';
         copyBtn.disabled = false;
         this.showShareStatus(`✅ Found existing participant data: <code>${existingParticipantId}</code> → Hover over link field to see full URL`, 'success');
+        this.showParticipantTimestamp(existingParticipantId);
       } else {
         // No existing participant file found
         this.existingParticipantId = null;
@@ -1689,6 +1695,7 @@ class PrototypeControlPanel {
         shareLinkField.placeholder = 'No existing participant data found...';
         copyBtn.disabled = true;
         this.showShareStatus(`📋 No existing participant data for ${selectedOrgName}. Generate new data below.`, 'info');
+        this.hideParticipantTimestamp();
       }
     } catch (error) {
       console.warn('Error checking for existing participant files:', error);
@@ -1698,6 +1705,7 @@ class PrototypeControlPanel {
       shareLinkField.placeholder = 'Could not check for existing data...';
       copyBtn.disabled = true;
       this.showShareStatus(`⚠️ Ready to generate participant data for ${selectedOrgName}.`, 'info');
+      this.hideParticipantTimestamp();
     }
   }
 
@@ -1798,10 +1806,12 @@ class PrototypeControlPanel {
       copyBtn.disabled = false;
       
       this.showShareStatus(`✅ Generated: ${result.participantId}.json - Upload this file to data/participants/ folder, deploy, then copy link.`, 'success');
+      this.showParticipantTimestamp(result.participantId);
       
     } catch (error) {
       console.error('Failed to generate participant JSON:', error);
       this.showShareStatus(`❌ ${error.message}`, 'error');
+      this.hideParticipantTimestamp();
     } finally {
       // Re-enable button
       generateBtn.disabled = false;
@@ -1889,6 +1899,49 @@ class PrototypeControlPanel {
     if (!shareStatus) return;
     
     shareStatus.style.display = 'none';
+  }
+
+  // Show participant file timestamp
+  showParticipantTimestamp(participantId) {
+    const timestampElement = document.getElementById('participant-timestamp');
+    const timestampText = timestampElement?.querySelector('.timestamp-text');
+    if (!timestampElement || !timestampText) return;
+    
+    try {
+      // Extract timestamp from participant ID (format: participant-[timestamp]-[randomid])
+      const timestampMatch = participantId.match(/participant-(\d+)-/);
+      if (!timestampMatch) return;
+      
+      const timestamp = parseInt(timestampMatch[1]);
+      const date = new Date(timestamp);
+      
+      // Format: "Dec 31, 2024 at 2:30 PM"
+      const formattedDate = date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+      const formattedTime = date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+      
+      timestampText.textContent = `Generated: ${formattedDate} at ${formattedTime}`;
+      timestampElement.style.display = 'block';
+      
+    } catch (error) {
+      console.warn('Could not parse participant timestamp:', error);
+      this.hideParticipantTimestamp();
+    }
+  }
+
+  // Hide participant file timestamp
+  hideParticipantTimestamp() {
+    const timestampElement = document.getElementById('participant-timestamp');
+    if (!timestampElement) return;
+    
+    timestampElement.style.display = 'none';
   }
 
 
