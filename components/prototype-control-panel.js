@@ -1660,6 +1660,7 @@ class PrototypeControlPanel {
       generateBtn.disabled = false; 
       copyBtn.disabled = true;
       shareLinkField.value = '';
+      shareLinkField.title = ''; // Clear tooltip
       shareLinkField.placeholder = 'Select organization to check for existing participant data...';
       this.hideShareStatus();
       this.existingParticipantId = null;
@@ -1676,14 +1677,17 @@ class PrototypeControlPanel {
       if (existingParticipantId) {
         // Found existing participant file
         this.existingParticipantId = existingParticipantId;
-        shareLinkField.value = `${window.location.origin}${window.location.pathname}?data=${existingParticipantId}&mode=participant`;
+        const fullUrl = `${window.location.origin}${window.location.pathname}?data=${existingParticipantId}&mode=participant`;
+        shareLinkField.value = fullUrl;
+        shareLinkField.title = fullUrl; // Add hover tooltip with full URL
         shareLinkField.placeholder = '';
         copyBtn.disabled = false;
-        this.showShareStatus(`✅ Found existing participant data: ${existingParticipantId}.json`, 'success');
+        this.showShareStatus(`✅ Found existing participant data: <code>${existingParticipantId}</code> → Hover over link field to see full URL`, 'success');
       } else {
         // No existing participant file found
         this.existingParticipantId = null;
         shareLinkField.value = '';
+        shareLinkField.title = ''; // Clear tooltip
         shareLinkField.placeholder = 'No existing participant data found...';
         copyBtn.disabled = true;
         this.showShareStatus(`📋 No existing participant data for ${selectedOrgName}. Generate new data below.`, 'info');
@@ -1692,6 +1696,7 @@ class PrototypeControlPanel {
       console.warn('Error checking for existing participant files:', error);
       this.existingParticipantId = null;
       shareLinkField.value = '';
+      shareLinkField.title = ''; // Clear tooltip
       shareLinkField.placeholder = 'Could not check for existing data...';
       copyBtn.disabled = true;
       this.showShareStatus(`⚠️ Ready to generate participant data for ${selectedOrgName}.`, 'info');
@@ -1790,6 +1795,7 @@ class PrototypeControlPanel {
       
       // Update UI
       shareLinkField.value = result.shareUrl;
+      shareLinkField.title = result.shareUrl; // Add hover tooltip with full URL
       shareLinkField.placeholder = '';
       copyBtn.disabled = false;
       

@@ -278,6 +278,17 @@
   color: var(--neutral-400);
 }
 
+/* Share Link Field - Enhanced for URL visibility */
+#share-link-field {
+  font-family: monospace;
+  font-size: 12px;
+  letter-spacing: 0;
+  padding-right: 48px; /* Make room for copy button */
+  word-break: break-all;
+  line-height: 1.2;
+  min-height: 42px;
+}
+
 .form-input:disabled {
   background-color: var(--neutral-50);
   border-color: var(--neutral-200);
