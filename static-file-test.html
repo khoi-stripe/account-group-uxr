@@ -97,7 +97,7 @@
     </div>
 
     <div class="test-section">
-        <h3>3. Master vs Participant Mode</h3>
+        <h3>3. Researcher vs Participant Mode</h3>
         <p>Test the visibility of prototype controls:</p>
         
         <div id="mode-status"></div>
@@ -118,7 +118,7 @@
         
         <h3>🔄 New Workflow:</h3>
         <ol>
-            <li><strong>Master:</strong> Open prototype, configure organization data</li>
+            <li><strong>Researcher:</strong> Open prototype, configure organization data</li>
             <li><strong>Share Quick:</strong> Click scenario buttons for instant sharing</li>
             <li><strong>Share Custom:</strong> Generate participant file, upload to /data/participants/</li>
             <li><strong>Participant:</strong> Use clean URL with ?mode=participant</li>
@@ -153,7 +153,7 @@
             
             status.innerHTML = `
                 <div class="status-box ${hasControls ? 'success' : 'warning'}">
-                    <strong>Mode:</strong> ${hasControls ? 'Master (Controls Visible)' : 'Participant (Clean View)'}<br>
+                    <strong>Mode:</strong> ${hasControls ? 'Researcher (Controls Visible)' : 'Participant (Clean View)'}<br>
                     <strong>Static Data Loader:</strong> ${window.staticDataLoader ? '✅ Loaded' : '❌ Missing'}<br>
                     <strong>Current Data:</strong> ${window.staticDataLoader?.getCurrentData()?.organizationName || 'None'}
                 </div>
@@ -177,7 +177,7 @@
                 currentStatus.innerHTML = `
                     <div class="status-box warning">
                         <strong>No parameters detected</strong><br>
-                        This is the master version
+                        This is the researcher version
                     </div>
                 `;
             }

@@ -30,7 +30,7 @@ class StaticDataLoader {
         // Load predefined scenario
         await this.loadScenario(scenarioParam);
       } else if (!this.isParticipantMode) {
-        // Load default data for master mode
+        // Load default data for researcher mode
         await this.loadDefaultData();
       }
 

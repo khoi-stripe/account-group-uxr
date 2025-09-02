@@ -25,7 +25,7 @@ This branch implements a **static file approach** to replace API-based prototype
 
 ## 🔄 New Workflow
 
-### Master Mode (Researcher)
+### Researcher Mode (UX Researchers)
 1. Open prototype with full controls
 2. **Quick Share:** Click scenario buttons (🏢 Enterprise, 🚀 Startup, 🎨 Agency)
 3. **Custom Share:** 
@@ -110,7 +110,7 @@ https://yoursite.com/prototype.html?data=participant-001&mode=participant
 
 ### What Stayed the Same  
 - ✅ All prototype functionality
-- ✅ Master/participant distinction
+- ✅ Researcher/participant distinction
 - ✅ Organization data management
 - ✅ Account grouping features
 - ✅ CSV upload capability
