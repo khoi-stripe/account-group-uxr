@@ -6,8 +6,10 @@
 
 class StaticDataLoader {
   constructor() {
+    console.log('🚀 StaticDataLoader constructor called');
     this.currentData = null;
     this.isParticipantMode = this.checkParticipantMode();
+    console.log('🔍 Participant mode detected:', this.isParticipantMode);
     this.init();
   }
 
@@ -46,10 +48,12 @@ class StaticDataLoader {
 
   async init() {
     try {
+      console.log('🔧 StaticDataLoader.init() starting...');
       // Load data based on URL parameters or sessionStorage
       const urlParams = new URLSearchParams(window.location.search);
       const dataParam = urlParams.get('data');
       const scenarioParam = urlParams.get('scenario');
+      console.log('🔍 URL params - data:', dataParam, 'scenario:', scenarioParam);
 
       if (dataParam) {
         // Load participant-specific data from URL
@@ -404,7 +408,9 @@ class StaticDataLoader {
 }
 
 // Global instance
+console.log('📦 Creating global StaticDataLoader instance...');
 window.staticDataLoader = new StaticDataLoader();
+console.log('✅ StaticDataLoader instance created:', window.staticDataLoader);
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
