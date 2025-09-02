@@ -1,0 +1,47 @@
+{
+  "scenarioName": "Demo Company",
+  "organizationName": "Demo Company",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Demo Company",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "demo_account_1",
+      "name": "Main Account",
+      "originalName": "Main Account",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "demo_account_2",
+      "name": "Test Account",
+      "originalName": "Test Account",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "demo_account_3",
+      "name": "Development Account",
+      "originalName": "Development Account",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "demo_account_4",
+      "name": "Staging Account",
+      "originalName": "Staging Account",
+      "type": "Account",
+      "color": "#8B5CF6"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-02-02T12:05:00.000Z",
+    "scenario": "demo",
+    "description": "Demo data for testing and presentations",
+    "participantFile": true,
+    "generatedFrom": "default-fallback"
+  }
+}

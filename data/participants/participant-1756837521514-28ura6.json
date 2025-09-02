@@ -1,0 +1,291 @@
+{
+  "scenarioName": "Vocento",
+  "organizationName": "Vocento",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Vocento",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "voce_abcsuscr_vaeaui",
+      "name": "ABC - Suscripciones",
+      "originalName": "ABC - Suscripciones",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "voce_canarias_o43juj",
+      "name": "Canarias7 - Suscripciones",
+      "originalName": "Canarias7 - Suscripciones",
+      "type": "Account",
+      "color": "#A78BFA"
+    },
+    {
+      "id": "voce_abcdesev_boj6gr",
+      "name": "ABC de Sevilla - Suscripciones",
+      "originalName": "ABC de Sevilla - Suscripciones",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "voce_diariosu_7ah7uy",
+      "name": "Diario Sur - Suscripciones",
+      "originalName": "Diario Sur - Suscripciones",
+      "type": "Account",
+      "color": "#34D399"
+    },
+    {
+      "id": "voce_elcomerc_p8m2uc",
+      "name": "El Comercio - Suscripciones",
+      "originalName": "El Comercio - Suscripciones",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "voce_elcorreo_s9h5ef",
+      "name": "El Correo - Suscripciones",
+      "originalName": "El Correo - Suscripciones",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "voce_eldiario_94hc15",
+      "name": "El Diario Montañés - Suscripciones",
+      "originalName": "El Diario Montañés - Suscripciones",
+      "type": "Account",
+      "color": "#FBBF24"
+    },
+    {
+      "id": "voce_elnorted_ls8q47",
+      "name": "El Norte de Castilla - Suscripciones",
+      "originalName": "El Norte de Castilla - Suscripciones",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "voce_diariova_3fjksa",
+      "name": "Diario Vasco - Suscripciones",
+      "originalName": "Diario Vasco - Suscripciones",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "voce_hoysuscr_88aj6u",
+      "name": "Hoy - Suscripciones",
+      "originalName": "Hoy - Suscripciones",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "voce_idealsus_gttkgt",
+      "name": "Ideal - Suscripciones",
+      "originalName": "Ideal - Suscripciones",
+      "type": "Account",
+      "color": "#FBBF24"
+    },
+    {
+      "id": "voce_lariojas_yfcn5e",
+      "name": "La Rioja - Suscripciones",
+      "originalName": "La Rioja - Suscripciones",
+      "type": "Account",
+      "color": "#FBBF24"
+    },
+    {
+      "id": "voce_laverdad_w9n6mh",
+      "name": "La Verdad - Suscripciones",
+      "originalName": "La Verdad - Suscripciones",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "voce_lasprovi_683fce",
+      "name": "Las Provincias - Suscripciones",
+      "originalName": "Las Provincias - Suscripciones",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "voce_elcorreo_6gvwys",
+      "name": "El Correo - Tienda Promociones",
+      "originalName": "El Correo - Tienda Promociones",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "voce_diariova_rxvnj3",
+      "name": "Diario Vasco - Tienda Promociones",
+      "originalName": "Diario Vasco - Tienda Promociones",
+      "type": "Account",
+      "color": "#A78BFA"
+    },
+    {
+      "id": "voce_abctiend_hozmnv",
+      "name": "ABC - Tienda Archivo",
+      "originalName": "ABC - Tienda Archivo",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "voce_lavozdig_5nirv1",
+      "name": "La Voz Digital - Oferplan",
+      "originalName": "La Voz Digital - Oferplan",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "voce_ldkclasi_14t3ng",
+      "name": "LDK - Clasificados",
+      "originalName": "LDK - Clasificados",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "voce_lagaceta_kafupr",
+      "name": "La Gaceta de Salamanca - Oferplan",
+      "originalName": "La Gaceta de Salamanca - Oferplan",
+      "type": "Account",
+      "color": "#A78BFA"
+    },
+    {
+      "id": "voce_lavozdeg_rd1qus",
+      "name": "La Voz de Galicia - Oferplan",
+      "originalName": "La Voz de Galicia - Oferplan",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "voce_elcorreo_iqi5ys",
+      "name": "El Correo - Oferplan",
+      "originalName": "El Correo - Oferplan",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "voce_elnorted_vobk1u",
+      "name": "El Norte de Castilla - Oferplan",
+      "originalName": "El Norte de Castilla - Oferplan",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "voce_lasprovi_xgrtbb",
+      "name": "Las Provincias - Oferplan",
+      "originalName": "Las Provincias - Oferplan",
+      "type": "Account",
+      "color": "#34D399"
+    },
+    {
+      "id": "voce_diariova_3mbey9",
+      "name": "Diario Vasco - Oferplan",
+      "originalName": "Diario Vasco - Oferplan",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "voce_leonotic_x9jw5d",
+      "name": "Leonoticias - Oferplan",
+      "originalName": "Leonoticias - Oferplan",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "voce_laverdad_wkg9yk",
+      "name": "La Verdad - Oferplan",
+      "originalName": "La Verdad - Oferplan",
+      "type": "Account",
+      "color": "#A78BFA"
+    },
+    {
+      "id": "voce_lariojao_mwko9v",
+      "name": "La Rioja - Oferplan",
+      "originalName": "La Rioja - Oferplan",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "voce_abcdesev_6go3y2",
+      "name": "ABC de Sevilla - Oferplan",
+      "originalName": "ABC de Sevilla - Oferplan",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "voce_abcoferp_dgdx4v",
+      "name": "ABC - Oferplan",
+      "originalName": "ABC - Oferplan",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "voce_diariosu_t2biet",
+      "name": "Diario Sur - Oferplan",
+      "originalName": "Diario Sur - Oferplan",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "voce_elcomerc_4kbevj",
+      "name": "El Comercio - Oferplan",
+      "originalName": "El Comercio - Oferplan",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "voce_eldiario_2ak1h0",
+      "name": "El Diario Montañés - Oferplan",
+      "originalName": "El Diario Montañés - Oferplan",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "voce_hoyoferp_tn9qfl",
+      "name": "Hoy - Oferplan",
+      "originalName": "Hoy - Oferplan",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "voce_idealofe_qf7s8e",
+      "name": "Ideal - Oferplan",
+      "originalName": "Ideal - Oferplan",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "voce_relevoti_qjra2e",
+      "name": "Relevo - Tienda",
+      "originalName": "Relevo - Tienda",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "voce_lasprovi_tleq9m",
+      "name": "Las Provincias - ProBrand",
+      "originalName": "Las Provincias - ProBrand",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "voce_gigbroso_m6up4e",
+      "name": "Gigbro - SoD",
+      "originalName": "Gigbro - SoD",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "voce_laverdad_sp36wv",
+      "name": "La Verdad - ProBrand",
+      "originalName": "La Verdad - ProBrand",
+      "type": "Account",
+      "color": "#FBBF24"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-02T18:25:21.514Z",
+    "participantId": "participant-1756837521514-28ura6",
+    "scenario": "custom",
+    "description": "Custom participant data for Vocento"
+  }
+}

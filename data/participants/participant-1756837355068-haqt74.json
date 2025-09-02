@@ -1,0 +1,277 @@
+{
+  "scenarioName": "Togetherwork",
+  "organizationName": "Togetherwork",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Togetherwork",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "toge_protechc_279zlz",
+      "name": "Protech - Custom",
+      "originalName": "Protech - Custom",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "toge_together_plxphr",
+      "name": "Togetherwork",
+      "originalName": "Togetherwork",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "toge_smartwai_ccn1ct",
+      "name": "Smartwaiver - Custom",
+      "originalName": "Smartwaiver - Custom",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "toge_massageb_ogermy",
+      "name": "MassageBook - Custom",
+      "originalName": "MassageBook - Custom",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "toge_doublekn_tuk9xl",
+      "name": "Doubleknot - Custom",
+      "originalName": "Doubleknot - Custom",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "toge_fontevas_5gswrm",
+      "name": "Fonteva - Subscriptions",
+      "originalName": "Fonteva - Subscriptions",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "toge_cybergol_2mrw9b",
+      "name": "Cybergolf - Custom",
+      "originalName": "Cybergolf - Custom",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "toge_gingrsub_uq5o20",
+      "name": "Gingr - Subscriptions",
+      "originalName": "Gingr - Subscriptions",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "toge_studiopr_7twq24",
+      "name": "Studio Pro - Subscriptions",
+      "originalName": "Studio Pro - Subscriptions",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "toge_smartwai_5p4d2m",
+      "name": "Smartwaiver - Subscriptions",
+      "originalName": "Smartwaiver - Subscriptions",
+      "type": "Account",
+      "color": "#FBBF24"
+    },
+    {
+      "id": "toge_studiopr_x3qk2d",
+      "name": "Studio Pro - Standard",
+      "originalName": "Studio Pro - Standard",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "toge_acceptds_ew2b6n",
+      "name": "Acceptd - Standard / Subscriptions",
+      "originalName": "Acceptd - Standard / Subscriptions",
+      "type": "Account",
+      "color": "#FBBF24"
+    },
+    {
+      "id": "toge_bunk1dir_fo482n",
+      "name": "Bunk1 - Direct",
+      "originalName": "Bunk1 - Direct",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "toge_softrekc_8cpd50",
+      "name": "Softrek - Custom",
+      "originalName": "Softrek - Custom",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "toge_gingrcus_k5avwz",
+      "name": "Gingr - Custom",
+      "originalName": "Gingr - Custom",
+      "type": "Account",
+      "color": "#F87171"
+    },
+    {
+      "id": "toge_circuitr_orcxrt",
+      "name": "CircuiTree - Custom",
+      "originalName": "CircuiTree - Custom",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "toge_massageb_e2v38i",
+      "name": "MassageBook - Standard",
+      "originalName": "MassageBook - Standard",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "toge_rockgymp_zphat",
+      "name": "Rock Gym Pro - Custom",
+      "originalName": "Rock Gym Pro - Custom",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "toge_rockgymp_ypiso1",
+      "name": "Rock Gym Pro - Standard",
+      "originalName": "Rock Gym Pro - Standard",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "toge_dsoadire_sffxnd",
+      "name": "DSOA - Direct",
+      "originalName": "DSOA - Direct",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "toge_jacksonr_g4fawb",
+      "name": "Jackson River - Custom",
+      "originalName": "Jackson River - Custom",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "toge_shulclou_39htar",
+      "name": "ShulCloud - Standard",
+      "originalName": "ShulCloud - Standard",
+      "type": "Account",
+      "color": "#FBBF24"
+    },
+    {
+      "id": "toge_revelati_3t3dnl",
+      "name": "Revelation Pets - Custom",
+      "originalName": "Revelation Pets - Custom",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "toge_omegafic_ejgl7e",
+      "name": "OmegaFi - Custom",
+      "originalName": "OmegaFi - Custom",
+      "type": "Account",
+      "color": "#FBBF24"
+    },
+    {
+      "id": "toge_studiopr_4med7l",
+      "name": "Studio Pro - Custom",
+      "originalName": "Studio Pro - Custom",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "toge_shulclou_mlxb4x",
+      "name": "ShulCloud - Custom",
+      "originalName": "ShulCloud - Custom",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "toge_capturep_3ko77s",
+      "name": "Capturepoint - Custom",
+      "originalName": "Capturepoint - Custom",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "toge_fontevac_19e9gp",
+      "name": "Fonteva - Custom",
+      "originalName": "Fonteva - Custom",
+      "type": "Account",
+      "color": "#34D399"
+    },
+    {
+      "id": "toge_mycolleg_67rhxk",
+      "name": "My College Audition - Direct",
+      "originalName": "My College Audition - Direct",
+      "type": "Account",
+      "color": "#34D399"
+    },
+    {
+      "id": "toge_shulclou_aipcgm",
+      "name": "ShulCloud - Subscriptions",
+      "originalName": "ShulCloud - Subscriptions",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "toge_massageb_3809hx",
+      "name": "MassageBook - Subscriptions",
+      "originalName": "MassageBook - Subscriptions",
+      "type": "Account",
+      "color": "#34D399"
+    },
+    {
+      "id": "toge_protechs_5z9on0",
+      "name": "Protech - Subscriptions",
+      "originalName": "Protech - Subscriptions",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "toge_file990d_7u3cvm",
+      "name": "File990 - Direct",
+      "originalName": "File990 - Direct",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "toge_dsoadire_c6ky0r",
+      "name": "DSOA - Direct (StudioSync)",
+      "originalName": "DSOA - Direct (StudioSync)",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "toge_revelati_lffzoq",
+      "name": "Revelation Pets - Subscriptions",
+      "originalName": "Revelation Pets - Subscriptions",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "toge_rockgymp_chjdai",
+      "name": "Rock Gym Pro - Subscriptions",
+      "originalName": "Rock Gym Pro - Subscriptions",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "toge_petexecs_y5h84m",
+      "name": "PetExec - Standard",
+      "originalName": "PetExec - Standard",
+      "type": "Account",
+      "color": "#34D399"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-02T18:22:35.068Z",
+    "participantId": "participant-1756837355068-haqt74",
+    "scenario": "custom",
+    "description": "Custom participant data for Togetherwork"
+  }
+}

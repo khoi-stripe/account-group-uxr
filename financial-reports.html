@@ -1,0 +1,2986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Reports - Stripe Dashboard UXR</title>
+  
+  <!-- Import shared styles -->
+  <link rel="stylesheet" href="./shared/styles/variables.css">
+  <link rel="stylesheet" href="./shared/styles/base.css">
+  <link rel="stylesheet" href="./shared/styles/typography.css">
+  <link rel="stylesheet" href="./shared/styles/components.css">
+  <link rel="stylesheet" href="./shared/styles/color-utilities.css">
+      <link rel="stylesheet" href="./shared/styles/account-groups-filter.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: white;
+      font-family: var(--font-family-ui);
+      overflow: hidden;
+    }
+
+    /* Wireframe bar styles to match Figma design */
+    .wireframe-bar {
+      background: #E8EAED;
+      border-radius: 8px;
+      height: 8px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .wireframe-bar.short {
+      width: 48px;
+    }
+    
+    .wireframe-bar.medium {
+      width: 60px;
+    }
+    
+    .wireframe-bar.long {
+      width: 80px;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    .layout-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Override date-range-display to be more compact */
+    .date-range-display {
+      width: auto;
+      max-width: 160px;
+      height: 26px;
+      padding: 0 8px;
+      gap: 4px;
+      border: 1px solid var(--neutral-100);
+    }
+
+         /* Navigation Panel */
+     .nav-panel {
+       width: 240px;
+       background: white;
+       border-right: 1px solid rgba(0, 39, 77, 0.08);
+       flex-shrink: 0;
+       position: relative;
+       display: flex;
+       flex-direction: column;
+       height: 100vh;
+       overflow: hidden;
+     }
+
+    .nav-panel.collapsed {
+       width: 64px;
+       overflow: visible;
+     }
+     
+          .nav-panel.collapsed .nav-item-label,
+     .nav-panel.collapsed .workload-caret-icon,
+     .nav-panel.collapsed .section-header {
+       display: none;
+     }
+     
+     /* Account Switcher in Nav Panel */
+     #nav-account-switcher {
+       margin-bottom: 16px;
+     }
+     
+
+     
+     .nav-panel.collapsed #nav-account-switcher .account-details,
+     .nav-panel.collapsed #nav-account-switcher .account-switcher-caret {
+       display: none;
+     }
+     
+     .nav-panel.collapsed #nav-account-switcher {
+       margin: 0 -20px 16px -20px;
+       display: flex;
+       justify-content: center;
+     }
+     
+     .nav-panel.collapsed #nav-account-switcher .account-switcher-trigger {
+       width: 24px;
+       margin: 0 auto;
+       justify-content: center;
+     }
+     
+     /* Disable animations for account switcher during nav collapse */
+     #nav-account-switcher,
+     #nav-account-switcher *,
+     #nav-account-switcher .account-switcher-trigger,
+     #nav-account-switcher .account-avatar {
+       transition: none !important;
+     }
+     
+     /* Custom pinkish red avatar color */
+     #nav-account-switcher .account-avatar {
+       background-color: #E11D48 !important; /* Pinkish red */
+     }
+     
+     /* Nav item tooltips for collapsed state */
+     .workload-item {
+       position: relative;
+     }
+     
+     .nav-item-tooltip {
+       position: absolute;
+       left: 100%;
+       top: 50%;
+       transform: translateY(-50%);
+       margin-left: 8px;
+       padding: 4px 8px;
+       background: var(--neutral-900);
+       color: white;
+       font-family: var(--font-family-ui);
+       font-size: var(--font-size-12);
+       font-weight: var(--font-weight-medium);
+       line-height: var(--line-height-16);
+       border-radius: 4px;
+       white-space: nowrap;
+       opacity: 0;
+       visibility: hidden;
+       transition: opacity 0.2s ease, visibility 0.2s ease;
+       pointer-events: none;
+       z-index: 99999;
+       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+       border: 1px solid rgba(255, 255, 255, 0.1);
+     }
+     
+     .nav-item-tooltip::before {
+       content: '';
+       position: absolute;
+       top: 50%;
+       left: -4px;
+       transform: translateY(-50%);
+      width: 0;
+       height: 0;
+       border-style: solid;
+       border-width: 4px 4px 4px 0;
+       border-color: transparent var(--neutral-900) transparent transparent;
+     }
+     
+     .nav-panel.collapsed .nav-item:hover .nav-item-tooltip,
+     .nav-panel.collapsed .workload-item:hover .nav-item-tooltip {
+       opacity: 1;
+       visibility: visible;
+     }
+     
+     .nav-panel:not(.collapsed) .nav-item-tooltip {
+       display: none;
+     }
+     
+     /* Customize account switcher for nav panel */
+     #nav-account-switcher .account-switcher {
+       display: block;
+       width: 100%;
+     }
+     
+     #nav-account-switcher .account-switcher-trigger {
+       width: 100%;
+       min-width: auto;
+       background: transparent;
+       border: none;
+       border-radius: var(--radius-sm);
+       padding: 4px 6px;
+       height: 36px;
+       max-width: 240px;
+       box-sizing: content-box;
+       margin: 0 -6px;
+     }
+     
+     #nav-account-switcher .account-switcher-trigger:hover {
+       background: var(--neutral-50);
+    }
+
+         /* Content Panel */
+     .content-panel {
+       flex: 1;
+       background: white;
+       min-width: 0; /* Allows flex item to shrink below content size */
+       position: relative;
+       display: flex;
+       flex-direction: column;
+       z-index: 10; /* Ensure content panel and its children (including popover) appear above nav panel */
+     }
+
+     /* Content Header */
+     .content-header {
+       height: 60px;
+       padding: 12px 32px;
+       background: white;
+       display: flex;
+       align-items: center;
+       width: 100%;
+       box-sizing: border-box;
+     }
+     
+     /* Header Actions */
+     .header-actions {
+       display: flex;
+       align-items: center;
+       gap: 4px; /* 4px spacing between icons */
+       margin-left: auto; /* Push to right side */
+     }
+     
+         .header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      position: relative;
+    }
+    
+    .header-icon:hover {
+      background-color: var(--neutral-25);
+    }
+    
+    /* Settings icon specific styling */
+    .settings-icon {
+      color: inherit;
+    }
+    
+    .settings-icon:hover svg path {
+      fill: var(--neutral-600);
+    }
+    
+    .settings-icon.active {
+      cursor: default;
+    }
+    
+
+
+
+
+     /* Main Navigation */
+     .main-nav {
+       display: flex;
+       flex-direction: column;
+       gap: 4px;
+     }
+     
+     /* Workloads Section */
+     .workloads-section {
+       margin-top: 24px;
+     }
+     
+         /* Workloads Navigation */
+    .workloads-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 0;
+    }
+
+    /* Expandable workload item styles */
+    .workload-item-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .workload-item.expandable {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .workload-item.expandable:hover {
+      background-color: var(--neutral-50);
+      text-decoration: none;
+    }
+
+    .workload-submenu {
+      display: none;
+      flex-direction: column;
+      padding-left: 32px;
+      margin-top: 4px;
+      gap: 4px;
+    }
+
+    .workload-submenu.expanded {
+      display: flex;
+    }
+
+    .workload-subitem {
+      display: flex;
+      align-items: center;
+      padding: 0;
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--neutral-700);
+      font-size: 14px;
+      transition: background-color 0.15s ease;
+      height: 24px;
+      min-height: 24px;
+    }
+
+    .workload-subitem .nav-item-label {
+      margin-left: 0;
+    }
+
+    .workload-subitem {
+      position: relative;
+    }
+
+    .workload-subitem::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -32px;
+      right: -4px;
+      bottom: -4px;
+      background-color: transparent;
+      border-radius: 8px;
+      transition: background-color 0.15s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .workload-subitem:hover:not(.disabled)::before {
+      background-color: var(--neutral-50);
+    }
+
+    .workload-subitem:hover:not(.disabled) {
+      color: var(--neutral-900);
+    }
+
+    .workload-subitem .nav-item-label {
+      position: relative;
+      z-index: 1;
+    }
+
+    .workload-subitem.disabled {
+      color: var(--neutral-500);
+      cursor: default;
+    }
+
+    .workload-subitem.disabled:hover {
+      background-color: transparent;
+    }
+
+    /* Workload Subitem Active state */
+    .workload-subitem.active .nav-item-label {
+      color: var(--brand-600);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    /* No background for active workload subitems */
+    .workload-subitem.active::before {
+      background-color: transparent;
+    }
+
+    .workload-subitem.active:hover::before {
+      background-color: var(--neutral-50);
+    }
+
+    .workload-subitem.active:hover .nav-item-label {
+      color: var(--brand-600);
+    }
+
+    /* Caret icon rotation */
+    .workload-item.expandable .workload-caret-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .workload-item.expandable.expanded .workload-caret-icon {
+      transform: rotate(180deg);
+    }
+     
+     /* Bottom Navigation */
+     .bottom-nav {
+       display: flex;
+       flex-direction: column;
+       gap: 4px;
+       padding: 12px 20px;
+       margin-top: auto; /* This pushes it to the bottom */
+     }
+     
+     /* Floating Collapse Handle */
+     .collapse-handle {
+       position: fixed;
+       left: 240px; /* Right edge of nav panel */
+       top: 50%;
+       transform: translateY(-50%);
+       padding: 8px;
+       z-index: 20; /* Higher than content panel to stay visible */
+       cursor: pointer;
+     }
+     
+     .collapse-handle.collapsed {
+       left: 64px; /* Adjust position when collapsed */
+     }
+     
+     .collapse-line {
+       width: 2px;
+       height: 14px;
+       background-color: var(--neutral-200);
+       border-radius: 1px; /* Rounded ends */
+       transition: opacity 0.2s ease;
+     }
+     
+     .collapse-arrow {
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%) rotate(180deg); /* Default: left-pointing when expanded */
+       opacity: 0;
+       transition: opacity 0.2s ease, transform 0.2s ease;
+     }
+     
+     /* Show arrow and hide line on hover */
+     .collapse-handle:hover .collapse-line {
+       opacity: 0;
+     }
+     
+     .collapse-handle:hover .collapse-arrow {
+       opacity: 1;
+     }
+     
+     /* Right-pointing arrow when collapsed (expand direction) */
+     .collapse-handle.collapsed .collapse-arrow {
+       transform: translate(-50%, -50%) rotate(0deg);
+     }
+     
+     .collapse-tooltip {
+       position: absolute;
+       left: 100%;
+       top: 50%;
+       transform: translateY(-50%);
+       margin-left: 8px;
+       padding: 4px 8px;
+       background: var(--neutral-900);
+       color: white;
+       font-family: var(--font-family-ui);
+       font-size: var(--font-size-12);
+       font-weight: var(--font-weight-medium);
+       line-height: var(--line-height-16);
+       border-radius: 4px;
+       white-space: nowrap;
+       opacity: 0;
+       visibility: hidden;
+       transition: opacity 0.2s ease, visibility 0.2s ease;
+       pointer-events: none;
+     }
+     
+     .collapse-handle:hover .collapse-tooltip {
+       opacity: 1;
+       visibility: visible;
+     }
+     
+     .collapse-handle.no-hover:hover .collapse-tooltip {
+       opacity: 0;
+       visibility: hidden;
+     }
+     
+     .collapse-handle.no-hover:hover .collapse-line {
+       opacity: 1;
+     }
+     
+     .collapse-handle.no-hover:hover .collapse-arrow {
+       opacity: 0;
+     }
+
+     /* Content Body */
+     .content-body {
+       flex: 1;
+       background: white;
+       overflow-y: auto;
+       padding: 20px 32px 32px 32px;
+     }
+     
+     .content-placeholder {
+       width: 100%;
+       height: 100%;
+       background-color: var(--neutral-50);
+       border-radius: 12px;
+     }
+
+     /* Reports Structure Classes */
+     .reports-container {
+       background: white;
+       border-radius: 8px;
+     }
+
+     .reports-header {
+       margin-bottom: 32px;
+     }
+
+     .metrics-grid {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+       gap: 24px;
+       margin-bottom: 32px;
+       border-radius: 16px;
+       padding: 24px;
+       background: var(--neutral-50);
+     }
+
+     .account-breakdown-card {
+       background: white;
+       border: 1px solid var(--neutral-100);
+       border-radius: 8px;
+       padding: 24px;
+     }
+
+     .breakdown-title {
+       margin: 0 0 20px 0;
+       font-size: 18px;
+       font-weight: 600;
+       color: var(--neutral-900);
+     }
+
+
+
+     /* Metric Card Classes */
+     .metric-card {
+       background: white;
+       border-radius: 8px;
+       padding: 16px;
+     }
+
+     .metric-header {
+       display: flex;
+       align-items: center;
+       justify-content: space-between;
+       margin-bottom: 8px;
+     }
+
+     /* More compact specific metric cards */
+     .balance-summary-card,
+     .balance-activity-card,
+     .payouts-card {
+       padding: 16px;
+     }
+
+     .balance-summary-card .metric-header,
+     .balance-activity-card .metric-header,
+     .payouts-card .metric-header {
+       margin-bottom: 8px;
+     }
+
+     .metric-title {
+       margin: 0;
+       font-size: 14px;
+       font-weight: 600;
+       color: var(--neutral-900);
+     }
+
+     .metric-badge {
+       display: inline-flex;
+       align-items: center;
+       padding: 4px 8px;
+       border-radius: 999px;
+       font-size: 12px;
+       font-weight: 600;
+       line-height: 1;
+     }
+
+     .metric-badge--positive {
+       background: var(--green-100);
+       color: var(--green-700);
+     }
+
+     .metric-badge--info {
+       background: var(--blue-100);
+       color: var(--blue-700);
+     }
+
+     .metric-badge--neutral {
+       background: var(--neutral-100);
+       color: var(--neutral-700);
+     }
+
+     .metric-value {
+       font-size: 24px;
+       font-weight: 700;
+       color: var(--neutral-900);
+       margin-bottom: 2px;
+       line-height: 1.1;
+     }
+
+         .metric-subtitle {
+      font-size: 12px;
+      color: var(--neutral-500);
+      line-height: 1.4;
+    }
+
+    /* Balance Summary Table Styles */
+    .balance-table {
+      width: 100%;
+    }
+
+    .balance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      min-height: 40px;
+    }
+
+    .balance-row:nth-child(even):not(.total-row) {
+      background: var(--neutral-25);
+    }
+
+    .balance-row.sub-row {
+      padding-left: 36px; /* 16px base + 20px additional indent */
+      font-size: 14px;
+    }
+
+    .balance-row.total-row {
+      padding-top: 8px;
+      margin-top: 4px;
+      font-weight: 600;
+      background: transparent !important;
+      border-top: 1px solid var(--neutral-100);
+    }
+
+    .balance-label {
+      font-size: 14px;
+      color: var(--neutral-700);
+    }
+
+    .balance-value {
+      font-size: 14px;
+      color: var(--neutral-900);
+      font-weight: 500;
+      text-align: right;
+    }
+
+    /* Activity Table Styles */
+    .activity-table {
+      width: 100%;
+    }
+
+    .activity-section {
+      margin-bottom: 16px;
+    }
+
+    .activity-section-header {
+      margin-bottom: 4px;
+      padding: 12px 0;
+    }
+
+    .activity-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--neutral-700);
+    }
+
+    .activity-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0 12px 16px;
+      min-height: 40px;
+    }
+
+    .activity-detail {
+      font-size: 14px;
+      color: var(--neutral-600);
+    }
+
+    .activity-value {
+      font-size: 14px;
+      color: var(--neutral-900);
+      text-align: right;
+      min-width: 80px;
+    }
+
+    .activity-row:nth-child(even):not(.total-row) {
+      background: var(--neutral-25);
+    }
+
+    .activity-section.total-section {
+      padding-top: 4px;
+      margin-top: 4px;
+    }
+
+    .activity-row.total-row {
+      font-weight: 600;
+      padding-left: 0;
+      padding-top: 8px;
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: transparent !important;
+      border-top: 1px solid var(--neutral-100);
+    }
+
+    .activity-row.total-row .activity-label {
+      color: var(--neutral-900);
+    }
+
+    /* Payouts Table Styles */
+    .payouts-table {
+      width: 100%;
+    }
+
+    /* Account Breakdown Styles */
+    .account-breakdown-row {
+      border-radius: 8px;
+      min-height: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+    }
+
+    .account-breakdown-row:nth-child(even) {
+      background: var(--neutral-25);
+    }
+
+   /* Responsive behavior */
+    @media (max-width: 768px) {
+      .nav-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 999;
+        box-shadow: var(--shadow-lg);
+      }
+      
+
+      
+      .content-panel {
+        width: 100%;
+      }
+      
+      .nav-toggle {
+        left: 20px !important;
+      }
+      
+      .collapse-handle {
+        display: none; /* Hide on mobile */
+      }
+      
+      .nav-panel.collapsed {
+        width: 64px;
+      }
+    }
+
+    /* Workload Item Active state when containing active subitems - ONLY when collapsed */
+    .workload-item-container:has(.workload-subitem.active) .workload-item:not(.expanded) .nav-item-label {
+      color: var(--brand-600);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .workload-item-container:has(.workload-subitem.active) .workload-item:not(.expanded) .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    .workload-item-container:has(.workload-subitem.active) .workload-item:not(.expanded) .workload-caret-icon svg {
+      color: var(--brand-600);
+    }
+
+    /* Active state for workload items when nav panel is collapsed (workloads are always collapsed when nav is collapsed) */
+    .nav-panel.collapsed .workload-item-container:has(.workload-subitem.active) .workload-item .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    /* Fallback for browsers that don't support :has() - check active subitems via JavaScript */
+    .workload-item.has-active-subitem:not(.expanded) .nav-item-label {
+      color: var(--brand-600);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .workload-item.has-active-subitem:not(.expanded) .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    .workload-item.has-active-subitem:not(.expanded) .workload-caret-icon svg {
+      color: var(--brand-600);
+    }
+
+    /* When nav panel is collapsed, always show active state regardless of expanded state */
+    .nav-panel.collapsed .workload-item.has-active-subitem .nav-item-icon svg {
+      stroke: none;
+      color: var(--brand-600) !important;
+    }
+
+    /* Caret icon rotation */
+  </style>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+  // Ensure spinner keyframes exist for initial trigger spinner
+  const styleId = 'agf-spinner-style';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = '@keyframes agf_spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+  }
+        const navPanel = document.getElementById('navPanel');
+        const collapseHandle = document.querySelector('.collapse-handle');
+        const tooltip = document.querySelector('.collapse-tooltip');
+        
+        let isCollapsed = false;
+        
+        // Toggle navigation panel on handle click
+        collapseHandle.addEventListener('click', function() {
+          // Dismiss tooltip immediately and prevent hover
+          collapseHandle.classList.add('no-hover');
+          
+          isCollapsed = !isCollapsed;
+          
+          if (isCollapsed) {
+            navPanel.classList.add('collapsed');
+            collapseHandle.classList.add('collapsed');
+            tooltip.textContent = 'Expand';
+            // Allow hover again once collapsed
+            collapseHandle.classList.remove('no-hover');
+          } else {
+            navPanel.classList.remove('collapsed');
+            collapseHandle.classList.remove('collapsed');
+            tooltip.textContent = 'Collapse';
+            // Allow hover again once expanded
+            collapseHandle.classList.remove('no-hover');
+          }
+        });
+      });
+    </script>
+
+    <!-- Flyout for collapsed nav workloads -->
+    <style>
+    /* ... existing code ... */
+
+    /* Flyout for collapsed nav workloads */
+    .workload-flyout {
+      position: fixed;
+      left: 64px; /* width of collapsed nav */
+      top: 0;
+      min-width: 220px;
+      background: #fff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1.5px 4px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      z-index: 10000;
+      padding: 8px 0;
+      border: 1px solid var(--neutral-100);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s;
+    }
+    .workload-flyout.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .workload-flyout .section-header {
+      padding: 12px 16px 8px 24px;
+      font-size: 12px;
+      color: var(--neutral-600);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .workload-flyout .workload-submenu {
+      display: flex;
+      flex-direction: column;
+      padding-left: 0;
+      margin-top: 0;
+      gap: 0;
+    }
+    </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navPanel = document.getElementById('navPanel');
+      const workloadsNav = navPanel.querySelector('.workloads-nav');
+      let flyoutParent = null;
+      let flyout = null;
+      let currentTrigger = null;
+
+      function showWorkloadFlyout(workloadItem) {
+        if (flyoutParent && currentTrigger === workloadItem) return;
+        hideWorkloadFlyout();
+        currentTrigger = workloadItem;
+
+        // Find the section header and submenu for this workload
+        const container = workloadItem.closest('.workload-item-container');
+        const sectionHeader = container.querySelector('.section-header');
+        const submenu = container.querySelector('.workload-submenu');
+        if (!submenu) return;
+
+        // Create parent container
+        flyoutParent = document.createElement('div');
+        flyoutParent.className = 'workload-flyout-parent';
+        flyoutParent.style.position = 'fixed';
+        flyoutParent.style.zIndex = '10000';
+        flyoutParent.style.pointerEvents = 'none'; // Only the flyout itself is interactive
+
+        // Position parent to cover trigger and flyout area
+        const triggerRect = workloadItem.getBoundingClientRect();
+        const flyoutWidth = 260;
+        const flyoutHeight = Math.max(120, submenu.children.length * 32 + 48);
+        flyoutParent.style.top = `${Math.max(0, triggerRect.top - 8)}px`;
+        flyoutParent.style.left = `${triggerRect.right + 8}px`;
+        flyoutParent.style.width = `${flyoutWidth}px`;
+        flyoutParent.style.height = `${flyoutHeight}px`;
+
+        // Create flyout
+        flyout = document.createElement('div');
+        flyout.className = 'popover workload-flyout show';
+        flyout.style.position = 'absolute';
+        flyout.style.top = '0';
+        flyout.style.left = '0';
+        flyout.style.pointerEvents = 'auto';
+
+        // Clone header and submenu
+        if (sectionHeader) {
+          const headerClone = sectionHeader.cloneNode(true);
+          flyout.appendChild(headerClone);
+        }
+        const submenuClone = submenu.cloneNode(true);
+        submenuClone.classList.add('expanded');
+        flyout.appendChild(submenuClone);
+
+        flyoutParent.appendChild(flyout);
+        document.body.appendChild(flyoutParent);
+
+        // Mouseleave on parent hides flyout
+        flyoutParent.addEventListener('mouseleave', hideWorkloadFlyout);
+        // Mouseenter on parent cancels hide
+        flyoutParent.addEventListener('mouseenter', function() {
+          if (flyoutParent.hideTimeout) {
+            clearTimeout(flyoutParent.hideTimeout);
+            flyoutParent.hideTimeout = null;
+          }
+        });
+      }
+
+      function hideWorkloadFlyout() {
+        if (flyoutParent) {
+          if (flyoutParent.hideTimeout) {
+            clearTimeout(flyoutParent.hideTimeout);
+            flyoutParent.hideTimeout = null;
+          }
+          flyoutParent.remove();
+          flyoutParent = null;
+          flyout = null;
+          currentTrigger = null;
+        }
+      }
+
+      // Attach listeners to only expandable workload items
+      function attachWorkloadFlyoutListeners() {
+        const triggers = workloadsNav.querySelectorAll('.workload-item.expandable');
+        triggers.forEach(trigger => {
+          trigger.addEventListener('mouseenter', function() {
+            if (!navPanel.classList.contains('collapsed')) return;
+            showWorkloadFlyout(trigger);
+          });
+          trigger.addEventListener('mouseleave', function() {
+            if (flyoutParent) {
+              // Delay hide to allow mouse to enter flyoutParent
+              flyoutParent.hideTimeout = setTimeout(() => {
+                hideWorkloadFlyout();
+              }, 200);
+            }
+          });
+          // Prevent expand/collapse in collapsed state
+          trigger.addEventListener('click', function(e) {
+            if (navPanel.classList.contains('collapsed')) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          });
+          trigger.addEventListener('keydown', function(e) {
+            if (navPanel.classList.contains('collapsed') && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          });
+        });
+      }
+
+      attachWorkloadFlyoutListeners();
+    });
+    </script>
+
+    <!-- Force-disable tooltip for workload items in collapsed nav -->
+    <style>
+    /* ... existing code ... */
+
+    /* Force-disable tooltip for workload items in collapsed nav */
+    .nav-panel.collapsed .workload-item:hover .nav-item-tooltip {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    </style>
+    <style>
+    .workload-flyout-parent {
+      position: relative; /* ensure element can host positioning for flyout anchors */
+    }
+    </style>
+    <style>
+    .workload-flyout .workload-submenu {
+      padding-left: 0 !important;
+    }
+    .workload-flyout .workload-subitem {
+      padding-left: 0 !important;
+    }
+    .workload-flyout .workload-subitem::before {
+      left: 0 !important;
+    }
+    </style>
+    <style>
+.workload-flyout .workload-subitem {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 16px !important;
+  display: flex;
+  align-items: center;
+  border-radius: 6px !important;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fff !important;
+  box-sizing: border-box;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+}
+.workload-flyout .workload-subitem::before {
+  background: transparent !important;
+}
+.workload-flyout .workload-subitem .nav-item-icon {
+  display: none !important;
+}
+.workload-flyout .workload-subitem .nav-item-label {
+  margin-left: 0 !important;
+}
+.workload-flyout .workload-subitem:hover .nav-item-label,
+.workload-flyout .workload-subitem.active .nav-item-label {
+  color: var(--brand-600) !important;
+}
+.workload-flyout .workload-subitem:hover:not(.disabled),
+.workload-flyout .workload-subitem.active {
+  background: var(--neutral-50) !important;
+  text-decoration: none !important;
+  /* color intentionally omitted to allow label override */
+}
+</style>
+</head>
+<body>
+  <div class="layout-container">
+         <!-- Navigation Panel -->
+     <div class="nav-panel" id="navPanel">
+       <div style="padding: 12px 20px; flex: 1;">
+         <!-- Account Switcher -->
+         <div id="nav-account-switcher"></div>
+         <div class="main-nav">
+                     <a href="./index.html" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M3 16C1.61929 16 0.5 14.8807 0.5 13.5V5.54791C0.5 4.89162 0.821983 4.27709 1.36158 3.90352L6.48633 0.355616C6.82081 0.124056 7.21794 0 7.62475 0H8.37525C8.78206 0 9.17919 0.124056 9.51367 0.355615L14.6384 3.90352C15.178 4.27709 15.5 4.89162 15.5 5.54791V13.5C15.5 14.8807 14.3807 16 13 16H3ZM5 14.5H3C2.44772 14.5 2 14.0523 2 13.5V5.54791C2 5.38383 2.0805 5.2302 2.21539 5.13681L7.34015 1.5889C7.42377 1.53101 7.52305 1.5 7.62475 1.5H8.37525C8.47695 1.5 8.57623 1.53101 8.65985 1.5889L13.7846 5.13681C13.9195 5.2302 14 5.38383 14 5.54791V13.5C14 14.0523 13.5523 14.5 13 14.5H11V8C11 7.44772 10.5523 7 10 7H6C5.44772 7 5 7.44772 5 8V14.5ZM6.5 14.5H9.5V8.5H6.5V14.5Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Home</span>
+            <div class="nav-item-tooltip">Home</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 2C1 1.58579 1.33579 1.25 1.75 1.25H9.25C9.66421 1.25 10 1.58579 10 2C10 2.41421 9.66421 2.75 9.25 2.75H1.75C1.33579 2.75 1 2.41421 1 2Z" fill="currentColor"/>
+                <path d="M1 10C1 9.58579 1.33579 9.25 1.75 9.25H6.75C7.16421 9.25 7.5 9.58579 7.5 10C7.5 10.4142 7.16421 10.75 6.75 10.75H1.75C1.33579 10.75 1 10.4142 1 10Z" fill="currentColor"/>
+                <path d="M3.25 5.25C2.83579 5.25 2.5 5.58579 2.5 6C2.5 6.41421 2.83579 6.75 3.25 6.75H10.75C11.1642 6.75 11.5 6.41421 11.5 6C11.5 5.58579 11.1642 5.25 10.75 5.25H3.25Z" fill="currentColor"/>
+                <path d="M2.5 14C2.5 13.5858 2.83579 13.25 3.25 13.25H7.25C7.66421 13.25 8 13.5858 8 14C8 14.4142 7.66421 14.75 7.25 14.75H3.25C2.83579 14.75 2.5 14.4142 2.5 14Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16 11.5C16 13.433 14.433 15 12.5 15C10.567 15 9 13.433 9 11.5C9 9.567 10.567 8 12.5 8C14.433 8 16 9.567 16 11.5ZM14.5 11.5C14.5 12.6046 13.6046 13.5 12.5 13.5C11.3954 13.5 10.5 12.6046 10.5 11.5C10.5 10.3954 11.3954 9.5 12.5 9.5C13.6046 9.5 14.5 10.3954 14.5 11.5Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Balances</span>
+            <div class="nav-item-tooltip">Balances</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.71445 6.69302C9.43459 6.99838 9.45526 7.4728 9.76062 7.75267C10.066 8.03254 10.5404 8.01187 10.8203 7.7065L13.7526 4.50699C14.0154 4.22029 14.0154 3.7803 13.7527 3.49356L10.8203 0.293368C10.5405 -0.0120257 10.0661 -0.0327462 9.76068 0.247088C9.45529 0.526922 9.43457 1.00134 9.7144 1.30674L11.4953 3.25028L4.60029 3.24993C2.52914 3.24983 0.850098 4.92879 0.850098 6.99993V7.06671C0.850098 7.48092 1.18588 7.81671 1.6001 7.81671C2.01431 7.81671 2.3501 7.48092 2.3501 7.06671V6.99993C2.3501 5.75725 3.35753 4.74987 4.60021 4.74993L11.495 4.75028L9.71445 6.69302Z" fill="currentColor"/>
+                <path d="M6.28588 9.3068C6.56571 9.0014 6.54499 8.52698 6.2396 8.24715C5.9342 7.96731 5.45978 7.98803 5.17994 8.29343L2.24759 11.4936C1.98486 11.7803 1.98488 12.2203 2.24762 12.507L5.17998 15.7068C5.45983 16.0122 5.93425 16.0329 6.23963 15.753C6.54501 15.4732 6.5657 14.9988 6.28584 14.6934L4.50542 12.7506H11.4C13.4711 12.7506 15.15 11.0716 15.15 9.00058V8.93365C15.15 8.51944 14.8142 8.18365 14.4 8.18365C13.9858 8.18365 13.65 8.51944 13.65 8.93365V9.00058C13.65 10.2432 12.6427 11.2506 11.4 11.2506H4.50478L6.28588 9.3068Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Transactions</span>
+            <div class="nav-item-tooltip">Transactions</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M2.5 14.4H13.5C13.7209 14.4 13.9 14.2209 13.9 14C13.9 12.1222 12.3778 10.6 10.5 10.6H5.5C3.62223 10.6 2.1 12.1222 2.1 14C2.1 14.2209 2.27909 14.4 2.5 14.4ZM2.5 16H13.5C14.6046 16 15.5 15.1046 15.5 14C15.5 11.2386 13.2614 9 10.5 9H5.5C2.73858 9 0.5 11.2386 0.5 14C0.5 15.1046 1.39543 16 2.5 16Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8 6.4C9.32548 6.4 10.4 5.32548 10.4 4C10.4 2.67452 9.32548 1.6 8 1.6C6.67452 1.6 5.6 2.67452 5.6 4C5.6 5.32548 6.67452 6.4 8 6.4ZM8 8C10.2091 8 12 6.20914 12 4C12 1.79086 10.2091 0 8 0C5.79086 0 4 1.79086 4 4C4 6.20914 5.79086 8 8 8Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Customers</span>
+            <div class="nav-item-tooltip">Customers</div>
+          </a>
+           
+                     <a href="#" class="nav-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.97311 0C7.66262 0 7.3564 0.0722903 7.07869 0.211146L1.60655 2.94721C0.928981 3.286 0.500977 3.97852 0.500977 4.73607V11.3054C0.500977 12.0412 0.904957 12.7175 1.55278 13.0664L6.33503 15.6414C6.77216 15.8768 7.26086 16 7.75733 16H8.24452C8.74105 16 9.22982 15.8768 9.66699 15.6413L14.4483 13.0664C15.096 12.7175 15.4999 12.0412 15.4999 11.3055V4.73599C15.4999 3.97848 15.072 3.28599 14.3945 2.94718L8.92331 0.211199C8.64557 0.0723089 8.33931 0 8.02878 0H7.97311ZM13.9999 11.3055V5.62105L8.7499 8.44799V14.4123C8.82049 14.387 8.88932 14.3564 8.95576 14.3207L13.737 11.7457C13.899 11.6585 13.9999 11.4894 13.9999 11.3055ZM8.25241 1.5528L13.5093 4.18162L11.4495 5.29075L6.06848 2.3933L7.74951 1.55279C7.81893 1.51807 7.89549 1.5 7.97311 1.5H8.02878C8.10641 1.5 8.18298 1.51808 8.25241 1.5528ZM4.75605 3.04951L2.49116 4.18196L7.9999 7.14821L10.1839 5.9722L4.75605 3.04951ZM7.2499 8.44799L2.00098 5.62165V11.3054C2.00098 11.4894 2.10197 11.6584 2.26393 11.7456L7.04618 14.3207C7.11195 14.3561 7.18006 14.3865 7.2499 14.4116V8.44799Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Product Catalog</span>
+            <div class="nav-item-tooltip">Product Catalog</div>
+          </a>
+         </div>
+         
+         <div class="workloads-section">
+           <div class="section-header text-label-small text-neutral-600" style="padding: 12px 16px 8px 0px;">Products</div>
+           <div class="workloads-nav">
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 6C0 5.6898 0.162753 5.40235 0.428746 5.24275L7.07125 1.25725C7.3518 1.08892 7.67283 1 8 1C8.32717 1 8.6482 1.08892 8.92875 1.25725L15.5713 5.24275C15.8372 5.40235 16 5.6898 16 6C16 6.3102 15.8372 6.59765 15.5713 6.75725L8.92875 10.7428C8.6482 10.9111 8.32717 11 8 11C7.67283 11 7.3518 10.9111 7.07125 10.7428L0.428746 6.75725C0.162753 6.59765 0 6.3102 0 6ZM7.89445 9.37076L2.27651 6L7.89445 2.62924C7.92633 2.61011 7.96282 2.6 8 2.6C8.03718 2.6 8.07367 2.61011 8.10555 2.62924L13.7235 6L8.10555 9.37076C8.07367 9.38989 8.03718 9.4 8 9.4C7.96281 9.4 7.92633 9.38989 7.89445 9.37076Z" fill="currentColor"/>
+                <path d="M1.43422 9.82811C1.06312 9.58833 0.5679 9.69478 0.328114 10.0659C0.0883268 10.437 0.194776 10.9322 0.565875 11.172L6.69425 15.1319C7.06621 15.3722 7.49965 15.5 7.9425 15.5H8.0576C8.50045 15.5 8.93388 15.3722 9.30584 15.1319L15.4342 11.172C15.8053 10.9322 15.9118 10.437 15.672 10.0659C15.4322 9.69478 14.937 9.58833 14.5659 9.82811L8.4375 13.788C8.32429 13.8611 8.19238 13.9 8.0576 13.9H7.9425C7.80772 13.9 7.6758 13.8611 7.5626 13.788L1.43422 9.82811Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Connect</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">Connect</div>
+          </a>
+           
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0 3.88431C0 3.08377 0.545006 2.40837 1.3057 2.20462L1.32368 2.19981L10.5518 0.212648C10.7019 0.175079 10.8523 0.157617 11 0.158478C11.927 0.163877 12.75 0.890772 12.75 1.89811V4.5H13.5C14.8807 4.5 16 5.61929 16 7V13.5C16 14.8807 14.8807 16 13.5 16H2.5C1.11929 16 0 14.8807 0 13.5V3.88431ZM10.9127 1.6686C11.1118 1.61666 11.25 1.75884 11.25 1.89811V4.5H2.5C2.14445 4.5 1.80623 4.57422 1.5 4.70802V3.88431C1.5 3.79247 1.5588 3.69527 1.68102 3.65725L10.8971 1.67268L10.9127 1.6686ZM1.5 7V13.5C1.5 14.0523 1.94772 14.5 2.5 14.5H13.5C14.0523 14.5 14.5 14.0523 14.5 13.5V7C14.5 6.44772 14.0523 6 13.5 6H2.5C1.94772 6 1.5 6.44772 1.5 7ZM13 10.25C13 10.9375 12.4375 11.5 11.75 11.5C11.0625 11.5 10.5 10.95 10.5 10.25C10.5 9.56248 11.0625 8.99998 11.75 8.99998C12.4375 8.99998 13 9.56248 13 10.25Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Payments</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">Payments</div>
+          </a>
+           
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 4.70007C4 4.28586 4.33579 3.95007 4.75 3.95007H7.25C7.66421 3.95007 8 4.28586 8 4.70007C8 5.11429 7.66421 5.45007 7.25 5.45007H4.75C4.33579 5.45007 4 5.11429 4 4.70007Z" fill="currentColor"/>
+                <path d="M4.75 6.95007C4.33579 6.95007 4 7.28586 4 7.70007C4 8.11429 4.33579 8.45007 4.75 8.45007H11.25C11.6642 8.45007 12 8.11429 12 7.70007C12 7.28586 11.6642 6.95007 11.25 6.95007H4.75Z" fill="currentColor"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M1.55279 15.2764C1.214 15.107 1 14.7607 1 14.382V2.5C1 1.11929 2.11929 0 3.5 0H12.5C13.8807 0 15 1.11929 15 2.5V12C15 12.3148 14.8518 12.6111 14.6 12.8L13.3 13.775C13.1222 13.9083 12.8778 13.9083 12.7 13.775L11.3163 12.7372C11.1309 12.5982 10.8743 12.6048 10.6962 12.7531L8.27282 14.7727C8.10945 14.9088 7.87783 14.9267 7.69548 14.8173L5.83475 13.7009C5.63802 13.5828 5.38619 13.6138 5.22395 13.776L3.25483 15.7452C3.10265 15.8974 2.87016 15.9351 2.67767 15.8388L1.55279 15.2764ZM2.5 14.0729V2.5C2.5 1.94772 2.94772 1.5 3.5 1.5H12.5C13.0523 1.5 13.5 1.94772 13.5 2.5V11.75L13 12.125L12.2163 11.5372C11.4747 10.9811 10.4481 11.0073 9.73596 11.6008L7.85818 13.1656L6.6065 12.4146C5.81955 11.9424 4.81223 12.0664 4.16329 12.7154L2.70382 14.1749L2.5 14.0729Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">Billing</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">Billing</div>
+          </a>
+           
+                     <div class="workload-item-container">
+            <button class="workload-item expandable expanded" data-section="reporting" type="button">
+              <div class="nav-item-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14 1.875C14 1.39175 13.6082 1 13.125 1C12.6418 1 12.25 1.39175 12.25 1.875V10.625C12.25 11.1082 12.6418 11.5 13.125 11.5C13.6082 11.5 14 11.1082 14 10.625V1.875Z" fill="currentColor"/>
+                  <path d="M2.60073 1.875C2.60073 1.43317 2.24256 1.075 1.80073 1.075C1.3589 1.075 1.00073 1.43317 1.00073 1.875V13.2C1.00073 14.1941 1.80662 15 2.80073 15H14.6265C15.0683 15 15.4265 14.6418 15.4265 14.2C15.4265 13.7582 15.0683 13.4 14.6265 13.4H2.80073C2.69027 13.4 2.60073 13.3105 2.60073 13.2V1.875Z" fill="currentColor"/>
+                  <path d="M9.125 3.5C9.60825 3.5 10 3.89175 10 4.375V10.625C10 11.1082 9.60825 11.5 9.125 11.5C8.64175 11.5 8.25 11.1082 8.25 10.625V4.375C8.25 3.89175 8.64175 3.5 9.125 3.5Z" fill="currentColor"/>
+                  <path d="M6 6.875C6 6.39175 5.60825 6 5.125 6C4.64175 6 4.25 6.39175 4.25 6.875V10.625C4.25 11.1082 4.64175 11.5 5.125 11.5C5.60825 11.5 6 11.1082 6 10.625V6.875Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="nav-item-label">Reporting</span>
+              <div class="workload-caret-icon">
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="nav-item-tooltip">Reporting</div>
+            </button>
+            <div class="workload-submenu expanded" data-section="reporting">
+              <a href="./financial-reports.html" class="workload-subitem active">
+                <span class="nav-item-label">Reports</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Custom metrics</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Sigma</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Revenue Recognition</span>
+              </a>
+              <a href="#" class="workload-subitem">
+                <span class="nav-item-label">Data management</span>
+              </a>
+            </div>
+          </div>
+           
+                     <a href="#" class="workload-item">
+            <div class="nav-item-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 9.5C8.82843 9.5 9.5 8.82843 9.5 8C9.5 7.17157 8.82843 6.5 8 6.5C7.17157 6.5 6.5 7.17157 6.5 8C6.5 8.82843 7.17157 9.5 8 9.5Z" fill="currentColor"/>
+                <path d="M13.5 9.5C14.3284 9.5 15 8.82843 15 8C15 7.17157 14.3284 6.5 13.5 6.5C12.6716 6.5 12 7.17157 12 8C12 8.82843 12.6716 9.5 13.5 9.5Z" fill="currentColor"/>
+                <path d="M2.5 9.5C3.32843 9.5 4 8.82843 4 8C4 7.17157 3.32843 6.5 2.5 6.5C1.67157 6.5 1 7.17157 1 8C1 8.82843 1.67157 9.5 2.5 9.5Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="nav-item-label">More</span>
+            <div class="workload-caret-icon">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.606072 2.33351C0.307015 2.62011 0.296913 3.09487 0.58351 3.39393L3.45851 6.39393C3.59989 6.54146 3.79535 6.62492 3.99969 6.625C4.20403 6.62509 4.39955 6.54179 4.54106 6.39438L7.41606 3.39938C7.70291 3.10056 7.6932 2.62579 7.39438 2.33894C7.09556 2.0521 6.62079 2.0618 6.33394 2.36062L4.00045 4.79151L1.66649 2.35607C1.3799 2.05701 0.905129 2.04691 0.606072 2.33351Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="nav-item-tooltip">More</div>
+          </a>
+
+         </div>
+         </div>
+       </div>
+       
+             <!-- Bottom Navigation -->
+      <div class="bottom-nav">
+        <a href="#" class="nav-item">
+          <div class="nav-item-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M13 2.5H3C2.17157 2.5 1.5 3.17157 1.5 4V12C1.5 12.8284 2.17157 13.5 3 13.5H13C13.8284 13.5 14.5 12.8284 14.5 12V4C14.5 3.17157 13.8284 2.5 13 2.5ZM3 1C1.34315 1 0 2.34315 0 4V12C0 13.6569 1.34315 15 3 15H13C14.6569 15 16 13.6569 16 12V4C16 2.34315 14.6569 1 13 1H3Z" fill="currentColor"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M3.43056 4.51191C3.70012 4.19741 4.1736 4.16099 4.48809 4.43056L7.98809 7.43056C8.15433 7.57304 8.25 7.78106 8.25 8C8.25 8.21894 8.15433 8.42696 7.98809 8.56944L4.48809 11.5694C4.1736 11.839 3.70012 11.8026 3.43056 11.4881C3.16099 11.1736 3.19741 10.7001 3.51191 10.4306L6.34756 8L3.51191 5.56944C3.19741 5.29988 3.16099 4.8264 3.43056 4.51191Z" fill="currentColor"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M8 10.75C8 10.3358 8.33579 10 8.75 10H12.25C12.6642 10 13 10.3358 13 10.75C13 11.1642 12.6642 11.5 12.25 11.5H8.75C8.33579 11.5 8 11.1642 8 10.75Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <span class="nav-item-label">Developers</span>
+          <div class="nav-item-tooltip">Developers</div>
+        </a>
+
+      </div>
+
+     </div>
+     
+         <!-- Floating Collapse Handle -->
+    <div class="collapse-handle">
+      <div class="collapse-line"></div>
+      <svg class="collapse-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <polyline stroke="var(--neutral-200)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" points="4,2 8,6 4,10"/>
+      </svg>
+      <div class="collapse-tooltip">Collapse</div>
+    </div>
+    
+         <!-- Content Panel -->
+     <div class="content-panel" id="contentPanel">
+       <!-- Content Header -->
+       <div class="content-header">
+         <!-- Dashboard Search -->
+         <div class="dashboard-search-container">
+           <div class="dashboard-search-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+               <path fill-rule="evenodd" clip-rule="evenodd" d="M10.5788 11.8163C9.57969 12.5599 8.34124 13 7 13C3.68629 13 1 10.3137 1 7C1 3.68629 3.68629 1 7 1C10.3137 1 13 3.68629 13 7C13 8.34124 12.5599 9.57969 11.8163 10.5788L15.2437 14.0063C15.5854 14.348 15.5854 14.902 15.2437 15.2437C14.902 15.5854 14.348 15.5854 14.0063 15.2437L10.5788 11.8163ZM11.25 7C11.25 9.34721 9.34721 11.25 7 11.25C4.65279 11.25 2.75 9.34721 2.75 7C2.75 4.65279 4.65279 2.75 7 2.75C9.34721 2.75 11.25 4.65279 11.25 7Z" fill="currentColor"/>
+             </svg>
+           </div>
+           <input type="text" class="dashboard-search-input" placeholder="Search…">
+         </div>
+         
+         <!-- Header Actions -->
+         <div class="header-actions">
+           <div class="header-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16">
+               <circle cx="8" cy="8" r="8" fill="var(--neutral-50)"/>
+             </svg>
+           </div>
+           <div class="header-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16">
+               <circle cx="8" cy="8" r="8" fill="var(--neutral-50)"/>
+             </svg>
+           </div>
+           <div class="header-icon">
+             <svg width="16" height="16" viewBox="0 0 16 16">
+               <circle cx="8" cy="8" r="8" fill="var(--neutral-50)"/>
+             </svg>
+           </div>
+                     <a href="settings.html" class="header-icon settings-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M7.99996 10C9.10453 10 9.99996 9.10457 9.99996 8C9.99996 6.89543 9.10453 6 7.99996 6C6.89539 6 5.99996 6.89543 5.99996 8C5.99996 9.10457 6.89539 10 7.99996 10ZM7.99996 11.5C9.93295 11.5 11.5 9.933 11.5 8C11.5 6.067 9.93295 4.5 7.99996 4.5C6.06696 4.5 4.49996 6.067 4.49996 8C4.49996 9.933 6.06696 11.5 7.99996 11.5Z" fill="var(--neutral-500)"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M7.40917 14.5H8.59082L8.64285 13.6676C8.68604 12.9765 9.12642 12.4062 9.72215 12.1591C10.3207 11.9109 11.0352 12.0054 11.5529 12.4622L12.1784 13.014L13.0139 12.1785L12.4622 11.5531C12.0053 11.0354 11.9109 10.3208 12.1591 9.72222C12.4062 9.12646 12.9765 8.68604 13.6676 8.64285L14.5 8.59082V7.40918L13.6676 7.35715C12.9765 7.31396 12.4062 6.87355 12.1591 6.27781C11.9109 5.67926 12.0053 4.9647 12.4622 4.44695L13.0139 3.82163L12.1784 2.98608L11.553 3.53784C11.0353 3.99467 10.3207 4.0891 9.72218 3.84089C9.12644 3.59384 8.68604 3.02347 8.64285 2.33241L8.59082 1.5H7.40917L7.35715 2.33236C7.31396 3.02345 6.87354 3.59384 6.27778 3.8409C5.67921 4.08913 4.96463 3.99471 4.44686 3.53785L3.82153 2.98609L2.98598 3.82164L3.53784 4.44708C3.99465 4.9648 4.08908 5.67931 3.84088 6.27784C3.59384 6.87357 3.02348 7.31396 2.33245 7.35715L1.5 7.40917V8.59082L2.33241 8.64285C3.02346 8.68604 3.59383 9.12643 3.84089 9.72218C4.0891 10.3207 3.99467 11.0353 3.53784 11.553L2.98597 12.1785L3.82152 13.014L4.44696 12.4622C4.9647 12.0053 5.67925 11.9109 6.27781 12.1591C6.87356 12.4062 7.31396 12.9765 7.35715 13.6676L7.40917 14.5ZM4.51386 14.3779C4.57751 14.3386 4.63866 14.2934 4.69655 14.2424L5.4394 13.5869C5.51167 13.5231 5.61418 13.5078 5.70322 13.5447C5.79219 13.5816 5.85406 13.665 5.86007 13.7612L5.92186 14.7498C5.92668 14.8269 5.93797 14.902 5.95519 14.9748C5.96527 15.0175 5.9774 15.0593 5.99145 15.1002C6.17209 15.6264 6.67094 16 7.2526 16H8.7474C9.32903 16 9.82785 15.6264 10.0085 15.1003C10.0226 15.0594 10.0347 15.0175 10.0448 14.9749C10.062 14.9021 10.0733 14.8269 10.0781 14.7498L10.1399 13.7611C10.1459 13.665 10.2078 13.5816 10.2967 13.5447C10.3858 13.5078 10.4882 13.5232 10.5605 13.5869L11.3033 14.2424C11.3612 14.2935 11.4224 14.3387 11.4861 14.378C11.5234 14.401 11.5615 14.422 11.6004 14.441C12.1001 14.6852 12.717 14.5967 13.1283 14.1854L14.1853 13.1284C14.5966 12.7171 14.6851 12.1002 14.4408 11.6004C14.4218 11.5616 14.4009 11.5234 14.3779 11.4862C14.3385 11.4225 14.2934 11.3614 14.2423 11.3035L13.5869 10.5607C13.5231 10.4884 13.5077 10.3859 13.5447 10.2968C13.5816 10.2078 13.665 10.1459 13.7612 10.1399L14.7498 10.0781C14.8269 10.0733 14.902 10.062 14.9748 10.0448C15.0174 10.0347 15.0593 10.0226 15.1002 10.0086C15.6263 9.82795 16 9.32909 16 8.7474V7.2526C16 6.67093 15.6264 6.17209 15.1002 5.99144C15.0593 5.9774 15.0175 5.96527 14.9748 5.95519C14.902 5.93797 14.8269 5.92668 14.7498 5.92186L13.7612 5.86007C13.665 5.85406 13.5816 5.79219 13.5447 5.70321C13.5078 5.61417 13.5231 5.51166 13.5869 5.43938L14.2423 4.69666C14.2934 4.63873 14.3386 4.57754 14.3779 4.51384C14.4009 4.47658 14.4219 4.43846 14.4409 4.39963C14.6851 3.89987 14.5966 3.28297 14.1853 2.87168L13.1283 1.8147C12.717 1.40342 12.1001 1.31487 11.6004 1.55913C11.5615 1.57811 11.5234 1.5991 11.4861 1.6221C11.4224 1.66142 11.3613 1.70662 11.3033 1.75773L10.5606 2.41309C10.4883 2.47686 10.3858 2.49223 10.2968 2.4553C10.2078 2.41841 10.1459 2.33497 10.1399 2.23884L10.0781 1.25016C10.0733 1.17312 10.062 1.09795 10.0448 1.02516C10.0347 0.982504 10.0226 0.940667 10.0085 0.899751C9.8279 0.373623 9.32906 0 8.7474 0H7.2526C6.67091 0 6.17205 0.373663 5.99142 0.899834C5.97738 0.940737 5.96526 0.982562 5.95518 1.0252C5.93797 1.09798 5.92668 1.17314 5.92186 1.25016L5.86007 2.2388C5.85406 2.33495 5.79218 2.41842 5.70318 2.45532C5.61412 2.49225 5.51159 2.47688 5.43929 2.41309L4.69656 1.75774C4.63865 1.70665 4.57748 1.66146 4.51381 1.62215C4.47655 1.59915 4.43844 1.57817 4.39962 1.55919C3.89985 1.31487 3.2829 1.40341 2.87159 1.81472L1.81461 2.8717C1.40332 3.28298 1.31477 3.89987 1.55903 4.39963C1.57802 4.43848 1.59902 4.47662 1.62203 4.5139C1.66134 4.57758 1.70653 4.63876 1.75763 4.69667L2.41308 5.43951C2.47684 5.51177 2.4922 5.61425 2.45529 5.70326C2.4184 5.79221 2.33499 5.85406 2.23888 5.86007L1.25016 5.92186C1.17311 5.92668 1.09792 5.93797 1.02512 5.9552C0.982451 5.96529 0.940602 5.97742 0.899674 5.99147C0.373587 6.17215 0 6.67097 0 7.2526V8.7474C0 9.32905 0.373619 9.82789 0.899741 10.0085C0.940658 10.0226 0.982497 10.0347 1.02516 10.0448C1.09795 10.062 1.17312 10.0733 1.25016 10.0781L2.23884 10.1399C2.33497 10.1459 2.41841 10.2078 2.4553 10.2968C2.49222 10.3858 2.47686 10.4883 2.41309 10.5606L1.75762 11.3034C1.70654 11.3613 1.66137 11.4225 1.62207 11.4861C1.59906 11.5234 1.57806 11.5615 1.55907 11.6004C1.31475 12.1001 1.40328 12.7171 1.81459 13.1284L2.87157 14.1854C3.28289 14.5967 3.89985 14.6852 4.39963 14.4409C4.43846 14.4219 4.47659 14.4009 4.51386 14.3779Z" fill="var(--neutral-500)"/>
+            </svg>
+          </a>
+        </div>
+       </div>
+       
+             <!-- Content Body -->
+      <div class="content-body">
+        <div class="reports-container">
+         <div class="reports-header">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;">
+              <div>
+                <h2 id="reports-title" class="text-heading-xlarge" style="color: var(--neutral-900); margin: 0 0 8px 0;">Financial Reports</h2>
+                <p id="reports-description" style="font-size: 14px; color: var(--neutral-600); margin: 0; line-height: 1.5;">
+                  View financial data and analytics. Use the account group filter to see how data changes based on selected account groups.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Groups Filter (only shown when viewing "All accounts") - Positioned between title and metrics -->
+          <div style="display: flex; align-items: center; gap: 8px; margin: 16px 0 16px 0;">
+            <div class="account-groups-filter-container" style="position: relative; display: block;">
+            <button class="account-groups-trigger" id="reportsFilterTrigger">
+              <span class="trigger-show">Accounts</span>
+              <span class="trigger-separator">|</span>
+              <span class="trigger-option" id="reportsFilterOption">
+                <span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(0,39,77,0.18);border-top-color:rgba(0,39,77,0.45);border-radius:50%;animation:agf_spin .6s linear infinite;vertical-align:-1px;"></span>
+              </span>
+              <svg class="trigger-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
+              </svg>
+            </button>
+            
+            <!-- Popover -->
+            <div class="account-groups-popover" id="reportsFilterPopover" style="display: none;">
+              <!-- Column 1 - Groups -->
+              <div class="groups-section">
+                <div class="groups-header">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px; flex-shrink: 0;">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16 7.82679C16 7.94141 15.9803 8.05518 15.9417 8.16312L13.974 13.6727C13.6898 14.4687 12.9358 15 12.0906 15H2C0.895431 15 0 14.1046 0 13V3C0 1.89543 0.89543 1 2 1H4.58579C4.851 1 5.10536 1.10536 5.29289 1.29289L6 2H11C12.1046 2 13 2.89543 13 4V5H14C15.1046 5 16 5.89543 16 7V7.82679ZM3.75 6.5C3.33579 6.5 3 6.16421 3 5.75C3 5.33579 3.33579 5 3.75 5H11.5V4C11.5 3.72386 11.2761 3.5 11 3.5H6C5.60218 3.5 5.22064 3.34196 4.93934 3.06066L4.37868 2.5H2C1.72386 2.5 1.5 2.72386 1.5 3V13C1.5 13.2761 1.72386 13.5 2 13.5H12.0906C12.3019 13.5 12.4904 13.3672 12.5614 13.1682L14.5 7.74018V7C14.5 6.72386 14.2761 6.5 14 6.5H3.75Z" fill="currentColor"/>
+                  </svg>
+                  Groups
+                </div>
+                <button class="group-item active" data-group="all">All accounts</button>
+                <button class="group-item" data-group="connected">Connected accounts</button>
+                <button class="group-item" data-group="express">Express accounts</button>
+                <button class="group-item" data-group="standard">Standard accounts</button>
+                <button class="group-item" data-group="custom">Custom accounts</button>
+              </div>
+            
+              <!-- Column 2 - Accounts Section -->
+              <div class="accounts-section">
+                <div class="filter-search-container">
+                  <svg class="filter-search-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                    <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <input type="text" class="filter-search-input" placeholder="Search accounts" id="reportsSearchInput">
+                </div>
+                
+                <!-- Pinned Select All Row -->
+                <div class="select-all-container" id="reportsSelectAllContainer">
+                  <!-- Select all will be dynamically populated by JavaScript -->
+                </div>
+                
+                <div class="accounts-list" id="reportsAccountsList">
+                  <!-- Individual accounts will be dynamically populated by JavaScript -->
+                </div>
+                
+                <!-- Footer inside accounts-section (Column 2) -->
+                <div class="popover-footer">
+                  <div class="footer-buttons">
+                    <button class="btn-cancel" onclick="window.reportsFilter?.close()">Cancel</button>
+                    <button class="btn-apply" onclick="window.reportsFilter?.applySelection()">Apply</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+            
+            <!-- Date Range Display -->
+            <div class="date-range-display" id="reportsDateRangeDisplay">
+              <div class="wireframe-bar medium"></div>
+              <svg class="date-period-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M2.16699 4.375C2.39082 4.15117 2.75918 4.15117 2.98301 4.375L6 7.39199L9.01699 4.375C9.24082 4.15117 9.60918 4.15117 9.83301 4.375C10.0568 4.59883 10.0568 4.96719 9.83301 5.19102L6.40801 8.61602C6.18418 8.83984 5.81582 8.83984 5.59199 8.61602L2.16699 5.19102C1.94316 4.96719 1.94316 4.59883 2.16699 4.375Z" fill="currentColor"/>
+              </svg>
+              <span class="date-range-divider">|</span>
+              <svg class="date-range-icon" width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.34082 0.75C6.34082 0.335786 6.00503 0 5.59082 0C5.17661 0 4.84082 0.335786 4.84082 0.75V1.5H3.5C1.84315 1.5 0.5 2.84315 0.5 4.5V13C0.5 14.6569 1.84315 16 3.5 16H12.5C14.1569 16 15.5 14.6569 15.5 13V4.5C15.5 2.84315 14.1569 1.5 12.5 1.5H11.1494V0.75C11.1494 0.335786 10.8136 0 10.3994 0C9.9852 0 9.64941 0.335786 9.64941 0.75V1.5H6.34082V0.75ZM9.64941 3.75V3H6.34082V3.75C6.34082 4.16421 6.00503 4.5 5.59082 4.5C5.17661 4.5 4.84082 4.16421 4.84082 3.75V3H3.5C2.67157 3 2 3.67157 2 4.5V5.5H14V4.5C14 3.67157 13.3284 3 12.5 3H11.1494V3.75C11.1494 4.16421 10.8136 4.5 10.3994 4.5C9.9852 4.5 9.64941 4.16421 9.64941 3.75ZM14 7H2V13C2 13.8284 2.67157 14.5 3.5 14.5H12.5C13.3284 14.5 14 13.8284 14 13V7Z" fill="currentColor"/>
+                <path d="M6 8H4V10H6V8Z" fill="currentColor"/>
+                <path d="M6 11H4V13H6V11Z" fill="currentColor"/>
+                <path d="M9 11H7V13H9V11Z" fill="currentColor"/>
+                <path d="M10 11H12V13H10V11Z" fill="currentColor"/>
+                <path d="M7 8H9V10H7V8Z" fill="currentColor"/>
+                <path d="M12 8H10V10H12V8Z" fill="currentColor"/>
+              </svg>
+              <div class="wireframe-bar long"></div>
+            </div>
+          </div>
+
+          <!-- Sample Financial Reports Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card revenue-card">
+              <div class="metric-header">
+                <h3 class="metric-title">Total Revenue</h3>
+                <div class="metric-badge metric-badge--positive">
+                  +12.5%
+                </div>
+              </div>
+              <div class="metric-value" id="total-revenue">
+                $142,580
+              </div>
+              <div class="metric-subtitle">
+                Last 30 days
+              </div>
+            </div>
+
+            <div class="metric-card transactions-card">
+              <div class="metric-header">
+                <h3 class="metric-title">Transactions</h3>
+                <div class="metric-badge metric-badge--info">
+                  +8.2%
+                </div>
+              </div>
+              <div class="metric-value" id="total-transactions">
+                2,847
+              </div>
+              <div class="metric-subtitle">
+                Last 30 days
+              </div>
+            </div>
+
+            <div class="metric-card accounts-card">
+              <div class="metric-header">
+                <h3 class="metric-title">Accounts</h3>
+                <div class="metric-badge metric-badge--neutral" id="filtered-accounts-badge" style="display: none;">
+                  <span id="filtered-accounts-count"></span>
+                </div>
+              </div>
+              <div class="metric-value" id="active-accounts">
+                5
+              </div>
+              <div class="metric-subtitle">
+                Current organization
+              </div>
+            </div>
+          </div>
+
+          <!-- Balance Summary Section -->
+          <div class="metric-card balance-summary-card" style="margin-top: 32px;">
+            <div class="metric-header">
+              <h3 class="metric-title">Balance summary</h3>
+              <button class="download-btn" style="border: none; background: none; color: var(--neutral-600); font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                Download
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            
+            <div class="balance-table">
+              <div class="balance-row">
+                <div class="balance-label"><div class="wireframe-bar medium"></div></div>
+                <div class="balance-value"><div class="wireframe-bar medium"></div></div>
+              </div>
+              <div class="balance-row">
+                <div class="balance-label"><div class="wireframe-bar long"></div></div>
+                <div class="balance-value"><div class="wireframe-bar medium"></div></div>
+              </div>
+              <div class="balance-row">
+                <div class="balance-label"><div class="wireframe-bar medium"></div></div>
+                <div class="balance-value"><div class="wireframe-bar short"></div></div>
+              </div>
+              <div class="balance-row total-row">
+                <div class="balance-label"><div class="wireframe-bar medium"></div></div>
+                <div class="balance-value"><div class="wireframe-bar long"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Balance Change from Activity Section -->
+          <div class="metric-card balance-activity-card" style="margin-top: 20px;">
+            <div class="metric-header">
+              <h3 class="metric-title">Balance change from activity</h3>
+              <button class="download-btn" style="border: none; background: none; color: var(--neutral-600); font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                Download
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            
+            <div class="activity-table">
+              <div class="activity-section">
+                <div class="activity-section-header">
+                  <div class="activity-label"><div class="wireframe-bar medium"></div></div>
+                </div>
+                <div class="activity-row">
+                  <div class="activity-value"><div class="wireframe-bar medium"></div></div>
+                </div>
+              </div>
+
+              <div class="activity-section">
+                <div class="activity-section-header">
+                  <div class="activity-label"><div class="wireframe-bar short"></div></div>
+                </div>
+                <div class="activity-row">
+                  <div class="activity-value"><div class="wireframe-bar short"></div></div>
+                </div>
+              </div>
+
+              <div class="activity-section">
+                <div class="activity-section-header">
+                  <div class="activity-label"><div class="wireframe-bar long"></div></div>
+                </div>
+                <div class="activity-row">
+                  <div class="activity-value"><div class="wireframe-bar long"></div></div>
+                </div>
+              </div>
+
+              <div class="activity-section total-section">
+                <div class="activity-row total-row">
+                  <div class="activity-label"><div class="wireframe-bar long"></div></div>
+                  <div class="activity-value"><div class="wireframe-bar long"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payouts Section -->
+          <div class="metric-card payouts-card" style="margin-top: 20px;">
+            <div class="metric-header">
+              <h3 class="metric-title">Payouts</h3>
+              <button class="download-btn" style="border: none; background: none; color: var(--neutral-600); font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                Download
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21 15V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="7,10 12,15 17,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            
+            <div class="payouts-table">
+              <div class="activity-section">
+                <div class="activity-section-header">
+                  <div class="activity-label"><div class="wireframe-bar medium"></div></div>
+                </div>
+                <div class="activity-row">
+                  <div class="activity-value"><div class="wireframe-bar short"></div></div>
+                </div>
+              </div>
+
+              <div class="activity-section total-section">
+                <div class="activity-row total-row">
+                  <div class="activity-label"><div class="wireframe-bar long"></div></div>
+                  <div class="activity-value"><div class="wireframe-bar short"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Account-wise breakdown -->
+          <div class="account-breakdown-card">
+            <h3 class="breakdown-title">Account Breakdown</h3>
+            
+            <div id="account-breakdown">
+              <!-- This will be populated by JavaScript based on filters -->
+            </div>
+          </div>
+
+
+        </div>
+       </div>
+     </div>
+  </div>
+
+  <!-- Include account switcher component -->
+  <script src="./shared/components/account-switcher.js"></script>
+  
+  <!-- Static data loader (replaces API-based sharing) -->
+  <script src="./js/static-data-loader.js"></script>
+  <script src="./js/participant-navigation.js"></script>
+  
+  <!-- Include account groups data provider -->
+  <script src="./shared/components/account-groups-data.js"></script>
+  <!-- Include account groups filter global component -->
+  <script src="./shared/components/account-groups-filter.js"></script>
+  
+  <!-- UXR Data Management -->
+  <script src="./data/organizations.js"></script>
+<script src="./components/group-creation-modal.js"></script>
+<script src="./components/prototype-control-panel.js"></script>
+
+<!-- Prototype Sharing (static file approach) -->
+<script src="./shared/utils/share.js"></script>
+  <script type="module">
+    import { showPageSpinner, hidePageSpinner } from './shared/utils/helpers.js';
+    // Global page spinner during initial data readiness
+    document.addEventListener('DOMContentLoaded', async () => {
+      showPageSpinner('Loading reports...');
+      try {
+        if (window.OrgDataManager) {
+          await window.OrgDataManager.waitForReady();
+        } else {
+          await new Promise(r => setTimeout(r, 300));
+        }
+      } finally {
+        hidePageSpinner();
+      }
+    });
+  </script>
+
+                 <script>
+   // Initialize UXR functionality
+         document.addEventListener('DOMContentLoaded', async function() {
+       // FIRST: Wait for shared data check to complete
+       console.log('⏳ Waiting for shared data check to complete...');
+       if (window.sharedDataReady) {
+         await window.sharedDataReady;
+       }
+       console.log('✅ Shared data check complete, proceeding with page initialization');
+       
+       // Wait for OrgDataManager to be ready
+       await window.OrgDataManager.waitForReady();
+       
+       // Initialize account switcher with SUB-ACCOUNT data
+       const switcherData = window.OrgDataManager.getAccountSwitcherData();
+       const navAccountSwitcher = new AccountSwitcher(
+       document.getElementById('nav-account-switcher'),
+       {
+         currentAccount: switcherData.currentAccount,
+         accounts: switcherData.accounts,
+         variant: '2-line',
+         onAccountChange: (account) => {
+           console.log('Sub-account switched to:', account.name);
+           // Use setTimeout to ensure DOM manipulation doesn't interfere with account switcher closing
+           setTimeout(() => {
+             switchToSubAccount(account.id);
+           }, 100);
+         }
+       }
+     );
+
+
+
+      // Set up navigation panel collapse (matching dash-chrome)
+      setupNavCollapse();
+      
+      
+      
+      // Initialize financial reports using new account context pattern
+      updateAccountContext();
+      
+      console.log('🚀 Financial Reports Page ready!');
+    });
+
+    function switchToSubAccount(subAccountId) {
+      console.log('🔄 switchToSubAccount called with ID:', subAccountId);
+      if (window.OrgDataManager.switchToSubAccount(subAccountId)) {
+        console.log('✅ OrgDataManager.switchToSubAccount succeeded');
+        // Use the new pattern from homepage - update account context
+        updateAccountContext();
+        
+        // Clear any active filters when switching accounts
+        clearActiveFilters();
+      } else {
+        console.warn('❌ OrgDataManager.switchToSubAccount failed');
+      }
+    }
+
+    function setupNavCollapse() {
+      const navPanel = document.getElementById('navPanel');
+      const collapseHandle = document.querySelector('.collapse-handle');
+      const tooltip = document.querySelector('.collapse-tooltip');
+      
+      let isCollapsed = false;
+      let savedWorkloadStates = {}; // Store workload expansion states
+      
+      // Toggle navigation panel on handle click (matching dash-chrome)
+      collapseHandle.addEventListener('click', function() {
+        // Dismiss tooltip immediately and prevent hover
+        collapseHandle.classList.add('no-hover');
+        
+        isCollapsed = !isCollapsed;
+        
+        if (isCollapsed) {
+          // Save current workload states before collapsing
+          saveWorkloadStates();
+          collapseAllWorkloads();
+          
+          navPanel.classList.add('collapsed');
+          collapseHandle.classList.add('collapsed');
+          tooltip.textContent = 'Expand';
+          // Allow hover again once collapsed
+          collapseHandle.classList.remove('no-hover');
+        } else {
+          navPanel.classList.remove('collapsed');
+          collapseHandle.classList.remove('collapsed');
+          tooltip.textContent = 'Collapse';
+          
+          // Restore workload states after expanding
+          restoreWorkloadStates();
+          
+          // Allow hover again once expanded
+          collapseHandle.classList.remove('no-hover');
+        }
+      });
+      
+      // Save current expansion state of all workload sections
+      function saveWorkloadStates() {
+        const expandableItems = document.querySelectorAll('.workload-item.expandable');
+        savedWorkloadStates = {};
+        
+        expandableItems.forEach(item => {
+          const section = item.getAttribute('data-section');
+          savedWorkloadStates[section] = item.classList.contains('expanded');
+        });
+      }
+      
+      // Collapse all workload sections
+      function collapseAllWorkloads() {
+        const expandableItems = document.querySelectorAll('.workload-item.expandable');
+        
+        expandableItems.forEach(item => {
+          const section = item.getAttribute('data-section');
+          const submenu = document.querySelector(`.workload-submenu[data-section="${section}"]`);
+          
+          if (item.classList.contains('expanded')) {
+            item.classList.remove('expanded');
+            submenu.classList.remove('expanded');
+          }
+        });
+      }
+      
+      // Restore workload states to their previous state
+      function restoreWorkloadStates() {
+        const expandableItems = document.querySelectorAll('.workload-item.expandable');
+        
+        expandableItems.forEach(item => {
+          const section = item.getAttribute('data-section');
+          const submenu = document.querySelector(`.workload-submenu[data-section="${section}"]`);
+          
+          // Restore to saved state (default to collapsed if no saved state)
+          if (savedWorkloadStates[section] === true) {
+            item.classList.add('expanded');
+            submenu.classList.add('expanded');
+          } else {
+            item.classList.remove('expanded');
+            submenu.classList.remove('expanded');
+          }
+        });
+      }
+    }
+
+    // Generate deterministic financial data based on account ID
+    function generateAccountFinancialData(account) {
+      // Create a deterministic hash from account ID and name
+      const seed = account.id + account.name;
+      let hash = 0;
+      for (let i = 0; i < seed.length; i++) {
+        const char = seed.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & 0xffffffff; // Convert to 32-bit integer
+      }
+      
+      // Use hash to generate consistent pseudo-random values
+      const random1 = Math.abs(hash) / 0xffffffff;
+      const random2 = Math.abs(hash * 13) / 0xffffffff;
+      const random3 = Math.abs(hash * 17) / 0xffffffff;
+      
+      return {
+        ...account,
+        revenue: Math.floor(random1 * 80000) + 15000, // $15K-$95K
+        transactions: Math.floor(random2 * 2000) + 250, // 250-2250 transactions
+        growth: ((random3 * 40) - 15).toFixed(1) // -15% to +25% growth
+      };
+    }
+
+    function updateAccountContext() {
+      const switcherData = window.OrgDataManager.getAccountSwitcherData();
+      const currentAccount = switcherData.currentAccount;
+      
+      console.log('🔍 updateAccountContext called');
+      console.log('📊 switcherData:', switcherData);
+      console.log('👤 currentAccount:', currentAccount);
+      console.log('🏢 isAggregate:', currentAccount?.isAggregate);
+      
+      if (!currentAccount) {
+        console.warn('❌ No current account found');
+        return;
+      }
+      
+      // Determine if this is aggregate view - check for explicit true value or 'all_accounts' ID
+      const isAggregateView = currentAccount.isAggregate === true || currentAccount.id === 'all_accounts';
+      
+      if (isAggregateView) {
+        console.log('🏢 Showing aggregate view');
+        showAggregateView();
+      } else {
+        console.log('👤 Showing individual account view for:', currentAccount.name);
+        showIndividualAccountView(currentAccount);
+      }
+    }
+    
+    function showAggregateView() {
+      console.log('🏢 showAggregateView() executing');
+      
+      const currentOrg = window.OrgDataManager.getCurrentOrganization();
+      const allSubAccounts = currentOrg.accounts.filter(acc => !acc.isAggregate);
+      
+      // Update page content for organization view
+      document.getElementById('reports-title').textContent = `${currentOrg.name} - Financial Reports`;
+      document.getElementById('reports-description').textContent = `Organization-wide financial data and analytics for all ${allSubAccounts.length} accounts. Filter to an account group or individual accounts for detailed breakdowns.`;
+      document.getElementById('active-accounts').textContent = allSubAccounts.length;
+      
+      // Show the accounts card
+      const accountsCard = document.querySelector('.accounts-card');
+      if (accountsCard) {
+        accountsCard.style.display = 'block';
+        console.log('✅ Showed accounts card');
+      }
+      
+      // Show account group filters
+      const filterContainer = document.querySelector('.account-groups-filter-container');
+      if (filterContainer) {
+        filterContainer.style.display = 'block';
+        console.log('✅ Showed account group filters');
+      }
+      
+      // Update account breakdown for all accounts
+      updateAccountBreakdown(allSubAccounts, true); // true = show aggregate
+    }
+    
+    function showIndividualAccountView(currentAccount) {
+      console.log('👤 showIndividualAccountView() executing for:', currentAccount.name);
+      
+      const currentOrg = window.OrgDataManager.getCurrentOrganization();
+      const allSubAccounts = currentOrg.accounts.filter(acc => !acc.isAggregate);
+      const currentAccountOnly = allSubAccounts.filter(acc => acc.id === currentAccount.id);
+      
+      // Update page content for individual account view
+      document.getElementById('reports-title').textContent = `${currentAccount.name} - Financial Reports`;
+      document.getElementById('reports-description').textContent = `Detailed financial data and analytics for the ${currentAccount.name} account. Switch to organization view for aggregated data.`;
+      
+      // Hide the accounts card - not relevant for individual account view
+      const accountsCard = document.querySelector('.accounts-card');
+      if (accountsCard) {
+        accountsCard.style.display = 'none';
+        console.log('✅ Hidden accounts card');
+      }
+      
+      // Hide account group filters - not relevant for individual account view
+      const filterContainer = document.querySelector('.account-groups-filter-container');
+      if (filterContainer) {
+        filterContainer.style.display = 'none';
+        console.log('✅ Hidden account group filters');
+      }
+      
+      // Update account breakdown for current account only
+      updateAccountBreakdown(currentAccountOnly, false); // false = individual account
+    }
+    
+    // Legacy function name for compatibility - now just calls updateAccountContext
+    function loadFinancialReports() {
+      updateAccountContext();
+    }
+
+    function updateAccountBreakdown(accounts, isAggregateView = false) {
+      const breakdown = document.getElementById('account-breakdown');
+      
+      if (accounts.length === 0) {
+        breakdown.innerHTML = '<div style="text-align: center; color: var(--neutral-500); padding: 24px;">No accounts selected</div>';
+        return;
+      }
+      
+      // Generate consistent financial data for each account
+      const accountData = accounts.map(account => generateAccountFinancialData(account));
+      
+      if (isAggregateView) {
+        // Show all accounts in organization view
+        breakdown.innerHTML = accountData.map(account => {
+          const revenue = account.revenue || 0;
+          const transactions = account.transactions || 0;
+          const growth = account.growth || '0';
+          const growthValue = parseFloat(growth);
+          
+          return `
+          <div style="display: grid; grid-template-columns: 1fr 120px 120px 120px; gap: 24px; align-items: center; padding: 24px; border-radius: 6px; margin-bottom: 16px; background: var(--neutral-25);">
+            <div>
+              <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px; font-size: 18px;">${account.name}</div>
+              <div style="font-size: 14px; color: var(--neutral-500);">Primary Account Metrics</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${revenue.toLocaleString()}</div>
+              <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Total Revenue</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${transactions.toLocaleString()}</div>
+              <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Transactions</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; font-size: 20px; color: ${growthValue >= 0 ? 'var(--green-600)' : 'var(--red-600)'};">
+                ${growthValue >= 0 ? '+' : ''}${growth}%
+              </div>
+              <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Growth Rate</div>
+            </div>
+          </div>
+        `;
+        }).join('');
+      } else {
+        // Show single account view with more detailed breakdown
+        const account = accountData[0];
+        const revenue = account.revenue || 0;
+        const transactions = account.transactions || 0;
+        const growth = account.growth || '0';
+        const growthValue = parseFloat(growth);
+        
+        // Calculate derived metrics with safe division
+        const avgTransaction = transactions > 0 ? Math.round(revenue / transactions) : 0;
+        const revenuePerDay = Math.round(revenue / 30);
+        const transactionsPerDay = Math.round(transactions / 30);
+        
+        breakdown.innerHTML = `
+          <div style="display: grid; grid-template-columns: 1fr 120px 120px 120px; gap: 24px; align-items: center; padding: 24px; border-radius: 6px; background: var(--neutral-25);">
+            <div>
+              <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px; font-size: 18px;">${account.name}</div>
+              <div style="font-size: 14px; color: var(--neutral-500);">Primary Account Metrics</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${revenue.toLocaleString()}</div>
+              <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Total Revenue</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${transactions.toLocaleString()}</div>
+              <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Transactions</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; font-size: 20px; color: ${growthValue >= 0 ? 'var(--green-600)' : 'var(--red-600)'};">
+                ${growthValue >= 0 ? '+' : ''}${growth}%
+              </div>
+              <div style="font-size: 12px; color: var(--neutral-500); margin-top: 2px;">Growth Rate</div>
+            </div>
+          </div>
+          <div style="padding: 16px; background: var(--neutral-50); border-radius: 6px; margin-top: 16px;">
+            <div style="font-size: 14px; color: var(--neutral-700); margin-bottom: 8px; font-weight: 500;">Account Details</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; font-size: 13px;">
+              <div>
+                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${avgTransaction.toLocaleString()}</div>
+                <div style="color: var(--neutral-500);">Average Transaction</div>
+              </div>
+              <div>
+                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">$${revenuePerDay.toLocaleString()}</div>
+                <div style="color: var(--neutral-500);">Revenue per Day</div>
+              </div>
+              <div>
+                <div style="font-weight: 600; color: var(--neutral-900); font-size: 20px;">${transactionsPerDay} per day</div>
+                <div style="color: var(--neutral-500);">Transaction Volume</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Calculate and update totals (aggregated from all accounts)
+      const totalRevenue = accountData.reduce((sum, acc) => sum + (acc.revenue || 0), 0);
+      const totalTransactions = accountData.reduce((sum, acc) => sum + (acc.transactions || 0), 0);
+      
+      document.getElementById('total-revenue').textContent = `$${totalRevenue.toLocaleString()}`;
+      document.getElementById('total-transactions').textContent = totalTransactions.toLocaleString();
+    }
+
+    // Override the filter functions to update financial reports
+    function updateActiveFilters(selectedGroups) {
+      const filterLabel = document.getElementById('filter-label');
+      const filteredAccountsCount = document.getElementById('filtered-accounts-count');
+      
+      if (selectedGroups.length > 0) {
+        filterLabel.textContent = `${selectedGroups.length} group${selectedGroups.length > 1 ? 's' : ''}`;
+        
+        // Get accounts from selected groups
+        const accountIds = new Set();
+        selectedGroups.forEach(group => {
+          group.accountIds.forEach(id => accountIds.add(id));
+        });
+        
+        const allSubAccounts = window.OrgDataManager.getAllSubAccounts().filter(acc => !acc.isAggregate);
+        const filteredAccounts = allSubAccounts.filter(account => accountIds.has(account.id));
+        
+        // Update financial reports with filtered accounts (always show as list view when filtering)
+        updateAccountBreakdown(filteredAccounts, true);
+        document.getElementById('active-accounts').textContent = filteredAccounts.length;
+        
+        filteredAccountsCount.textContent = `${filteredAccounts.length} of ${allSubAccounts.length}`;
+      } else {
+        clearActiveFilters();
+      }
+    }
+
+    function clearActiveFilters() {
+      const filterLabel = document.getElementById('filter-label');
+      const filteredAccountsCount = document.getElementById('filtered-accounts-count');
+      
+      filterLabel.textContent = 'All accounts';
+      filteredAccountsCount.textContent = 'All';
+      
+      // Don't reload reports here - let the caller handle it to avoid double execution
+    }
+
+    // Initialize expandable workload items
+    function initExpandableWorkloads() {
+      const expandableItems = document.querySelectorAll('.workload-item.expandable');
+      expandableItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          const navPanel = document.getElementById('navPanel');
+          if (navPanel && navPanel.classList.contains('collapsed')) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          const section = this.getAttribute('data-section');
+          const submenu = document.querySelector(`.workload-submenu[data-section="${section}"]`);
+          const isExpanded = this.classList.contains('expanded');
+          if (isExpanded) {
+            // Collapse
+            this.classList.remove('expanded');
+            submenu.classList.remove('expanded');
+          } else {
+            // Expand
+            this.classList.add('expanded');
+            submenu.classList.add('expanded');
+          }
+        });
+      });
+    }
+
+    // Initialize on DOM content loaded
+    initExpandableWorkloads();
+
+    // Update workload active states based on active subitems
+    function updateWorkloadActiveStates() {
+      const workloadContainers = document.querySelectorAll('.workload-item-container');
+      
+      workloadContainers.forEach(container => {
+        const workloadItem = container.querySelector('.workload-item');
+        const activeSubitem = container.querySelector('.workload-subitem.active');
+        
+        if (workloadItem) {
+          if (activeSubitem) {
+            workloadItem.classList.add('has-active-subitem');
+          } else {
+            workloadItem.classList.remove('has-active-subitem');
+          }
+        }
+      });
+    }
+
+    // Initialize workload active states
+    updateWorkloadActiveStates();
+
+    // Account Groups Filter Functionality
+    // ===================================
+    
+
+    
+    // Generate account groups from current organization data
+    function generateAccountGroups() {
+      // Prefer OrgDataManager as single source of truth
+      const manager = window.OrgDataManager;
+      if (!manager) {
+        console.warn('OrgDataManager not available, using fallback data');
+        return getFallbackAccountGroups();
+      }
+
+      try {
+        const allAccounts = manager.getAllSubAccounts();
+        
+        if (!allAccounts || allAccounts.length === 0) {
+          console.warn('No accounts found in OrgDataManager, using fallback data');
+          return getFallbackAccountGroups();
+        }
+        
+        // Filter out aggregate views and convert to filter format
+        const accountData = allAccounts
+          .filter(acc => !acc.isAggregate)
+          .map((acc, index) => ({
+            name: acc.name,
+            initials: generateInitials(acc.name),
+            color: convertHexToColorClass(acc.color) || (index % 2 === 0 ? 'blue' : 'green'),
+            backgroundColor: acc.color, // Store the original hex color for inline styles
+            checked: true,
+            id: acc.id,
+            type: acc.type || 'Account'
+          }));
+
+        // account data generated
+
+        // Create groups based on account type/characteristics with fallback to ensure no empty groups
+        const groups = {};
+        
+        // All accounts group (always populated)
+        groups['all'] = accountData;
+        
+        // Connected accounts - tech/digital related
+        const connectedAccounts = accountData.filter(acc => 
+          acc.type === 'Connected' || 
+          acc.name.toLowerCase().includes('tech') || 
+          acc.name.toLowerCase().includes('digital') ||
+          acc.name.toLowerCase().includes('api') ||
+          acc.name.toLowerCase().includes('app') ||
+          acc.name.toLowerCase().includes('platform')
+        );
+        
+        // Express accounts - creative/energy/quick setup
+        const expressAccounts = accountData.filter(acc => 
+          acc.type === 'Express' || 
+          acc.name.toLowerCase().includes('creative') || 
+          acc.name.toLowerCase().includes('energy') ||
+          acc.name.toLowerCase().includes('mobile') ||
+          acc.name.toLowerCase().includes('web')
+        );
+        
+        // Standard accounts - traditional/banking/commerce
+        const standardAccounts = accountData.filter(acc => 
+          acc.type === 'Standard' || 
+          acc.name.toLowerCase().includes('banking') || 
+          acc.name.toLowerCase().includes('commerce') ||
+          acc.name.toLowerCase().includes('payment') ||
+          acc.name.toLowerCase().includes('investment')
+        );
+        
+        // Custom accounts - development/environment related
+        const customAccounts = accountData.filter(acc =>
+          acc.name.toLowerCase().includes('development') ||
+          acc.name.toLowerCase().includes('staging') ||
+          acc.name.toLowerCase().includes('production') ||
+          acc.name.toLowerCase().includes('environment')
+        );
+        
+        // Ensure each group has at least one account by using fallback distribution
+        if (connectedAccounts.length === 0) {
+          // Fallback: assign accounts with even indices
+          groups['connected'] = accountData.filter((_, index) => index % 3 === 0);
+        } else {
+          groups['connected'] = connectedAccounts;
+        }
+        
+        if (expressAccounts.length === 0) {
+          // Fallback: assign accounts with indices divisible by 3, offset by 1
+          groups['express'] = accountData.filter((_, index) => index % 3 === 1);
+        } else {
+          groups['express'] = expressAccounts;
+        }
+        
+        if (standardAccounts.length === 0) {
+          // Fallback: assign accounts with indices divisible by 3, offset by 2
+          groups['standard'] = accountData.filter((_, index) => index % 3 === 2);
+        } else {
+          groups['standard'] = standardAccounts;
+        }
+        
+        if (customAccounts.length === 0) {
+          // Fallback: assign first half of accounts
+          groups['custom'] = accountData.slice(0, Math.ceil(accountData.length / 2));
+        } else {
+          groups['custom'] = customAccounts;
+        }
+        
+        // Final safety check - ensure no group is empty
+        Object.keys(groups).forEach(groupKey => {
+          if (groups[groupKey].length === 0 && groupKey !== 'all') {
+            // Emergency fallback: give it at least one account
+            const accountIndex = Object.keys(groups).indexOf(groupKey) % accountData.length;
+            groups[groupKey] = [accountData[accountIndex]];
+          }
+        });
+        
+        console.log('Group distribution:', Object.entries(groups).map(([key, accounts]) => 
+          `${key}: ${accounts.length} accounts`
+        ));
+
+        return groups;
+      } catch (error) {
+        console.error('Error generating account groups:', error);
+        return getFallbackAccountGroups();
+      }
+    }
+
+    // Fallback account groups in case OrgDataManager is not available
+    function getFallbackAccountGroups() {
+      const fallbackAccounts = [
+        { name: 'Mobile App', initials: 'MA', color: 'blue', checked: true },
+        { name: 'Web Platform', initials: 'WP', color: 'green', checked: true },
+        { name: 'API Services', initials: 'AS', color: 'blue', checked: true },
+        { name: 'Analytics Dashboard', initials: 'AD', color: 'green', checked: true },
+        { name: 'Payment Processing', initials: 'PP', color: 'blue', checked: true },
+        { name: 'Personal Banking', initials: 'PB', color: 'green', checked: true }
+      ];
+      
+      return {
+        'all': fallbackAccounts,
+        'connected': [
+          fallbackAccounts[0], // Mobile App
+          fallbackAccounts[1], // Web Platform  
+          fallbackAccounts[2]  // API Services
+        ],
+        'express': [
+          fallbackAccounts[1], // Web Platform
+          fallbackAccounts[3]  // Analytics Dashboard
+        ],
+        'standard': [
+          fallbackAccounts[4], // Payment Processing
+          fallbackAccounts[5]  // Personal Banking
+        ],
+        'custom': [
+          fallbackAccounts[0], // Mobile App
+          fallbackAccounts[3], // Analytics Dashboard
+          fallbackAccounts[4]  // Payment Processing
+        ]
+      };
+    }
+
+    // Helper function to generate initials from account name
+    function generateInitials(name) {
+      return name
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase())
+        .join('')
+        .substring(0, 2);
+    }
+
+    // Helper function to convert hex colors to CSS class names
+    function convertHexToColorClass(hexColor) {
+      if (!hexColor || !hexColor.startsWith('#')) {
+        return null;
+      }
+      
+      // Map common hex colors to existing CSS classes
+      const colorMap = {
+        '#06B6D4': 'blue',   // cyan-500
+        '#84CC16': 'green',  // lime-500  
+        '#F97316': 'blue',   // orange-500
+        '#6366F1': 'green',  // indigo-500
+        '#14B8A6': 'blue',   // teal-500
+        '#F87171': 'green',  // red-400
+        '#A78BFA': 'blue',   // violet-400
+        '#34D399': 'green',  // emerald-400
+        '#FBBF24': 'blue',   // amber-400
+      };
+      
+      return colorMap[hexColor] || 'blue'; // fallback to blue
+    }
+
+
+
+    
+
+    /*function positionReportsPopover() {
+      const trigger = document.getElementById('reportsFilterTrigger');
+      const popover = document.getElementById('reportsFilterPopover');
+      
+      if (!trigger || !popover) {
+        return;
+      }
+      
+      // Get dimensions and positions
+      const triggerRect = trigger.getBoundingClientRect();
+      const popoverWidth = 532;
+      const popoverHeight = 360;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const margin = 16; // Minimum margin from viewport edges
+      
+      // Calculate initial position (below trigger, left-aligned)
+      let left = 0; // Start relative to container
+      let top = triggerRect.height + 8; // 8px below trigger
+      
+      // Check if popover would go off the right edge of viewport
+      const triggerLeftInViewport = triggerRect.left;
+      if (triggerLeftInViewport + popoverWidth > viewportWidth - margin) {
+        // Align popover to the right edge of trigger instead
+        left = triggerRect.width - popoverWidth;
+      }
+      
+      // Ensure popover doesn't go off the left edge
+      if (triggerLeftInViewport + left < margin) {
+        left = margin - triggerLeftInViewport;
+      }
+      
+      // Check if popover would go off the bottom of viewport
+      if (triggerRect.bottom + popoverHeight + 8 > viewportHeight - margin) {
+        // Position above trigger instead
+        top = -popoverHeight - 8;
+      }
+      
+      // Ensure popover doesn't go off the top
+      if (triggerRect.top + top < margin) {
+        top = margin - triggerRect.top;
+      }
+      
+      // Apply positioning
+      popover.style.left = `${left}px`;
+      popover.style.top = `${top}px`;
+    }
+    
+    function applyReportsSelection() {
+      console.log('Reports selection applied!');
+      toggleReportsPopover();
+    }
+
+    function renderReportsAccounts(groupKey) {
+      const selectAllContainer = document.getElementById('reportsSelectAllContainer');
+      const accountsList = document.getElementById('reportsAccountsList');
+      const accounts = reportsAccountGroups[groupKey] || [];
+      
+      if (!selectAllContainer || !accountsList) {
+        return;
+      }
+      
+      // Create select all checkbox (pinned at top)
+      const selectAllHTML = `
+        <div class="select-all-item">
+          <div class="checkbox-container">
+            <input type="checkbox" id="reportsSelectAll" checked>
+          </div>
+          <div class="account-filter-content">
+            <label for="reportsSelectAll">Select all</label>
+            <span class="select-all-count" id="reportsSelectionCount">${accounts.length} selected</span>
+          </div>
+        </div>
+      `;
+      
+      // Create account items (scrollable)
+      const accountsHTML = accounts.map(account => `
+        <div class="account-item">
+          <div class="checkbox-container">
+            <input type="checkbox" ${account.checked ? 'checked' : ''}>
+          </div>
+          <div class="account-filter-content">
+            <div class="account-icon ${account.color}">${account.initials}</div>
+            <label>${account.name}</label>
+          </div>
+        </div>
+      `).join('');
+
+      // Set innerHTML separately
+      selectAllContainer.innerHTML = selectAllHTML;
+      accountsList.innerHTML = accountsHTML;
+
+      // Reattach event listeners
+      attachReportsCheckboxListeners();
+      attachReportsSelectAllListener();
+      
+      // Apply search filter if active
+      if (reportsSearchTerm) {
+        filterReportsAccountsBySearch(reportsSearchTerm);
+      }
+      
+      updateReportsSelectionCount();
+      updateReportsSelectAllState();
+    }
+
+    function attachReportsCheckboxListeners() {
+      // Add change listeners to checkboxes (only in scrollable accounts list)
+      document.querySelectorAll('#reportsAccountsList .account-item input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          updateReportsSelectionCount();
+          updateReportsSelectAllState();
+        });
+      });
+      
+      // Make entire account row clickable (only in scrollable accounts list)
+      document.querySelectorAll('#reportsAccountsList .account-item').forEach(accountItem => {
+        accountItem.addEventListener('click', function(e) {
+          // Don't trigger if clicking directly on the checkbox (to avoid double-toggling)
+          if (e.target.type === 'checkbox') {
+            return;
+          }
+          
+          // Find the checkbox in this row and toggle it
+          const checkbox = accountItem.querySelector('input[type="checkbox"]');
+          if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+            // Trigger the change event to update counts
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        });
+      });
+    }
+
+    function filterReportsAccountsBySearch(term) {
+      document.querySelectorAll('#reportsAccountsList .account-item').forEach(item => {
+        const label = item.querySelector('label').textContent.toLowerCase();
+        item.style.display = label.includes(term.toLowerCase()) ? 'flex' : 'none';
+      });
+    }
+
+    function updateReportsSelectionCount() {
+      const checked = document.querySelectorAll('#reportsAccountsList .account-item input[type="checkbox"]:checked').length;
+      const selectionCountElement = document.getElementById('reportsSelectionCount');
+      if (selectionCountElement) {
+        selectionCountElement.textContent = `${checked} selected`;
+      }
+    }
+
+    function updateReportsSelectAllState() {
+      const selectAllCheckbox = document.getElementById('reportsSelectAll');
+      const accountCheckboxes = document.querySelectorAll('#reportsAccountsList .account-item input[type="checkbox"]');
+      const checkedCount = document.querySelectorAll('#reportsAccountsList .account-item input[type="checkbox"]:checked').length;
+      
+      if (!selectAllCheckbox || !accountCheckboxes.length) return;
+      
+      if (checkedCount === 0) {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+      } else if (checkedCount === accountCheckboxes.length) {
+        selectAllCheckbox.checked = true;
+        selectAllCheckbox.indeterminate = false;
+      } else {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = true;
+      }
+    }
+
+    function handleReportsSelectAll() {
+      const selectAllCheckbox = document.getElementById('reportsSelectAll');
+      const accountCheckboxes = document.querySelectorAll('#reportsAccountsList .account-item input[type="checkbox"]');
+      
+      if (!selectAllCheckbox || !accountCheckboxes.length) return;
+      
+      accountCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+      
+      updateReportsSelectionCount();
+      selectAllCheckbox.indeterminate = false;
+    }
+
+    function attachReportsSelectAllListener() {
+      const selectAllCheckbox = document.getElementById('reportsSelectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', handleReportsSelectAll);
+      }
+      
+      // Make entire select all row clickable
+      const selectAllItem = document.querySelector('#reportsSelectAllContainer .select-all-item');
+      if (selectAllItem) {
+        selectAllItem.addEventListener('click', function(e) {
+          // Don't trigger if clicking directly on the checkbox (to avoid double-toggling)
+          if (e.target.type === 'checkbox') {
+            return;
+          }
+          
+          // Find the checkbox and toggle it
+          const checkbox = selectAllItem.querySelector('input[type="checkbox"]');
+          if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+            // Trigger the change event to handle select all logic
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        });
+      }
+    }
+
+    function addReportsScrollEffect() {
+      const accountsList = document.getElementById('reportsAccountsList');
+      let scrollTimeout;
+
+      if (accountsList) {
+        accountsList.addEventListener('scroll', function() {
+          // Add scrolling class
+          this.classList.add('scrolling');
+          
+          // Clear previous timeout
+          clearTimeout(scrollTimeout);
+          
+          // Set timeout to remove scrolling class when scrolling stops
+          scrollTimeout = setTimeout(() => {
+            this.classList.remove('scrolling');
+          }, 300); // 300ms delay after scrolling stops
+        }, { passive: true });
+      }
+    }
+
+    function initializeReportsFilter() {
+      // Render accounts for default group
+      renderReportsAccounts('all');
+      
+      // Initialize scroll effect
+      addReportsScrollEffect();
+      
+      // Ensure popover is closed initially and trigger is in correct state
+      const initPopover = document.getElementById('reportsFilterPopover');
+      const initTrigger = document.getElementById('reportsFilterTrigger');
+      
+      if (initPopover && initTrigger) {
+        initPopover.style.display = 'none';
+        initTrigger.classList.remove('open');
+      }
+      
+      // Attach event listeners
+      const trigger = document.getElementById('reportsFilterTrigger');
+      const cancelBtn = document.querySelector('#reportsFilterPopover .btn-cancel');
+      const applyBtn = document.querySelector('#reportsFilterPopover .btn-apply');
+      const searchInput = document.getElementById('reportsSearchInput');
+      
+      if (trigger) {
+        trigger.addEventListener('click', toggleReportsPopover);
+      }
+      
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', toggleReportsPopover);
+      }
+      
+      if (applyBtn) {
+        applyBtn.addEventListener('click', applyReportsSelection);
+      }
+      
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          reportsSearchTerm = this.value;
+          filterReportsAccountsBySearch(reportsSearchTerm);
+        });
+      }
+      
+      // Group selection functionality
+      document.querySelectorAll('#reportsFilterPopover .group-item').forEach(item => {
+        item.addEventListener('click', function() {
+          document.querySelectorAll('#reportsFilterPopover .group-item').forEach(g => g.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Determine which group was clicked
+          const groupKey = this.getAttribute('data-group');
+          reportsCurrentGroup = groupKey;
+          
+          // Clear search when switching groups
+          if (searchInput) {
+            searchInput.value = '';
+            reportsSearchTerm = '';
+          }
+          
+          // Re-render accounts for new group
+          renderReportsAccounts(groupKey);
+        });
+      });
+      
+      // Close popover when clicking outside
+      document.addEventListener('click', function(e) {
+        const popover = document.getElementById('reportsFilterPopover');
+        const trigger = document.getElementById('reportsFilterTrigger');
+        
+        if (popover && trigger && popover.style.display === 'flex') {
+          if (!popover.contains(e.target) && !trigger.contains(e.target)) {
+            toggleReportsPopover();
+          }
+        }
+      });
+      
+      // Reposition popover on window resize and scroll
+      window.addEventListener('resize', function() {
+        const popover = document.getElementById('reportsFilterPopover');
+        if (popover && popover.style.display === 'flex') {
+          positionReportsPopover();
+        }
+      }, { passive: true });
+      
+      window.addEventListener('scroll', function() {
+        const popover = document.getElementById('reportsFilterPopover');
+        if (popover && popover.style.display === 'flex') {
+          positionReportsPopover();
+        }
+      }, { passive: true });
+    }*/
+
+    // Ensure OrgDataManager reference
+    const managerRef = window.OrgDataManager;
+
+    // Check if filter should be visible based on current account
+    function shouldShowAccountGroupsFilter() {
+    if (!managerRef) {
+        return false; // No org manager, don't show filter
+      }
+      
+      const currentSubAccount = managerRef.getCurrentSubAccount();
+      
+      // Only show filter when viewing "All accounts" (aggregate view)
+      return currentSubAccount && currentSubAccount.isAggregate;
+    }
+
+    // Cache for consistent financial data
+    let accountFinancialDataCache = null;
+
+    // Generate sample financial data for each account (with persistence)
+    function generateAccountFinancialData() {
+      if (accountFinancialDataCache) {
+        return accountFinancialDataCache;
+      }
+      
+      const accountDataMap = new Map();
+      
+    if (managerRef) {
+      // Exclude the aggregate "All accounts" entry so counts reflect real accounts only
+      const accounts = managerRef.getAllSubAccounts().filter(acc => !acc.isAggregate);
+        
+        accounts.forEach((account, index) => {
+          // Use account ID to seed random data for consistency
+          const seed = account.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+          const seededRandom1 = (seed * 9301 + 49297) % 233280 / 233280;
+          const seededRandom2 = ((seed + 1) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom3 = ((seed + 2) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom4 = ((seed + 3) * 9301 + 49297) % 233280 / 233280;
+          
+          // Generate consistent financial data for each account
+          const baseRevenue = Math.floor(seededRandom1 * 50000) + 10000; // $10k-$60k base
+          const baseTransactions = Math.floor(seededRandom2 * 800) + 200; // 200-1000 transactions
+          
+          accountDataMap.set(account.id, {
+            name: account.name,
+            revenue: baseRevenue,
+            transactions: baseTransactions,
+            revenueGrowth: ((seededRandom3 * 40) - 10).toFixed(1), // -10% to +30%
+            transactionGrowth: ((seededRandom4 * 30) - 5).toFixed(1) // -5% to +25%
+          });
+        });
+      }
+      
+      // Fallback data if no org manager
+      if (accountDataMap.size === 0) {
+        const fallbackAccounts = [
+          { id: 'mobile-app', name: 'Mobile App' },
+          { id: 'web-platform', name: 'Web Platform' },
+          { id: 'api-services', name: 'API Services' },
+          { id: 'analytics', name: 'Analytics Dashboard' },
+          { id: 'payments', name: 'Payment Processing' }
+        ];
+        
+        fallbackAccounts.forEach((account, index) => {
+          // Use index to create consistent seeded data
+          const seed = index * 1000;
+          const seededRandom1 = (seed * 9301 + 49297) % 233280 / 233280;
+          const seededRandom2 = ((seed + 1) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom3 = ((seed + 2) * 9301 + 49297) % 233280 / 233280;
+          const seededRandom4 = ((seed + 3) * 9301 + 49297) % 233280 / 233280;
+          
+          const baseRevenue = Math.floor(seededRandom1 * 50000) + 10000;
+          const baseTransactions = Math.floor(seededRandom2 * 800) + 200;
+          
+          accountDataMap.set(account.id, {
+            name: account.name,
+            revenue: baseRevenue,
+            transactions: baseTransactions,
+            revenueGrowth: ((seededRandom3 * 40) - 10).toFixed(1),
+            transactionGrowth: ((seededRandom4 * 30) - 5).toFixed(1)
+          });
+        });
+      }
+      
+      // Cache the result
+      accountFinancialDataCache = accountDataMap;
+      return accountDataMap;
+    }
+
+    // Filter content based on selected accounts
+    function filterReportsContent(selectedAccountIds = null) {
+      const accountDataMap = generateAccountFinancialData();
+      let filteredData = Array.from(accountDataMap.values());
+      if (selectedAccountIds && selectedAccountIds.length > 0) {
+        // Filter to only selected accounts
+        filteredData = selectedAccountIds
+          .map(id => accountDataMap.get(id))
+          .filter(data => data); // Remove any undefined values
+      }
+      
+      // Calculate totals with null checks
+      const totalRevenue = filteredData.reduce((sum, account) => sum + (account.revenue || 0), 0);
+      const totalTransactions = filteredData.reduce((sum, account) => sum + (account.transactions || 0), 0);
+      const activeAccountsCount = filteredData.length;
+      
+      // Calculate average growth rates with null checks
+      const avgRevenueGrowth = filteredData.length > 0 
+        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.revenueGrowth || '0'), 0) / filteredData.length).toFixed(1)
+        : 0;
+      const avgTransactionGrowth = filteredData.length > 0 
+        ? (filteredData.reduce((sum, account) => sum + parseFloat(account.transactionGrowth || '0'), 0) / filteredData.length).toFixed(1)
+        : 0;
+      
+      // Update metrics cards
+      updateMetricCard('total-revenue', `$${totalRevenue.toLocaleString()}`, avgRevenueGrowth);
+      updateMetricCard('total-transactions', totalTransactions.toLocaleString(), avgTransactionGrowth);
+      updateActiveAccountsCard(activeAccountsCount, selectedAccountIds && selectedAccountIds.length > 0 ? 'Filtered' : 'All');
+      
+      // Update account breakdown
+      updateAccountBreakdown(filteredData);
+      
+
+    }
+    
+    function updateMetricCard(elementId, value, growth) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.textContent = value;
+      }
+      
+      // Update growth badge if it exists
+      const card = element?.closest('.metric-card');
+      const badge = card?.querySelector('.metric-badge');
+      if (badge && growth !== undefined) {
+        const growthNum = parseFloat(growth);
+        badge.textContent = `${growthNum >= 0 ? '+' : ''}${growth}%`;
+        
+        // Update badge style based on growth
+        badge.className = 'metric-badge';
+        if (growthNum > 5) {
+          badge.classList.add('metric-badge--positive');
+        } else if (growthNum < -2) {
+          badge.classList.add('metric-badge--neutral');
+        } else {
+          badge.classList.add('metric-badge--info');
+        }
+      }
+    }
+    
+    function updateActiveAccountsCard(count, filterType) {
+      const element = document.getElementById('active-accounts');
+      const badgeContainer = document.getElementById('filtered-accounts-badge');
+      const badgeElement = document.getElementById('filtered-accounts-count');
+      
+      if (element) {
+        element.textContent = count.toString();
+      }
+      
+      if (badgeElement && badgeContainer) {
+        // Check if we're in a filtered state (custom mode or non-all group)
+        const currentGroup = window.reportsFilter?.currentGroup;
+        const isCustomMode = window.reportsFilter?.isCustomMode;
+        const isFilteredGroup = (currentGroup && currentGroup !== 'all') || isCustomMode;
+        
+        if (filterType === 'Filtered' && isFilteredGroup) {
+          badgeElement.textContent = 'Filtered';
+          badgeContainer.style.display = 'inline-flex';
+        } else {
+          // Hide the badge entirely when not filtered (either 'all' group or no selection)
+          badgeElement.textContent = '';
+          badgeContainer.style.display = 'none';
+        }
+      }
+    }
+    
+    function updateAccountBreakdown(accountsData) {
+      const container = document.getElementById('account-breakdown');
+      if (!container) return;
+      
+      if (accountsData.length === 0) {
+        container.innerHTML = '<p style="color: var(--neutral-500); font-style: italic;">No accounts selected</p>';
+        return;
+      }
+      
+      const breakdownHTML = accountsData.map(account => {
+        // Add null checks for missing financial data
+        const transactions = account.transactions || 0;
+        const revenue = account.revenue || 0;
+        const revenueGrowthValue = account.revenueGrowth || '0';
+        const transactionGrowthValue = account.transactionGrowth || '0';
+        const revenueGrowth = parseFloat(revenueGrowthValue);
+        const transactionGrowth = parseFloat(transactionGrowthValue);
+        
+        return `
+          <div class="account-breakdown-row">
+            <div>
+              <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px;">${account.name}</div>
+              <div style="font-size: 12px; color: var(--neutral-500);">${transactions.toLocaleString()} transactions</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; color: var(--neutral-900); margin-bottom: 4px;">$${revenue.toLocaleString()}</div>
+              <div style="font-size: 12px; color: ${revenueGrowth >= 0 ? 'var(--success-600)' : 'var(--danger-600)'};">
+                ${revenueGrowth >= 0 ? '+' : ''}${revenueGrowthValue}%
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = breakdownHTML;
+    }
+    
+
+
+    // Initialize reports filter using global component
+    async function initializeReportsFilter() {
+      // Wait for OrgDataManager to be ready
+      if (window.OrgDataManager) {
+        await window.OrgDataManager.waitForReady();
+      }
+
+      const filterContainer = document.querySelector('.account-groups-filter-container');
+      
+      // Check if filter should be visible
+      if (shouldShowAccountGroupsFilter()) {
+        if (filterContainer) {
+          filterContainer.style.display = 'block';
+        }
+        
+        // Ensure custom account groups function is available and wait for it
+        console.log('🔧 Custom groups function available:', !!window.generateCustomAccountGroups);
+        console.log('🔧 Will use function:', window.generateCustomAccountGroups ? 'custom' : 'local');
+        
+        // Use a wrapper function that always calls the latest custom function
+        const getAccountGroups = () => {
+          if (window.generateCustomAccountGroups) {
+            console.log('🔧 Using custom account groups');
+            return window.generateCustomAccountGroups();
+          } else {
+            console.log('🔧 Falling back to local account groups');
+            return generateAccountGroups();
+          }
+        };
+        
+        const reportsFilter = new AccountGroupsFilter({
+          triggerId: 'reportsFilterTrigger',
+          popoverId: 'reportsFilterPopover',
+          searchInputId: 'reportsSearchInput',
+          selectAllContainerId: 'reportsSelectAllContainer',
+          accountsListId: 'reportsAccountsList',
+          triggerOptionId: 'reportsFilterOption',
+          namespace: 'reports',
+          generateAccountGroups: getAccountGroups
+        });
+        
+        // Make filter globally accessible for button handlers
+        window.reportsFilter = reportsFilter;
+        
+        // Force refresh to ensure custom groups are loaded
+        setTimeout(() => {
+          console.log('🔄 Force refreshing filter to load custom groups...');
+          reportsFilter.refresh();
+        }, 100);
+        
+        // Use hook pattern to customize reports behavior while keeping base state persistence
+        reportsFilter.onApplySelection = function(checkedCheckboxes) {
+          console.log('🎯🔥 Reports onApplySelection hook called!');
+          
+          // Get selected account IDs
+          const selectedAccountIds = [];
+          checkedCheckboxes.forEach(checkbox => {
+            const accountItem = checkbox.closest('.account-item');
+            const accountLabel = accountItem.querySelector('label');
+            if (accountLabel) {
+              // Find matching account by name
+              const accountName = accountLabel.textContent;
+              if (managerRef) {
+                const accounts = managerRef.getAllSubAccounts();
+                const matchingAccount = accounts.find(acc => acc.name === accountName);
+                if (matchingAccount) {
+                  selectedAccountIds.push(matchingAccount.id);
+                }
+              } else {
+                // Fallback: create ID from name
+                selectedAccountIds.push(accountName.toLowerCase().replace(/\s+/g, '-'));
+              }
+            }
+          });
+          
+          // Filter content based on selection
+          filterReportsContent(selectedAccountIds.length > 0 ? selectedAccountIds : null);
+          
+          console.log('🎯 Reports-specific logic completed, selected IDs:', selectedAccountIds);
+        };
+        
+        // Override the close method to reset content to show all accounts
+        reportsFilter.close = function() {
+          const popover = document.getElementById(this.options.popoverId);
+          const trigger = document.getElementById(this.options.triggerId);
+          
+          if (popover && trigger) {
+            popover.style.display = 'none';
+            trigger.classList.remove('open');
+          }
+          
+          // Reset to show appropriate data based on current account context
+    const currentSubAccount = managerRef?.getCurrentSubAccount();
+          if (currentSubAccount && !currentSubAccount.isAggregate) {
+            // Show data for current individual account
+            filterReportsContent([currentSubAccount.id]);
+            console.log('Filter cancelled - showing current account:', currentSubAccount.name);
+          } else {
+            // Show all accounts for aggregate view
+            filterReportsContent();
+            console.log('Filter cancelled - showing all accounts');
+          }
+        };
+        
+        // Initialize with appropriate data based on current account context
+    const currentSubAccount = managerRef?.getCurrentSubAccount();
+        if (currentSubAccount && !currentSubAccount.isAggregate) {
+          // Show data for current individual account
+          filterReportsContent([currentSubAccount.id]);
+          console.log('Initialized filter - showing current account:', currentSubAccount.name);
+        } else {
+          // Show all accounts for aggregate view
+          filterReportsContent();
+          console.log('Initialized filter - showing all accounts');
+        }
+        
+      } else {
+        // Hide the filter when viewing individual accounts
+        if (filterContainer) {
+          filterContainer.style.display = 'none';
+        }
+        
+        // Show data for current individual account when filter is hidden
+    const currentSubAccount = managerRef?.getCurrentSubAccount();
+        if (currentSubAccount && !currentSubAccount.isAggregate) {
+          filterReportsContent([currentSubAccount.id]);
+          console.log('Filter hidden - showing current account:', currentSubAccount.name);
+        } else {
+          filterReportsContent();
+          console.log('Filter hidden - showing all accounts');
+        }
+      }
+    }
+
+    // Monitor account switches to show/hide filter and refresh content
+    function monitorAccountSwitches() {
+      let currentSubAccount = null;
+      
+      setInterval(() => {
+        if (managerRef) {
+          const newSubAccount = managerRef.getCurrentSubAccount();
+          
+          // Check if account has changed
+          if (newSubAccount && (!currentSubAccount || currentSubAccount.id !== newSubAccount.id)) {
+            currentSubAccount = newSubAccount;
+            console.log('🔄 Account change detected, updating context:', newSubAccount.name);
+            
+            // Use our new unified pattern from homepage
+            updateAccountContext();
+          }
+        }
+      }, 500); // Check every 500ms for account changes
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeReportsFilter().catch(console.error);
+        monitorAccountSwitches();
+      });
+    } else {
+          // DOM is already loaded
+    initializeReportsFilter().catch(console.error);
+    monitorAccountSwitches();
+  }
+
+ </script>
+
+</body>
+</html> 

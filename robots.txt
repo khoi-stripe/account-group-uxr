@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /*.js$
+Disallow: /*.css$
+
+# This is a UX research prototype site
+# Not intended for search engine indexing
+Disallow: /
+
+# Sitemap would go here in production
+# Sitemap: https://khoi-stripe.github.io/account-group-uxr/sitemap.xml

@@ -1,0 +1,309 @@
+/* ========================================
+   WIREFRAME STYLES
+   ======================================== */
+
+/* Wireframe-specific variables */
+:root {
+  /* Low-fidelity colors */
+  --wireframe-low-bg: #f8f9fa;
+  --wireframe-low-element: #e9ecef;
+  --wireframe-low-border: #dee2e6;
+  --wireframe-low-text: #6c757d;
+  --wireframe-low-placeholder: #adb5bd;
+  
+  /* Mid-fidelity inherits from existing variables */
+  --wireframe-mid-bg: var(--color-background);
+  --wireframe-mid-element: var(--color-surface);
+  --wireframe-mid-border: var(--color-border);
+  --wireframe-mid-text: var(--color-text-secondary);
+  
+  /* High-fidelity uses full design system */
+  --wireframe-high-bg: var(--color-background);
+  --wireframe-high-element: var(--color-surface);
+  --wireframe-high-border: var(--color-border);
+  --wireframe-high-text: var(--color-text);
+}
+
+/* ========================================
+   FIDELITY MODE BASE STYLES
+   ======================================== */
+
+/* Low-fidelity mode */
+.wireframe-low {
+  background-color: var(--wireframe-low-bg);
+  color: var(--wireframe-low-text);
+  font-family: var(--font-family-ui);
+}
+
+.wireframe-low * {
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* Mid-fidelity mode */
+.wireframe-mid {
+  background-color: var(--wireframe-mid-bg);
+  color: var(--wireframe-mid-text);
+}
+
+/* High-fidelity mode (uses existing design system) */
+.wireframe-high {
+  /* Inherits all existing styles */
+}
+
+/* ========================================
+   WIREFRAME ELEMENTS
+   ======================================== */
+
+.wireframe-box {
+  background-color: var(--wireframe-low-element);
+  border: 2px dashed var(--wireframe-low-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wireframe-low-text);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  min-height: 40px;
+}
+
+.wireframe-box::before {
+  content: attr(data-label);
+  opacity: 0.7;
+}
+
+.wireframe-text {
+  background-color: transparent;
+}
+
+.wireframe-text .text-line {
+  height: 16px;
+  background-color: var(--wireframe-low-placeholder);
+  margin-bottom: 4px;
+  border-radius: 2px;
+}
+
+.wireframe-text .text-line:nth-child(1) { width: 100%; }
+.wireframe-text .text-line:nth-child(2) { width: 85%; }
+.wireframe-text .text-line:nth-child(3) { width: 60%; }
+
+.wireframe-btn {
+  background-color: var(--wireframe-low-element);
+  border: 2px solid var(--wireframe-low-border);
+  color: var(--wireframe-low-text);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.wireframe-input {
+  background-color: var(--wireframe-low-bg);
+  border: 2px solid var(--wireframe-low-border);
+  color: var(--wireframe-low-text);
+  padding: var(--space-sm);
+  font-size: var(--font-size-14);
+  border-radius: 2px;
+  width: 100%;
+}
+
+.wireframe-input::placeholder {
+  color: var(--wireframe-low-placeholder);
+}
+
+.wireframe-card {
+  background-color: var(--wireframe-low-element);
+  border: 2px dashed var(--wireframe-low-border);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  border-radius: 2px;
+}
+
+.wireframe-header {
+  background-color: var(--wireframe-low-element);
+  border: 2px dashed var(--wireframe-low-border);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 2px;
+}
+
+.wireframe-sidebar {
+  background-color: var(--wireframe-low-element);
+  border: 2px dashed var(--wireframe-low-border);
+  padding: var(--space-md);
+  border-radius: 2px;
+  min-height: 400px;
+}
+
+/* ========================================
+   FIDELITY-SPECIFIC OVERRIDES
+   ======================================== */
+
+/* Mid-fidelity: Use some real styling */
+.wireframe-mid .wireframe-box,
+.wireframe-mid .wireframe-card,
+.wireframe-mid .wireframe-header,
+.wireframe-mid .wireframe-sidebar {
+  background-color: var(--wireframe-mid-element);
+  border: 1px solid var(--wireframe-mid-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.wireframe-mid .wireframe-btn {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+}
+
+.wireframe-mid .wireframe-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.wireframe-mid .wireframe-input {
+  background-color: var(--wireframe-mid-bg);
+  border: 1px solid var(--wireframe-mid-border);
+  border-radius: var(--radius-md);
+}
+
+/* High-fidelity: Use full design system */
+.wireframe-high .wireframe-btn {
+  /* Inherits from existing .btn classes */
+}
+
+.wireframe-high .wireframe-input {
+  /* Inherits from existing .form-input classes */
+}
+
+.wireframe-high .wireframe-card {
+  /* Inherits from existing .card classes */
+}
+
+/* ========================================
+   FIDELITY CONTROLS
+   ======================================== */
+
+.fidelity-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  font-size: var(--font-size-14);
+}
+
+.fidelity-controls label {
+  font-weight: var(--font-weight-semibold);
+  margin-right: var(--space-sm);
+  color: var(--color-text-secondary);
+}
+
+.fidelity-controls button {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--space-xs) var(--space-sm);
+  margin: 0 2px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-12);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.fidelity-controls button:hover {
+  background: var(--color-border);
+}
+
+.fidelity-controls button.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* ========================================
+   RESPONSIVE WIREFRAME LAYOUT
+   ======================================== */
+
+.wireframe-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 60px 1fr;
+  grid-template-areas: 
+    "header header"
+    "sidebar main";
+  min-height: 100vh;
+  gap: var(--space-md);
+  padding: var(--space-md);
+}
+
+.wireframe-layout .wireframe-header {
+  grid-area: header;
+  margin-bottom: 0;
+}
+
+.wireframe-layout .wireframe-sidebar {
+  grid-area: sidebar;
+}
+
+.wireframe-layout .wireframe-main {
+  grid-area: main;
+  background-color: var(--wireframe-low-bg);
+  border: 2px dashed var(--wireframe-low-border);
+  padding: var(--space-lg);
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .wireframe-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px auto 1fr;
+    grid-template-areas: 
+      "header"
+      "sidebar"
+      "main";
+  }
+  
+  .wireframe-layout .wireframe-sidebar {
+    min-height: auto;
+  }
+}
+
+/* ========================================
+   DARK MODE SUPPORT
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --wireframe-low-bg: #1a1a1a;
+    --wireframe-low-element: #2d2d2d;
+    --wireframe-low-border: #404040;
+    --wireframe-low-text: #a0a0a0;
+    --wireframe-low-placeholder: #666666;
+  }
+  
+  .fidelity-controls {
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+}
+
+.dark {
+  --wireframe-low-bg: #1a1a1a;
+  --wireframe-low-element: #2d2d2d;
+  --wireframe-low-border: #404040;
+  --wireframe-low-text: #a0a0a0;
+  --wireframe-low-placeholder: #666666;
+}
