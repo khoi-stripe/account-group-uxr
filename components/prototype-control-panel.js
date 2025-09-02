@@ -602,6 +602,12 @@ class PrototypeControlPanel {
         border: 1px solid var(--neutral-200);
       }
       
+      .share-status.info {
+        background: var(--blue-50);
+        color: var(--blue-700);
+        border: 1px solid var(--blue-200);
+      }
+      
       .generated-preview {
         margin-top: 12px;
       }
@@ -1624,14 +1630,14 @@ class PrototypeControlPanel {
     
     // Add event listener for org selection change
     shareOrgSelector.addEventListener('change', () => {
-      this.generateShareLink();
+      this.updateShareLinkPreview();
     });
     
-    // Generate initial link if an org is already selected or set current org
+    // Set initial organization if available
     const currentOrg = window.OrgDataManager?.getCurrentOrganization();
     if (currentOrg) {
       shareOrgSelector.value = currentOrg.name;
-      this.generateShareLink();
+      this.updateShareLinkPreview();
     }
   }
 
@@ -1654,6 +1660,30 @@ class PrototypeControlPanel {
       option.textContent = org.name;
       shareOrgSelector.appendChild(option);
     });
+  }
+
+  // Update share link preview without generating file
+  updateShareLinkPreview() {
+    const shareOrgSelector = document.getElementById('share-org-selector');
+    const shareLinkField = document.getElementById('share-link-field');
+    
+    if (!shareOrgSelector || !shareLinkField) return;
+    
+    const selectedOrgName = shareOrgSelector.value;
+    
+    if (!selectedOrgName) {
+      shareLinkField.value = '';
+      shareLinkField.placeholder = 'Select an organization to generate link...';
+      this.hideShareStatus();
+      return;
+    }
+    
+    // Show preview URL (will be generated when copy button is clicked)
+    const previewId = 'participant-[generated-when-copied]';
+    shareLinkField.value = `${window.location.origin}${window.location.pathname}?data=${previewId}&mode=participant`;
+    shareLinkField.placeholder = '';
+    
+    this.showShareStatus(`📋 Ready to generate participant file for ${selectedOrgName}. Click the copy button to generate & download JSON file.`, 'info');
   }
 
   // Generate share link for selected organization
@@ -1757,16 +1787,33 @@ class PrototypeControlPanel {
     }
   }
 
-  // Copy share link to clipboard
+  // Copy share link to clipboard (generates file first)
   async copyShareLink() {
+    const shareOrgSelector = document.getElementById('share-org-selector');
     const shareLinkField = document.getElementById('share-link-field');
     
-    if (!shareLinkField || !shareLinkField.value) {
-      this.showShareStatus('❌ No link to copy', 'error');
+    if (!shareOrgSelector || !shareLinkField) {
+      this.showShareStatus('❌ Interface error', 'error');
+      return;
+    }
+    
+    const selectedOrgName = shareOrgSelector.value;
+    if (!selectedOrgName) {
+      this.showShareStatus('❌ Please select an organization first', 'error');
       return;
     }
     
     try {
+      // First generate the participant file
+      this.showShareStatus('🔄 Generating participant file...', 'loading');
+      await this._doGenerateShareLink();
+      
+      // Now copy the real generated link
+      if (!shareLinkField.value || shareLinkField.value.includes('[generated-when-copied]')) {
+        this.showShareStatus('❌ Failed to generate participant file', 'error');
+        return;
+      }
+      
       await navigator.clipboard.writeText(shareLinkField.value);
       this.showShareStatus('✅ Link copied to clipboard!', 'success');
       
@@ -1776,6 +1823,12 @@ class PrototypeControlPanel {
       }, 3000);
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
+      
+      // If generation failed, show error
+      if (!shareLinkField.value || shareLinkField.value.includes('[generated-when-copied]')) {
+        this.showShareStatus('❌ Failed to generate participant file', 'error');
+        return;
+      }
       
       // Fallback: select the text
       shareLinkField.select();
@@ -1798,7 +1851,8 @@ class PrototypeControlPanel {
     const shareStatus = document.getElementById('share-status');
     if (!shareStatus) return;
     
-    shareStatus.textContent = message;
+    // 🔧 FIX: Use innerHTML to render HTML content properly
+    shareStatus.innerHTML = message;
     shareStatus.className = `share-status ${type}`;
     shareStatus.style.display = 'block';
   }
