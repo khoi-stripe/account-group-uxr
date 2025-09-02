@@ -224,23 +224,23 @@ class PrototypeControlPanel {
               </div>
               
               <div class="form-group">
-                <button id="generate-json-btn" class="btn btn-primary" onclick="window.prototypePanel.generateParticipantJSON()" disabled>
-                  📄 Generate Participant JSON
-                </button>
-                <p class="help-text">First, generate the JSON file for your selected organization.</p>
-              </div>
-              
-              <div class="form-group">
                 <label class="form-label" for="share-link-field">Shareable Link</label>
                 <div class="share-link-container">
-                  <input type="text" id="share-link-field" class="form-input" readonly placeholder="Generate JSON file first...">
+                  <input type="text" id="share-link-field" class="form-input" readonly placeholder="Select organization to check for existing participant data...">
                   <button id="copy-link-btn" class="btn btn-secondary copy-btn" onclick="window.prototypePanel.copyShareLink()" title="Copy to clipboard" disabled>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M4.5 2.5H2.5C2.23478 2.5 1.98043 2.60536 1.79289 2.79289C1.60536 2.98043 1.5 3.23478 1.5 3.5V11.5C1.5 11.7652 1.60536 12.0196 1.79289 12.2071C1.98043 12.3946 2.23478 12.5 2.5 12.5H10.5C10.7652 12.5 11.0196 12.3946 11.2071 12.2071C11.3946 12.0196 11.5 11.7652 11.5 11.5V9.5M8.5 1.5H11.5C11.7652 1.5 12.0196 1.60536 12.2071 1.79289C12.3946 1.98043 12.5 2.23478 12.5 2.5V5.5M8.5 1.5L12.5 5.5M8.5 1.5V5.5H12.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </button>
                 </div>
-                <p class="help-text">After generating JSON, upload it to <code>data/participants/</code> then copy this link.</p>
+                <p class="help-text">If participant data exists, it will auto-populate above. Otherwise, generate new data below.</p>
+              </div>
+              
+              <div class="form-group">
+                <button id="generate-json-btn" class="btn btn-primary" onclick="window.prototypePanel.generateParticipantJSON()">
+                  📄 Generate new participant JSON
+                </button>
+                <p class="help-text">Creates fresh participant data for selected organization (overwrites existing).</p>
               </div>
               
               <div id="share-status" class="share-status" style="display: none;"></div>
@@ -1607,17 +1607,13 @@ class PrototypeControlPanel {
     
     // Add event listener for org selection change
     shareOrgSelector.addEventListener('change', () => {
-      // Clear generated state when org changes
-      if (this.generatedOrgName && this.generatedOrgName !== shareOrgSelector.value) {
-        this.generatedParticipantId = null;
-        this.generatedOrgName = null;
-      }
+      // Clear existing participant ID when org changes (will be repopulated by updateShareLinkPreview)
+      this.existingParticipantId = null;
       this.updateShareLinkPreview();
     });
     
     // Initialize state
-    this.generatedParticipantId = null;
-    this.generatedOrgName = null;
+    this.existingParticipantId = null;
     
     // Set initial organization if available
     const currentOrg = window.OrgDataManager?.getCurrentOrganization();
@@ -1649,7 +1645,7 @@ class PrototypeControlPanel {
   }
 
   // Update UI state when organization selection changes
-  updateShareLinkPreview() {
+  async updateShareLinkPreview() {
     const shareOrgSelector = document.getElementById('share-org-selector');
     const shareLinkField = document.getElementById('share-link-field');
     const generateBtn = document.getElementById('generate-json-btn');
@@ -1660,30 +1656,97 @@ class PrototypeControlPanel {
     const selectedOrgName = shareOrgSelector.value;
     
     if (!selectedOrgName) {
-      // No organization selected
-      generateBtn.disabled = true;
+      // No organization selected - keep generate button enabled for CSV refresh scenarios
+      generateBtn.disabled = false; 
       copyBtn.disabled = true;
       shareLinkField.value = '';
-      shareLinkField.placeholder = 'Generate JSON file first...';
+      shareLinkField.placeholder = 'Select organization to check for existing participant data...';
       this.hideShareStatus();
-      this.generatedParticipantId = null;
+      this.existingParticipantId = null;
       return;
     }
     
-    // Organization selected - enable generate button
+    // Organization selected - always enable generate button (for CSV refresh scenarios)
     generateBtn.disabled = false;
-    copyBtn.disabled = !this.generatedParticipantId; // Only enable if JSON already generated
     
-    if (this.generatedParticipantId) {
-      // JSON already generated for this org
-      shareLinkField.value = `${window.location.origin}${window.location.pathname}?data=${this.generatedParticipantId}&mode=participant`;
-      this.showShareStatus(`✅ JSON generated: ${this.generatedParticipantId}.json - Upload it to data/participants/ then copy link.`, 'success');
-    } else {
-      // No JSON generated yet
+    // Check for existing participant files for this organization
+    try {
+      const existingParticipantId = await this.findExistingParticipantFile(selectedOrgName);
+      
+      if (existingParticipantId) {
+        // Found existing participant file
+        this.existingParticipantId = existingParticipantId;
+        shareLinkField.value = `${window.location.origin}${window.location.pathname}?data=${existingParticipantId}&mode=participant`;
+        shareLinkField.placeholder = '';
+        copyBtn.disabled = false;
+        this.showShareStatus(`✅ Found existing participant data: ${existingParticipantId}.json`, 'success');
+      } else {
+        // No existing participant file found
+        this.existingParticipantId = null;
+        shareLinkField.value = '';
+        shareLinkField.placeholder = 'No existing participant data found...';
+        copyBtn.disabled = true;
+        this.showShareStatus(`📋 No existing participant data for ${selectedOrgName}. Generate new data below.`, 'info');
+      }
+    } catch (error) {
+      console.warn('Error checking for existing participant files:', error);
+      this.existingParticipantId = null;
       shareLinkField.value = '';
-      shareLinkField.placeholder = 'Generate JSON file first...';
-      this.showShareStatus(`📋 Ready to generate participant file for ${selectedOrgName}. Click the generate button below.`, 'info');
+      shareLinkField.placeholder = 'Could not check for existing data...';
+      copyBtn.disabled = true;
+      this.showShareStatus(`⚠️ Ready to generate participant data for ${selectedOrgName}.`, 'info');
     }
+  }
+
+  // Find existing participant file for organization (check localStorage and try common patterns)
+  async findExistingParticipantFile(orgName) {
+    // Check localStorage for recently generated files for this org
+    const recentFiles = JSON.parse(localStorage.getItem('uxr_recent_participant_files') || '[]');
+    const orgFiles = recentFiles.filter(file => file.orgName === orgName);
+    
+    if (orgFiles.length > 0) {
+      // Sort by timestamp (newest first) and try to verify the file exists
+      orgFiles.sort((a, b) => b.timestamp - a.timestamp);
+      
+      for (const file of orgFiles) {
+        try {
+          // Verify the file still exists by trying to fetch it
+          const response = await fetch(`./data/participants/${file.participantId}.json`);
+          if (response.ok) {
+            console.log(`Found existing participant file: ${file.participantId}.json`);
+            return file.participantId;
+          }
+        } catch (error) {
+          console.warn(`Could not verify participant file: ${file.participantId}.json`, error);
+        }
+      }
+    }
+    
+    // No existing file found in localStorage or files no longer exist
+    console.log(`No existing participant file found for organization: ${orgName}`);
+    return null;
+  }
+
+  // Store participant file info in localStorage for future reference
+  storeParticipantFileInfo(participantId, orgName) {
+    const recentFiles = JSON.parse(localStorage.getItem('uxr_recent_participant_files') || '[]');
+    
+    // Remove any existing entry for this org (to prevent duplicates)
+    const filteredFiles = recentFiles.filter(file => file.orgName !== orgName);
+    
+    // Add new entry
+    filteredFiles.unshift({
+      participantId,
+      orgName,
+      timestamp: Date.now(),
+      createdAt: new Date().toISOString()
+    });
+    
+    // Keep only the 20 most recent files to prevent localStorage bloat
+    const limitedFiles = filteredFiles.slice(0, 20);
+    
+    localStorage.setItem('uxr_recent_participant_files', JSON.stringify(limitedFiles));
+    console.log(`Stored participant file info: ${participantId} for ${orgName}`);
   }
 
   // Generate participant JSON file (explicit step)
@@ -1721,16 +1784,16 @@ class PrototypeControlPanel {
       // Generate participant data
       const result = await this._generateParticipantData(targetOrg, selectedOrgName);
       
-      // Store the generated ID for stable linking
-      this.generatedParticipantId = result.participantId;
-      this.generatedOrgName = selectedOrgName;
+      // Store the generated file info for future reference
+      this.storeParticipantFileInfo(result.participantId, selectedOrgName);
+      this.existingParticipantId = result.participantId;
       
       // Update UI
       shareLinkField.value = result.shareUrl;
       shareLinkField.placeholder = '';
       copyBtn.disabled = false;
       
-      this.showShareStatus(`✅ Generated: ${result.participantId}.json - Upload this file to data/participants/ folder and deploy.`, 'success');
+      this.showShareStatus(`✅ Generated: ${result.participantId}.json - Upload this file to data/participants/ folder, deploy, then copy link.`, 'success');
       
     } catch (error) {
       console.error('Failed to generate participant JSON:', error);
@@ -1738,7 +1801,7 @@ class PrototypeControlPanel {
     } finally {
       // Re-enable button
       generateBtn.disabled = false;
-      generateBtn.textContent = '📄 Generate Participant JSON';
+      generateBtn.textContent = '📄 Generate new participant JSON';
     }
   }
 
@@ -1764,7 +1827,7 @@ class PrototypeControlPanel {
 
 
 
-  // Copy share link to clipboard (no generation - uses existing JSON)
+  // Copy share link to clipboard (uses existing or generated JSON)
   async copyShareLink() {
     const shareLinkField = document.getElementById('share-link-field');
     
@@ -1773,7 +1836,7 @@ class PrototypeControlPanel {
       return;
     }
     
-    if (!this.generatedParticipantId || !shareLinkField.value) {
+    if (!this.existingParticipantId || !shareLinkField.value) {
       this.showShareStatus('❌ Please generate JSON file first', 'error');
       return;
     }
