@@ -212,25 +212,6 @@ class PrototypeControlPanel {
         
         <!-- Share Prototype Tab -->
         <div id="share-tab" class="tab-content">
-          <!-- Quick Scenarios Section -->
-          <div class="section">
-            <div class="section-content">
-              <h4 class="section-title">Quick Share - Predefined Scenarios</h4>
-              <div class="scenario-buttons">
-                <button class="btn btn-outline scenario-btn" onclick="window.prototypePanel.shareScenario('enterprise')">
-                  🏢 Enterprise
-                </button>
-                <button class="btn btn-outline scenario-btn" onclick="window.prototypePanel.shareScenario('startup')">
-                  🚀 Startup
-                </button>
-                <button class="btn btn-outline scenario-btn" onclick="window.prototypePanel.shareScenario('agency')">
-                  🎨 Agency
-                </button>
-              </div>
-              <p class="help-text">🚀 <strong>Instant sharing</strong> - no file uploads needed! Click any button above to copy a participant link.</p>
-            </div>
-          </div>
-
           <!-- Custom Organization Share -->
           <div class="section">
             <div class="section-content">
@@ -243,27 +224,23 @@ class PrototypeControlPanel {
               </div>
               
               <div class="form-group">
+                <button id="generate-json-btn" class="btn btn-primary" onclick="window.prototypePanel.generateParticipantJSON()" disabled>
+                  📄 Generate Participant JSON
+                </button>
+                <p class="help-text">First, generate the JSON file for your selected organization.</p>
+              </div>
+              
+              <div class="form-group">
                 <label class="form-label" for="share-link-field">Shareable Link</label>
                 <div class="share-link-container">
-                  <input type="text" id="share-link-field" class="form-input" readonly placeholder="Select an organization to generate link...">
-                  <button class="btn btn-secondary copy-btn" onclick="window.prototypePanel.copyShareLink()" title="Copy to clipboard">
+                  <input type="text" id="share-link-field" class="form-input" readonly placeholder="Generate JSON file first...">
+                  <button id="copy-link-btn" class="btn btn-secondary copy-btn" onclick="window.prototypePanel.copyShareLink()" title="Copy to clipboard" disabled>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M4.5 2.5H2.5C2.23478 2.5 1.98043 2.60536 1.79289 2.79289C1.60536 2.98043 1.5 3.23478 1.5 3.5V11.5C1.5 11.7652 1.60536 12.0196 1.79289 12.2071C1.98043 12.3946 2.23478 12.5 2.5 12.5H10.5C10.7652 12.5 11.0196 12.3946 11.2071 12.2071C11.3946 12.0196 11.5 11.7652 11.5 11.5V9.5M8.5 1.5H11.5C11.7652 1.5 12.0196 1.60536 12.2071 1.79289C12.3946 1.98043 12.5 2.23478 12.5 2.5V5.5M8.5 1.5L12.5 5.5M8.5 1.5V5.5H12.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </button>
                 </div>
-                <div class="workflow-help">
-                  <p class="help-text"><strong>📁 Static File Workflow (Chrome-Safe):</strong></p>
-                  <ol class="workflow-steps">
-                    <li><strong>Generate:</strong> Select organization → Click generates & downloads JSON file</li>
-                    <li><strong>Upload:</strong> Move downloaded file to <code>data/participants/</code> folder</li>
-                    <li><strong>Deploy:</strong> Commit & push to GitHub (triggers Netlify deploy)</li>
-                    <li><strong>Share:</strong> Use the generated participant link below</li>
-                  </ol>
-                  <p class="help-text" style="margin-top: 8px; color: var(--neutral-600); font-size: 11px;">
-                    💡 <strong>Why this way?</strong> Static files avoid Chrome security warnings that APIs trigger.
-                  </p>
-                </div>
+                <p class="help-text">After generating JSON, upload it to <code>data/participants/</code> then copy this link.</p>
               </div>
               
               <div id="share-status" class="share-status" style="display: none;"></div>
@@ -1630,8 +1607,17 @@ class PrototypeControlPanel {
     
     // Add event listener for org selection change
     shareOrgSelector.addEventListener('change', () => {
+      // Clear generated state when org changes
+      if (this.generatedOrgName && this.generatedOrgName !== shareOrgSelector.value) {
+        this.generatedParticipantId = null;
+        this.generatedOrgName = null;
+      }
       this.updateShareLinkPreview();
     });
+    
+    // Initialize state
+    this.generatedParticipantId = null;
+    this.generatedOrgName = null;
     
     // Set initial organization if available
     const currentOrg = window.OrgDataManager?.getCurrentOrganization();
@@ -1662,140 +1648,52 @@ class PrototypeControlPanel {
     });
   }
 
-  // Update share link preview without generating file
+  // Update UI state when organization selection changes
   updateShareLinkPreview() {
     const shareOrgSelector = document.getElementById('share-org-selector');
     const shareLinkField = document.getElementById('share-link-field');
+    const generateBtn = document.getElementById('generate-json-btn');
+    const copyBtn = document.getElementById('copy-link-btn');
     
-    if (!shareOrgSelector || !shareLinkField) return;
-    
-    const selectedOrgName = shareOrgSelector.value;
-    
-    if (!selectedOrgName) {
-      shareLinkField.value = '';
-      shareLinkField.placeholder = 'Select an organization to generate link...';
-      this.hideShareStatus();
-      return;
-    }
-    
-    // Show preview URL (will be generated when copy button is clicked)
-    const previewId = 'participant-[generated-when-copied]';
-    shareLinkField.value = `${window.location.origin}${window.location.pathname}?data=${previewId}&mode=participant`;
-    shareLinkField.placeholder = '';
-    
-    this.showShareStatus(`📋 Ready to generate participant file for ${selectedOrgName}. Click the copy button to generate & download JSON file.`, 'info');
-  }
-
-  // Generate share link for selected organization
-  async generateShareLink() {
-    // 🚨 DEBOUNCE: Prevent rapid successive calls that cause race conditions
-    if (this._generateLinkTimeout) {
-      clearTimeout(this._generateLinkTimeout);
-    }
-    
-    this._generateLinkTimeout = setTimeout(async () => {
-      await this._doGenerateShareLink();
-    }, 300); // 300ms debounce
-  }
-  
-  async _doGenerateShareLink() {
-    const shareOrgSelector = document.getElementById('share-org-selector');
-    const shareLinkField = document.getElementById('share-link-field');
-    const shareStatus = document.getElementById('share-status');
-    
-    if (!shareOrgSelector || !shareLinkField) return;
+    if (!shareOrgSelector || !shareLinkField || !generateBtn || !copyBtn) return;
     
     const selectedOrgName = shareOrgSelector.value;
     
     if (!selectedOrgName) {
+      // No organization selected
+      generateBtn.disabled = true;
+      copyBtn.disabled = true;
       shareLinkField.value = '';
-      shareLinkField.placeholder = 'Select an organization to generate link...';
+      shareLinkField.placeholder = 'Generate JSON file first...';
       this.hideShareStatus();
+      this.generatedParticipantId = null;
       return;
     }
     
-    try {
-      this.showShareStatus('Generating participant data file...', 'loading');
-      
-      // Get the selected organization data
-      const targetOrg = window.OrgDataManager?.getOrganizationByName(selectedOrgName);
-      
-      if (!targetOrg) {
-        throw new Error('Organization not found');
-      }
-      
-      // Check if static data loader is available
-      if (!window.staticDataLoader) {
-        // Wait a bit and try again - it might still be loading
-        await new Promise(resolve => setTimeout(resolve, 500));
-        if (!window.staticDataLoader) {
-          throw new Error('Static data loader not available. Please refresh the page.');
-        }
-      }
-      
-      // Ensure organization data is available
-      if (!window.OrgDataManager || !window.OrgDataManager.organizations || window.OrgDataManager.organizations.length === 0) {
-        throw new Error('Organization data not loaded. Please refresh the page.');
-      }
-      
-      // Temporarily set the organization data for export
-      const originalOrg = window.selectedOrganizationName;
-      window.selectedOrganizationName = selectedOrgName;
-      
-      let result;
-      try {
-        // Generate participant data and file
-        result = await window.staticDataLoader.generateParticipantData();
-        if (!result) {
-          throw new Error('Failed to generate participant data');
-        }
-      } catch (error) {
-        throw new Error(`Participant data generation failed: ${error.message}`);
-      } finally {
-        // Restore original organization
-        if (originalOrg) {
-          window.selectedOrganizationName = originalOrg;
-        }
-      }
-      
-      if (result && result.shareUrl) {
-        shareLinkField.value = result.shareUrl;
-        shareLinkField.placeholder = '';
-        this.showShareStatus(`✅ Step 1 Complete: ${result.participantId}.json downloaded! Next: Upload this file to data/participants/ folder and deploy.`, 'success');
-        
-        // Show detailed next steps
-        setTimeout(() => {
-          this.showShareStatus(`
-            <div style="text-align: left; font-size: 12px; line-height: 1.4;">
-              <strong>📋 Next Steps:</strong><br>
-              1. Find the downloaded ${result.participantId}.json<br>
-              2. Upload it to your data/participants/ folder<br>
-              3. Commit & deploy to GitHub/Netlify<br>
-              4. Share the link below with participants
-            </div>
-          `, 'success');
-        }, 3000);
-      } else {
-        throw new Error('Failed to generate share URL');
-      }
-      
-    } catch (error) {
-      console.error('Failed to generate share link:', error);
+    // Organization selected - enable generate button
+    generateBtn.disabled = false;
+    copyBtn.disabled = !this.generatedParticipantId; // Only enable if JSON already generated
+    
+    if (this.generatedParticipantId) {
+      // JSON already generated for this org
+      shareLinkField.value = `${window.location.origin}${window.location.pathname}?data=${this.generatedParticipantId}&mode=participant`;
+      this.showShareStatus(`✅ JSON generated: ${this.generatedParticipantId}.json - Upload it to data/participants/ then copy link.`, 'success');
+    } else {
+      // No JSON generated yet
       shareLinkField.value = '';
-      shareLinkField.placeholder = 'Error generating link...';
-      this.showShareStatus(`❌ ${error.message}`, 'error');
+      shareLinkField.placeholder = 'Generate JSON file first...';
+      this.showShareStatus(`📋 Ready to generate participant file for ${selectedOrgName}. Click the generate button below.`, 'info');
     }
   }
 
-  // Copy share link to clipboard (generates file first)
-  async copyShareLink() {
+  // Generate participant JSON file (explicit step)
+  async generateParticipantJSON() {
     const shareOrgSelector = document.getElementById('share-org-selector');
+    const generateBtn = document.getElementById('generate-json-btn');
+    const copyBtn = document.getElementById('copy-link-btn');
     const shareLinkField = document.getElementById('share-link-field');
     
-    if (!shareOrgSelector || !shareLinkField) {
-      this.showShareStatus('❌ Interface error', 'error');
-      return;
-    }
+    if (!shareOrgSelector || !generateBtn || !copyBtn || !shareLinkField) return;
     
     const selectedOrgName = shareOrgSelector.value;
     if (!selectedOrgName) {
@@ -1804,16 +1702,83 @@ class PrototypeControlPanel {
     }
     
     try {
-      // First generate the participant file
-      this.showShareStatus('🔄 Generating participant file...', 'loading');
-      await this._doGenerateShareLink();
+      // Disable button during generation
+      generateBtn.disabled = true;
+      generateBtn.textContent = '🔄 Generating...';
+      this.showShareStatus('🔄 Generating participant JSON file...', 'loading');
       
-      // Now copy the real generated link
-      if (!shareLinkField.value || shareLinkField.value.includes('[generated-when-copied]')) {
-        this.showShareStatus('❌ Failed to generate participant file', 'error');
-        return;
+      // Get the selected organization data
+      const targetOrg = window.OrgDataManager?.getOrganizationByName(selectedOrgName);
+      if (!targetOrg) {
+        throw new Error(`Organization '${selectedOrgName}' not found`);
       }
       
+      // Check if static data loader is available
+      if (!window.staticDataLoader) {
+        throw new Error('Static data loader not available. Please refresh the page.');
+      }
+      
+      // Generate participant data
+      const result = await this._generateParticipantData(targetOrg, selectedOrgName);
+      
+      // Store the generated ID for stable linking
+      this.generatedParticipantId = result.participantId;
+      this.generatedOrgName = selectedOrgName;
+      
+      // Update UI
+      shareLinkField.value = result.shareUrl;
+      shareLinkField.placeholder = '';
+      copyBtn.disabled = false;
+      
+      this.showShareStatus(`✅ Generated: ${result.participantId}.json - Upload this file to data/participants/ folder and deploy.`, 'success');
+      
+    } catch (error) {
+      console.error('Failed to generate participant JSON:', error);
+      this.showShareStatus(`❌ ${error.message}`, 'error');
+    } finally {
+      // Re-enable button
+      generateBtn.disabled = false;
+      generateBtn.textContent = '📄 Generate Participant JSON';
+    }
+  }
+
+  // Helper method to generate participant data
+  async _generateParticipantData(targetOrg, selectedOrgName) {
+    // Temporarily set the organization data for export
+    const originalOrg = window.selectedOrganizationName;
+    window.selectedOrganizationName = selectedOrgName;
+    
+    try {
+      const result = await window.staticDataLoader.generateParticipantData();
+      if (!result) {
+        throw new Error('Failed to generate participant data');
+      }
+      return result;
+    } finally {
+      // Restore original organization
+      if (originalOrg) {
+        window.selectedOrganizationName = originalOrg;
+      }
+    }
+  }
+
+
+
+  // Copy share link to clipboard (no generation - uses existing JSON)
+  async copyShareLink() {
+    const shareLinkField = document.getElementById('share-link-field');
+    
+    if (!shareLinkField) {
+      this.showShareStatus('❌ Interface error', 'error');
+      return;
+    }
+    
+    if (!this.generatedParticipantId || !shareLinkField.value) {
+      this.showShareStatus('❌ Please generate JSON file first', 'error');
+      return;
+    }
+    
+    try {
       await navigator.clipboard.writeText(shareLinkField.value);
       this.showShareStatus('✅ Link copied to clipboard!', 'success');
       
@@ -1823,12 +1788,6 @@ class PrototypeControlPanel {
       }, 3000);
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
-      
-      // If generation failed, show error
-      if (!shareLinkField.value || shareLinkField.value.includes('[generated-when-copied]')) {
-        this.showShareStatus('❌ Failed to generate participant file', 'error');
-        return;
-      }
       
       // Fallback: select the text
       shareLinkField.select();
@@ -1865,33 +1824,7 @@ class PrototypeControlPanel {
     shareStatus.style.display = 'none';
   }
 
-  // Share a predefined scenario
-  async shareScenario(scenarioName) {
-    const shareLinkField = document.getElementById('share-link-field');
-    
-    try {
-      // Generate the scenario URL
-      const scenarioUrl = `${window.location.origin}${window.location.pathname}?scenario=${scenarioName}&mode=participant`;
-      
-      if (shareLinkField) {
-        shareLinkField.value = scenarioUrl;
-        shareLinkField.placeholder = '';
-      }
-      
-      // Copy to clipboard automatically
-      await navigator.clipboard.writeText(scenarioUrl);
-      this.showShareStatus(`✅ ${scenarioName.charAt(0).toUpperCase() + scenarioName.slice(1)} scenario link copied to clipboard!`, 'success');
-      
-      // Hide success message after 3 seconds
-      setTimeout(() => {
-        this.hideShareStatus();
-      }, 3000);
-      
-    } catch (error) {
-      console.error('Failed to share scenario:', error);
-      this.showShareStatus(`❌ Failed to share ${scenarioName} scenario`, 'error');
-    }
-  }
+
 
   // Add visual indicator for participant mode
   addParticipantModeIndicator() {
