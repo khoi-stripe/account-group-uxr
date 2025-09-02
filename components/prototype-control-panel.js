@@ -15,6 +15,11 @@ class PrototypeControlPanel {
     this.overlay = null;
     this.isParticipantMode = this.checkParticipantMode();
     
+    console.log('🎛️ PrototypeControlPanel initializing:', {
+      isParticipantMode: this.isParticipantMode,
+      willShowControls: !this.isParticipantMode
+    });
+    
     // Only initialize controls in admin mode
     if (!this.isParticipantMode) {
       this.init();
@@ -32,7 +37,17 @@ class PrototypeControlPanel {
     // Check sessionStorage for persisted participant mode
     const storedParticipantMode = sessionStorage.getItem('participant_mode') === 'true';
     
-    return urlHasParticipantMode || storedParticipantMode;
+    const isParticipant = urlHasParticipantMode || storedParticipantMode;
+    
+    // Debug logging to help troubleshoot
+    console.log('🔍 PrototypeControlPanel participant mode check:', {
+      urlHasParticipantMode,
+      storedParticipantMode,
+      isParticipant,
+      currentURL: window.location.href
+    });
+    
+    return isParticipant;
   }
 
   init() {
