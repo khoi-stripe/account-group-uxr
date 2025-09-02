@@ -1738,7 +1738,7 @@ class PrototypeControlPanel {
       for (const file of orgFiles) {
         try {
           // Verify the file still exists by trying to fetch it
-          const response = await fetch(`./data/participants/${file.participantId}.json`);
+          const response = await fetch(`/account-group-uxr/data/participants/${file.participantId}.json`);
           if (response.ok) {
             console.log(`✅ Found existing participant file in localStorage: ${file.participantId}.json`);
             return file.participantId;
@@ -1759,7 +1759,7 @@ class PrototypeControlPanel {
         
         if (participantId) {
           // Verify the indexed file actually exists
-          const fileResponse = await fetch(`./data/participants/${participantId}.json`);
+          const fileResponse = await fetch(`/account-group-uxr/data/participants/${participantId}.json`);
           if (fileResponse.ok) {
             console.log(`✅ Found existing participant file in index: ${participantId}.json`);
             

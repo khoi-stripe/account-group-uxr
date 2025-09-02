@@ -101,7 +101,7 @@ class StaticDataLoader {
 
   async loadParticipantData(participantId) {
     try {
-      const response = await fetch(`./data/participants/${participantId}.json`);
+      const response = await fetch(`/account-group-uxr/data/participants/${participantId}.json`);
       if (!response.ok) {
         throw new Error(`Failed to load participant data: ${response.status}`);
       }
@@ -117,7 +117,7 @@ class StaticDataLoader {
 
   async loadScenario(scenarioName) {
     try {
-      const response = await fetch(`./data/scenarios/${scenarioName}.json`);
+      const response = await fetch(`/account-group-uxr/data/scenarios/${scenarioName}.json`);
       if (!response.ok) {
         throw new Error(`Failed to load scenario: ${response.status}`);
       }
