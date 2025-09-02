@@ -230,7 +230,38 @@ class StaticDataLoader {
   // Integrate with existing organization data system
   integrateWithOrganizationData() {
     if (this.currentData && this.currentData.accounts) {
-      // Update the global organization data to match our loaded data
+      // 🔧 FIX: In participant mode, force override all existing data
+      if (this.isParticipantMode) {
+        console.log(`🔄 Participant mode: Force loading ${this.currentData.organizationName} data`);
+        
+        // Clear any cached organization data that might conflict
+        localStorage.removeItem('uxr_organizations_data');
+        localStorage.removeItem('uxr_current_organization');
+        localStorage.removeItem('uxr_current_sub_account');
+        
+        // Force OrgDataManager to use our participant data
+        if (window.OrgDataManager) {
+          // Replace the organizations array with our participant data
+          window.OrgDataManager.organizations = [{
+            name: this.currentData.organizationName,
+            accounts: this.currentData.accounts
+          }];
+          
+          // Set as current organization
+          window.OrgDataManager.setCurrentOrganization(window.OrgDataManager.organizations[0]);
+          
+          // Set aggregate view as current sub-account
+          const aggregateAccount = this.currentData.accounts.find(acc => acc.isAggregate);
+          if (aggregateAccount) {
+            window.OrgDataManager.setCurrentSubAccount(aggregateAccount);
+          }
+        }
+        
+        console.log(`✅ Participant mode: Successfully loaded ${this.currentData.organizationName} data`);
+        return;
+      }
+      
+      // Normal mode: Standard integration
       window.selectedOrganizationName = this.currentData.organizationName;
       
       // Create a compatibility layer for window.organizationData
