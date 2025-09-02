@@ -1709,9 +1709,11 @@ class PrototypeControlPanel {
     }
   }
 
-  // Find existing participant file for organization (check localStorage and try common patterns)
+  // Find existing participant file for organization (check localStorage and participant index)
   async findExistingParticipantFile(orgName) {
-    // Check localStorage for recently generated files for this org
+    console.log(`🔍 Looking for existing participant file for: ${orgName}`);
+    
+    // STEP 1: Check localStorage for recently generated files for this org
     const recentFiles = JSON.parse(localStorage.getItem('uxr_recent_participant_files') || '[]');
     const orgFiles = recentFiles.filter(file => file.orgName === orgName);
     
@@ -1724,17 +1726,42 @@ class PrototypeControlPanel {
           // Verify the file still exists by trying to fetch it
           const response = await fetch(`./data/participants/${file.participantId}.json`);
           if (response.ok) {
-            console.log(`Found existing participant file: ${file.participantId}.json`);
+            console.log(`✅ Found existing participant file in localStorage: ${file.participantId}.json`);
             return file.participantId;
           }
         } catch (error) {
-          console.warn(`Could not verify participant file: ${file.participantId}.json`, error);
+          console.warn(`Could not verify participant file from localStorage: ${file.participantId}.json`, error);
         }
       }
     }
     
-    // No existing file found in localStorage or files no longer exist
-    console.log(`No existing participant file found for organization: ${orgName}`);
+    // STEP 2: Check participant index as fallback for script-generated files
+    try {
+      console.log(`📋 Checking participant index for: ${orgName}`);
+      const indexResponse = await fetch('./data/participant-index.json');
+      if (indexResponse.ok) {
+        const participantIndex = await indexResponse.json();
+        const participantId = participantIndex[orgName];
+        
+        if (participantId) {
+          // Verify the indexed file actually exists
+          const fileResponse = await fetch(`./data/participants/${participantId}.json`);
+          if (fileResponse.ok) {
+            console.log(`✅ Found existing participant file in index: ${participantId}.json`);
+            
+            // Store in localStorage for faster future access
+            this.storeParticipantFileInfo(participantId, orgName);
+            
+            return participantId;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Could not check participant index:', error);
+    }
+    
+    // No existing file found anywhere
+    console.log(`❌ No existing participant file found for organization: ${orgName}`);
     return null;
   }
 

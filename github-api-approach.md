@@ -1,4 +1,4 @@
-# 🔧 Alternative: GitHub API Direct Upload
+)# 🔧 Alternative: GitHub API Direct Upload
 
 ## How It Would Work:
 1. User clicks "Generate Participant File"

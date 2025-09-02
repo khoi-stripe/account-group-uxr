@@ -173,6 +173,34 @@ function generateParticipantData(organization) {
 }
 
 /**
+ * Update participant index file for prototype discovery
+ */
+async function updateParticipantIndex(results) {
+  try {
+    const indexPath = path.join(__dirname, '..', 'data', 'participant-index.json');
+    
+    // Read existing index or create new one
+    let participantIndex = {};
+    if (fs.existsSync(indexPath)) {
+      const existingIndex = fs.readFileSync(indexPath, 'utf8');
+      participantIndex = JSON.parse(existingIndex);
+    }
+    
+    // Update index with new results
+    results.forEach(result => {
+      participantIndex[result.organization] = result.participantId;
+    });
+    
+    // Write updated index
+    fs.writeFileSync(indexPath, JSON.stringify(participantIndex, null, 2));
+    console.log(`📋 Updated participant index with ${results.length} new entries`);
+    
+  } catch (error) {
+    console.warn('Could not update participant index:', error);
+  }
+}
+
+/**
  * Main execution function
  */
 async function main() {
@@ -233,6 +261,9 @@ async function main() {
       console.log(`   URL: ${result.url}`);
       console.log('');
     });
+    
+    // Update participant index for prototype discovery
+    await updateParticipantIndex(results);
     
     console.log('✅ All participant files generated successfully!');
     console.log('\n📋 NEXT STEPS:');
