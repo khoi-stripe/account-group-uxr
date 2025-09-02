@@ -25,14 +25,15 @@ class PrototypeControlPanel {
   }
 
   checkParticipantMode() {
-    // Check if this is a shared link (has ?share= parameter or came from shared data)
+    // Check for static file approach participant mode
     const urlParams = new URLSearchParams(window.location.search);
-    const hasShareParam = urlParams.has('share');
+    const hasParticipantMode = urlParams.has('mode') && urlParams.get('mode') === 'participant';
     
-    // Also check if we loaded shared data (indicates this was accessed via shared link)
-    const hasSharedData = sessionStorage.getItem('loaded_shared_data') === 'true';
+    // Also check if we have scenario or data parameters (indicates shared link)
+    const hasScenario = urlParams.has('scenario');
+    const hasDataParam = urlParams.has('data');
     
-    return hasShareParam || hasSharedData;
+    return hasParticipantMode || (hasScenario || hasDataParam);
   }
 
   init() {
@@ -1678,29 +1679,46 @@ class PrototypeControlPanel {
         throw new Error('Organization not found');
       }
       
-      // Use static data loader to generate participant file
+      // Check if static data loader is available
       if (!window.staticDataLoader) {
-        throw new Error('Static data loader not available');
+        // Wait a bit and try again - it might still be loading
+        await new Promise(resolve => setTimeout(resolve, 500));
+        if (!window.staticDataLoader) {
+          throw new Error('Static data loader not available. Please refresh the page.');
+        }
+      }
+      
+      // Ensure organization data is available
+      if (!window.organizationData || !window.organizationData.organizations) {
+        throw new Error('Organization data not loaded. Please refresh the page.');
       }
       
       // Temporarily set the organization data for export
       const originalOrg = window.selectedOrganizationName;
       window.selectedOrganizationName = selectedOrgName;
       
-      // Generate participant data and file
-      const result = await window.staticDataLoader.generateParticipantData();
-      
-      // Restore original organization
-      if (originalOrg) {
-        window.selectedOrganizationName = originalOrg;
+      let result;
+      try {
+        // Generate participant data and file
+        result = await window.staticDataLoader.generateParticipantData();
+        if (!result) {
+          throw new Error('Failed to generate participant data');
+        }
+      } catch (error) {
+        throw new Error(`Participant data generation failed: ${error.message}`);
+      } finally {
+        // Restore original organization
+        if (originalOrg) {
+          window.selectedOrganizationName = originalOrg;
+        }
       }
       
-      if (result.shareUrl) {
+      if (result && result.shareUrl) {
         shareLinkField.value = result.shareUrl;
         shareLinkField.placeholder = '';
         this.showShareStatus(`✅ Participant file generated! Upload ${result.participantId}.json to data/participants/ then share the link.`, 'success');
       } else {
-        throw new Error('Failed to generate participant data');
+        throw new Error('Failed to generate share URL');
       }
       
     } catch (error) {

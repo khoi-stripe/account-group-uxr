@@ -111,15 +111,22 @@ class StaticDataLoader {
 
   // Generate a participant data file from current state
   async generateParticipantData() {
+    console.log('generateParticipantData called');
+    console.log('window.organizationData:', window.organizationData);
+    console.log('window.selectedOrganizationName:', window.selectedOrganizationName);
+    
     if (!window.organizationData) {
       throw new Error('No organization data available to generate participant file');
     }
 
     const selectedOrgName = window.selectedOrganizationName || 'Default Organization';
+    console.log('Looking for organization:', selectedOrgName);
+    console.log('Available organizations:', window.organizationData.organizations?.map(org => org.name));
+    
     const selectedOrg = window.organizationData.organizations.find(org => org.name === selectedOrgName);
     
     if (!selectedOrg) {
-      throw new Error('Selected organization not found');
+      throw new Error(`Selected organization '${selectedOrgName}' not found. Available: ${window.organizationData.organizations?.map(org => org.name).join(', ')}`);
     }
 
     const participantId = this.generateParticipantId();
