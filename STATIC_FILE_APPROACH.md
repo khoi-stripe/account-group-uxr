@@ -95,7 +95,7 @@ https://yoursite.com/prototype.html?data=participant-001&mode=participant
 ## 🚀 Deployment
 
 1. **Merge branch:** `git checkout main && git merge static-file-approach`
-2. **Deploy to Netlify:** Push to trigger new build
+2. **Deploy to GitHub Pages:** Push to trigger new build
 3. **Test live site:** Verify no Chrome warnings
 4. **Update bookmarks:** Share new scenario URLs
 

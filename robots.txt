@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /api/
 Disallow: /*.js$
 Disallow: /*.css$
 
@@ -8,4 +7,4 @@ Disallow: /*.css$
 Disallow: /
 
 # Sitemap would go here in production
-# Sitemap: https://account-group-uxr.netlify.app/sitemap.xml
+# Sitemap: https://khoi-stripe.github.io/account-group-uxr/sitemap.xml

@@ -7,7 +7,7 @@
 **Expected:** ✅ No security warnings (local development)
 
 ### Test 2: Live Deployment Test (After Deploy)
-**URL:** `https://account-group-uxr.netlify.app/`
+**URL:** `https://khoi-stripe.github.io/account-group-uxr/`
 **Expected:** ✅ No "Dangerous site" warning
 
 ### Test 3: Network Security Validation
@@ -19,20 +19,20 @@
 
 #### Network Tab Analysis
 **✅ GOOD - Should see only:**
-- `https://account-group-uxr.netlify.app/index.html`
-- `https://account-group-uxr.netlify.app/js/static-data-loader.js`
-- `https://account-group-uxr.netlify.app/data/scenarios/enterprise.json`
+- `https://khoi-stripe.github.io/account-group-uxr/index.html`
+- `https://khoi-stripe.github.io/account-group-uxr/js/static-data-loader.js`
+- `https://khoi-stripe.github.io/account-group-uxr/data/scenarios/enterprise.json`
 - Other same-domain static files
 
 **❌ BAD - Should NOT see:**
 - `https://cdn.jsdelivr.net/...` (external CDN)
-- `/.netlify/functions/share` (API endpoints)
+- Any external API endpoints
 - Any POST requests
 - Any cross-domain requests
 
 ### Test 4: Google Safe Browsing Check
 1. Go to: https://transparencyreport.google.com/safe-browsing/search
-2. Enter your domain: `account-group-uxr.netlify.app`
+2. Enter your domain: `khoi-stripe.github.io`
 3. **Expected:** "No unsafe content found"
 
 ### Test 5: Incognito Mode Test
@@ -72,7 +72,7 @@ console.log('Participant Mode:', window.staticDataLoader?.isInParticipantMode())
 performance.getEntriesByType('navigation').concat(
   performance.getEntriesByType('resource')
 ).forEach(entry => {
-  if (entry.name.includes('api') || entry.name.includes('.netlify')) {
+  if (entry.name.includes('api')) {
     console.warn('Potential API call found:', entry.name);
   }
 });

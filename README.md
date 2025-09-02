@@ -9,7 +9,7 @@ This is a standalone version of the Stripe Dashboard prototype for UXR research.
 - Data sharing via shareable URLs
 
 ## Deployment
-Deploy to Netlify for best experience with sharing functionality.
+Deployed via GitHub Pages with static participant data sharing.
 
 ## Usage
 - Navigate between pages using the sidebar
