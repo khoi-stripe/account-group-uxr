@@ -227,7 +227,7 @@ class PrototypeControlPanel {
                   🎨 Agency
                 </button>
               </div>
-              <p class="help-text">Share predefined scenarios instantly - no setup required!</p>
+              <p class="help-text">🚀 <strong>Instant sharing</strong> - no file uploads needed! Click any button above to copy a participant link.</p>
             </div>
           </div>
 
@@ -253,12 +253,16 @@ class PrototypeControlPanel {
                   </button>
                 </div>
                 <div class="workflow-help">
-                  <p class="help-text"><strong>Static File Workflow:</strong></p>
+                  <p class="help-text"><strong>📁 Static File Workflow (Chrome-Safe):</strong></p>
                   <ol class="workflow-steps">
-                    <li>Select organization and click to generate participant file</li>
-                    <li>Upload the downloaded .json file to <code>data/participants/</code></li>
-                    <li>Share the generated link with participants</li>
+                    <li><strong>Generate:</strong> Select organization → Click generates & downloads JSON file</li>
+                    <li><strong>Upload:</strong> Move downloaded file to <code>data/participants/</code> folder</li>
+                    <li><strong>Deploy:</strong> Commit & push to GitHub (triggers Netlify deploy)</li>
+                    <li><strong>Share:</strong> Use the generated participant link below</li>
                   </ol>
+                  <p class="help-text" style="margin-top: 8px; color: var(--neutral-600); font-size: 11px;">
+                    💡 <strong>Why this way?</strong> Static files avoid Chrome security warnings that APIs trigger.
+                  </p>
                 </div>
               </div>
               
@@ -1716,7 +1720,20 @@ class PrototypeControlPanel {
       if (result && result.shareUrl) {
         shareLinkField.value = result.shareUrl;
         shareLinkField.placeholder = '';
-        this.showShareStatus(`✅ Participant file generated! Upload ${result.participantId}.json to data/participants/ then share the link.`, 'success');
+        this.showShareStatus(`✅ Step 1 Complete: ${result.participantId}.json downloaded! Next: Upload this file to data/participants/ folder and deploy.`, 'success');
+        
+        // Show detailed next steps
+        setTimeout(() => {
+          this.showShareStatus(`
+            <div style="text-align: left; font-size: 12px; line-height: 1.4;">
+              <strong>📋 Next Steps:</strong><br>
+              1. Find the downloaded ${result.participantId}.json<br>
+              2. Upload it to your data/participants/ folder<br>
+              3. Commit & deploy to GitHub/Netlify<br>
+              4. Share the link below with participants
+            </div>
+          `, 'success');
+        }, 3000);
       } else {
         throw new Error('Failed to generate share URL');
       }
