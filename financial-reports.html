@@ -2998,6 +2998,17 @@
       }, 500); // Check every 500ms for account changes
     }
 
+    // Global test function for debugging
+    window.testFinancialData = function() {
+      console.log('🧪 Testing financial data generation...');
+      window.accountFinancialDataCache = null; // Clear cache
+      const data = generateAccountFinancialData();
+      console.log('🧪 Generated data size:', data.size);
+      console.log('🧪 Sample accounts:', Array.from(data.values()).slice(0, 3));
+      filterReportsContent(); // Regenerate display
+      return data;
+    };
+
         // Listen for StaticDataLoader events to refresh financial data
     window.addEventListener('staticDataReady', (event) => {
       console.log('📊 StaticDataLoader ready, refreshing financial data');
