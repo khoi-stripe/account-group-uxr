@@ -2739,6 +2739,9 @@
         : 0;
       
       // Update metrics cards
+      console.log('💰 Updating metric cards...');
+      console.log('💰 Revenue card: total-revenue =', `$${totalRevenue.toLocaleString()}`, 'growth =', avgRevenueGrowth);
+      console.log('💰 Transactions card: total-transactions =', totalTransactions.toLocaleString(), 'growth =', avgTransactionGrowth);
       updateMetricCard('total-revenue', `$${totalRevenue.toLocaleString()}`, avgRevenueGrowth);
       updateMetricCard('total-transactions', totalTransactions.toLocaleString(), avgTransactionGrowth);
       updateActiveAccountsCard(activeAccountsCount, selectedAccountIds && selectedAccountIds.length > 0 ? 'Filtered' : 'All');
@@ -2750,9 +2753,14 @@
     }
     
     function updateMetricCard(elementId, value, growth) {
+      console.log('💰 updateMetricCard called:', elementId, '=', value, 'growth =', growth);
       const element = document.getElementById(elementId);
+      console.log('💰 Found element:', !!element, element ? element.tagName : 'null');
       if (element) {
         element.textContent = value;
+        console.log('💰 Set element text to:', value);
+      } else {
+        console.log('💰 ❌ Element not found:', elementId);
       }
       
       // Update growth badge if it exists
