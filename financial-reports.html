@@ -2699,24 +2699,35 @@
       // Cache the result
       window.accountFinancialDataCache = accountDataMap;
       console.log('📊 Generated financial data for', accountDataMap.size, 'accounts');
-      console.log('📊 Sample data:', Array.from(accountDataMap.values()).slice(0, 2));
+      const sampleData = Array.from(accountDataMap.values()).slice(0, 2);
+      console.log('📊 Sample data:', sampleData);
+      console.log('📊 Sample revenue values:', sampleData.map(d => d.revenue));
+      console.log('📊 Sample transaction values:', sampleData.map(d => d.transactions));
       return accountDataMap;
     }
 
     // Filter content based on selected accounts
     function filterReportsContent(selectedAccountIds = null) {
+      console.log('💰 filterReportsContent called with selectedAccountIds:', selectedAccountIds);
       const accountDataMap = generateAccountFinancialData();
+      console.log('💰 accountDataMap size:', accountDataMap.size);
       let filteredData = Array.from(accountDataMap.values());
+      console.log('💰 Initial filteredData length:', filteredData.length);
+      console.log('💰 First 2 accounts data:', filteredData.slice(0, 2));
+      
       if (selectedAccountIds && selectedAccountIds.length > 0) {
         // Filter to only selected accounts
         filteredData = selectedAccountIds
           .map(id => accountDataMap.get(id))
           .filter(data => data); // Remove any undefined values
+        console.log('💰 After filtering, filteredData length:', filteredData.length);
       }
       
       // Calculate totals with null checks
       const totalRevenue = filteredData.reduce((sum, account) => sum + (account.revenue || 0), 0);
       const totalTransactions = filteredData.reduce((sum, account) => sum + (account.transactions || 0), 0);
+      console.log('💰 Calculated totalRevenue:', totalRevenue);
+      console.log('💰 Calculated totalTransactions:', totalTransactions);
       const activeAccountsCount = filteredData.length;
       
       // Calculate average growth rates with null checks
