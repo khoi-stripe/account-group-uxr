@@ -2631,12 +2631,12 @@
       }
       
       console.log('📊 Generating fresh financial data...');
-      console.log('📊 managerRef:', !!managerRef);
-      console.log('📊 window.OrgDataManager:', !!window.OrgDataManager);
       
       const accountDataMap = new Map();
       
     const managerRef = getManagerRef();
+      console.log('📊 managerRef:', !!managerRef);
+      console.log('📊 window.OrgDataManager:', !!window.OrgDataManager);
     if (managerRef) {
       // Exclude the aggregate "All accounts" entry so counts reflect real accounts only
       const accounts = managerRef.getAllSubAccounts().filter(acc => !acc.isAggregate);
@@ -2990,7 +2990,13 @@
         // Listen for StaticDataLoader events to refresh financial data
     window.addEventListener('staticDataReady', (event) => {
       console.log('📊 StaticDataLoader ready, refreshing financial data');
+      console.log('📊 Event data:', event.detail);
       window.accountFinancialDataCache = null; // Clear cache
+      
+      // Force regenerate financial data
+      const freshData = generateAccountFinancialData();
+      console.log('📊 Forced regeneration result:', freshData.size, 'accounts');
+      
       filterReportsContent(); // Regenerate with new data
     });
 
