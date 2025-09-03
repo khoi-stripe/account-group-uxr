@@ -172,6 +172,10 @@ class GroupCreationModal {
 
   renderStep2() {
     const stepContent = this.modal.querySelector('.step-content');
+    
+    // Clean up any existing event listeners by re-creating the content
+    stepContent.innerHTML = '';
+    
     const eligibleAccounts = window.OrgDataManager.getEligibleAccounts(this.groupData.type);
     // Sort accounts alphabetically for better UX
     eligibleAccounts.sort((a, b) => a.name.localeCompare(b.name));
@@ -244,7 +248,12 @@ class GroupCreationModal {
 
       checkbox.addEventListener('change', () => {
         if (checkbox.checked) {
-          this.groupData.accountIds.push(accountId);
+          // Prevent duplicate account IDs
+          if (!this.groupData.accountIds.includes(accountId)) {
+            this.groupData.accountIds.push(accountId);
+          } else {
+            console.warn('🐛 Prevented duplicate account selection:', accountId);
+          }
           option.classList.add('selected');
         } else {
           this.groupData.accountIds = this.groupData.accountIds.filter(id => id !== accountId);
@@ -297,6 +306,16 @@ class GroupCreationModal {
       const accountType = option.querySelector('.account-type').textContent.toLowerCase();
       const matches = accountName.includes(searchTerm) || accountType.includes(searchTerm);
       option.style.display = matches ? 'flex' : 'none';
+      
+      // Ensure selection state remains consistent when filtering
+      const accountId = option.dataset.accountId;
+      const checkbox = option.querySelector('input[type="checkbox"]');
+      const isSelected = this.groupData.accountIds.includes(accountId);
+      
+      if (checkbox.checked !== isSelected) {
+        checkbox.checked = isSelected;
+        option.classList.toggle('selected', isSelected);
+      }
     });
   }
 
