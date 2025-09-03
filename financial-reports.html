@@ -2749,6 +2749,13 @@
       // Update account breakdown
       updateAccountBreakdown(filteredData);
       
+      // Force update after a delay to ensure values stick
+      setTimeout(() => {
+        console.log('💰 Force updating metric cards after delay...');
+        updateMetricCard('total-revenue', `$${totalRevenue.toLocaleString()}`, avgRevenueGrowth);
+        updateMetricCard('total-transactions', totalTransactions.toLocaleString(), avgTransactionGrowth);
+      }, 100);
+      
 
     }
     
