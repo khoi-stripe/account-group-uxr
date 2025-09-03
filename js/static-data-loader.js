@@ -6,12 +6,10 @@
 
 class StaticDataLoader {
   constructor() {
-    console.log('🚀 StaticDataLoader constructor called');
-    
     // 🧹 CACHE BUSTING: Check for ?fresh=true parameter
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('fresh') === 'true') {
-      console.log('🧹 Fresh mode activated: Clearing cached data');
+      console.log('🧹 Fresh mode: Clearing cached data');
       try {
         localStorage.clear();
         sessionStorage.clear();
@@ -23,7 +21,6 @@ class StaticDataLoader {
     
     this.currentData = null;
     this.isParticipantMode = this.checkParticipantMode();
-    console.log('🔍 Participant mode detected:', this.isParticipantMode);
     this.init();
   }
 
@@ -62,12 +59,12 @@ class StaticDataLoader {
 
   async init() {
     try {
-      console.log('🔧 StaticDataLoader.init() starting...');
+
       // Load data based on URL parameters or sessionStorage
       const urlParams = new URLSearchParams(window.location.search);
       const dataParam = urlParams.get('data');
       const scenarioParam = urlParams.get('scenario');
-      console.log('🔍 URL params - data:', dataParam, 'scenario:', scenarioParam);
+
 
       if (dataParam) {
         // Load participant-specific data from URL
@@ -85,10 +82,10 @@ class StaticDataLoader {
         const storedScenario = sessionStorage.getItem('participant_scenario');
         
         if (storedDataId) {
-          console.log('✅ Loading participant data from sessionStorage:', storedDataId);
+
           await this.loadParticipantData(storedDataId);
         } else if (storedScenario) {
-          console.log('✅ Loading scenario from sessionStorage:', storedScenario);
+
           await this.loadScenario(storedScenario);
         } else {
           // Try to restore from sessionStorage if available
@@ -97,7 +94,7 @@ class StaticDataLoader {
             try {
               const participantData = JSON.parse(storedOrgData);
               this.currentData = participantData;
-              console.log('✅ Restored participant data from sessionStorage:', participantData.organizationName);
+
             } catch (error) {
               console.warn('Failed to restore participant data from sessionStorage:', error);
               await this.loadDefaultData();
@@ -123,16 +120,13 @@ class StaticDataLoader {
 
   async loadParticipantData(participantId) {
     try {
-      console.log(`🔍 Attempting to load participant data: ${participantId}`);
       const url = `/account-group-uxr/data/participants/${participantId}.json`;
-      console.log(`🔍 Fetching URL: ${url}`);
       const response = await fetch(url);
-      console.log(`🔍 Fetch response status: ${response.status}`);
       if (!response.ok) {
         throw new Error(`Failed to load participant data: ${response.status}`);
       }
       this.currentData = await response.json();
-      console.log(`✅ Successfully loaded participant data for: ${participantId}`, this.currentData.organizationName);
+      console.log(`✅ Loaded participant data: ${this.currentData.organizationName}`);
       return this.currentData;
     } catch (error) {
       console.error('❌ Error loading participant data:', error);
@@ -144,13 +138,13 @@ class StaticDataLoader {
 
   async loadScenario(scenarioName) {
     try {
-      console.log(`🔍 Loading scenario: ${scenarioName}`);
+
       const response = await fetch(`/account-group-uxr/data/scenarios/${scenarioName}.json`);
       if (!response.ok) {
         throw new Error(`Failed to load scenario: ${response.status}`);
       }
       this.currentData = await response.json();
-      console.log(`✅ Loaded scenario: ${scenarioName}`, this.currentData.organizationName);
+      console.log(`✅ Loaded scenario: ${scenarioName}`);
       return this.currentData;
     } catch (error) {
       console.error('Error loading scenario:', error);
@@ -422,9 +416,7 @@ class StaticDataLoader {
 }
 
 // Global instance
-console.log('📦 Creating global StaticDataLoader instance...');
 window.staticDataLoader = new StaticDataLoader();
-console.log('✅ StaticDataLoader instance created:', window.staticDataLoader);
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
