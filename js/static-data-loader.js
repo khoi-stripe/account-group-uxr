@@ -394,6 +394,12 @@ class StaticDataLoader {
     // Integrate with existing system
     this.integrateWithOrganizationData();
     
+    // Clear financial data cache to force regeneration with new data
+    if (window.accountFinancialDataCache) {
+      window.accountFinancialDataCache = null;
+      console.log('🔄 Cleared financial data cache for fresh generation');
+    }
+    
     // Dispatch custom event for other components
     const event = new CustomEvent('staticDataReady', {
       detail: {
