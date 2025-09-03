@@ -428,11 +428,21 @@ class OrganizationDataManager {
 
     const accounts = this.currentOrganization.accounts.slice(); // Copy array
     
+    // Separate aggregate and regular accounts
+    const aggregateAccounts = accounts.filter(acc => acc.isAggregate);
+    const regularAccounts = accounts.filter(acc => !acc.isAggregate);
+    
+    // Sort regular accounts alphabetically by name
+    regularAccounts.sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Combine: aggregate accounts first, then sorted regular accounts
+    const sortedAccounts = [...aggregateAccounts, ...regularAccounts];
+    
     // Move current account to top of list
-    const currentIndex = accounts.findIndex(acc => acc.id === this.currentSubAccount.id);
+    const currentIndex = sortedAccounts.findIndex(acc => acc.id === this.currentSubAccount.id);
     if (currentIndex > 0) {
-      const currentAccount = accounts.splice(currentIndex, 1)[0];
-      accounts.unshift(currentAccount);
+      const currentAccount = sortedAccounts.splice(currentIndex, 1)[0];
+      sortedAccounts.unshift(currentAccount);
     }
 
     return {
@@ -443,7 +453,7 @@ class OrganizationDataManager {
         isAggregate: this.currentSubAccount.isAggregate, // Preserve aggregate flag
         color: this.currentSubAccount.color // Preserve color for consistency
       },
-      accounts: accounts.map(acc => ({
+      accounts: sortedAccounts.map(acc => ({
         id: acc.id,
         name: acc.name, // First line
         type: acc.isAggregate ? "Organization" : this.currentOrganization.name, // Second line
