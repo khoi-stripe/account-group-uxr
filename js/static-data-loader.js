@@ -7,6 +7,20 @@
 class StaticDataLoader {
   constructor() {
     console.log('🚀 StaticDataLoader constructor called');
+    
+    // 🧹 CACHE BUSTING: Check for ?fresh=true parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('fresh') === 'true') {
+      console.log('🧹 Fresh mode activated: Clearing cached data');
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        console.log('✅ Cache cleared successfully');
+      } catch (error) {
+        console.warn('⚠️ Could not clear cache:', error);
+      }
+    }
+    
     this.currentData = null;
     this.isParticipantMode = this.checkParticipantMode();
     console.log('🔍 Participant mode detected:', this.isParticipantMode);
