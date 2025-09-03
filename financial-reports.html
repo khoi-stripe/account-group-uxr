@@ -2602,11 +2602,14 @@
       }, { passive: true });
     }*/
 
-    // Ensure OrgDataManager reference
-    const managerRef = window.OrgDataManager;
+    // Ensure OrgDataManager reference (always get current reference)
+    function getManagerRef() {
+      return window.OrgDataManager;
+    }
 
     // Check if filter should be visible based on current account
     function shouldShowAccountGroupsFilter() {
+    const managerRef = getManagerRef();
     if (!managerRef) {
         return false; // No org manager, don't show filter
       }
@@ -2623,14 +2626,21 @@
     // Generate sample financial data for each account (with persistence)
     function generateAccountFinancialData() {
       if (window.accountFinancialDataCache) {
+        console.log('📊 Using cached financial data');
         return window.accountFinancialDataCache;
       }
       
+      console.log('📊 Generating fresh financial data...');
+      console.log('📊 managerRef:', !!managerRef);
+      console.log('📊 window.OrgDataManager:', !!window.OrgDataManager);
+      
       const accountDataMap = new Map();
       
+    const managerRef = getManagerRef();
     if (managerRef) {
       // Exclude the aggregate "All accounts" entry so counts reflect real accounts only
       const accounts = managerRef.getAllSubAccounts().filter(acc => !acc.isAggregate);
+      console.log('📊 Found accounts:', accounts.length, accounts.map(a => a.name));
         
         accounts.forEach((account, index) => {
           // Use account ID to seed random data for consistency
@@ -2656,6 +2666,7 @@
       
       // Fallback data if no org manager
       if (accountDataMap.size === 0) {
+        console.log('⚠️ Using fallback financial data - no organization data found');
         const fallbackAccounts = [
           { id: 'mobile-app', name: 'Mobile App' },
           { id: 'web-platform', name: 'Web Platform' },
@@ -2687,6 +2698,8 @@
       
       // Cache the result
       window.accountFinancialDataCache = accountDataMap;
+      console.log('📊 Generated financial data for', accountDataMap.size, 'accounts');
+      console.log('📊 Sample data:', Array.from(accountDataMap.values()).slice(0, 2));
       return accountDataMap;
     }
 
@@ -2877,6 +2890,7 @@
             if (accountLabel) {
               // Find matching account by name
               const accountName = accountLabel.textContent;
+              const managerRef = getManagerRef();
               if (managerRef) {
                 const accounts = managerRef.getAllSubAccounts();
                 const matchingAccount = accounts.find(acc => acc.name === accountName);
@@ -2907,6 +2921,7 @@
           }
           
           // Reset to show appropriate data based on current account context
+    const managerRef = getManagerRef();
     const currentSubAccount = managerRef?.getCurrentSubAccount();
           if (currentSubAccount && !currentSubAccount.isAggregate) {
             // Show data for current individual account
@@ -2920,6 +2935,7 @@
         };
         
         // Initialize with appropriate data based on current account context
+    const managerRef = getManagerRef();
     const currentSubAccount = managerRef?.getCurrentSubAccount();
         if (currentSubAccount && !currentSubAccount.isAggregate) {
           // Show data for current individual account
@@ -2938,6 +2954,7 @@
         }
         
         // Show data for current individual account when filter is hidden
+    const managerRef = getManagerRef();
     const currentSubAccount = managerRef?.getCurrentSubAccount();
         if (currentSubAccount && !currentSubAccount.isAggregate) {
           filterReportsContent([currentSubAccount.id]);
@@ -2954,6 +2971,7 @@
       let currentSubAccount = null;
       
       setInterval(() => {
+        const managerRef = getManagerRef();
         if (managerRef) {
           const newSubAccount = managerRef.getCurrentSubAccount();
           
