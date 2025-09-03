@@ -2618,12 +2618,12 @@
     }
 
     // Cache for consistent financial data
-    let accountFinancialDataCache = null;
+    window.accountFinancialDataCache = null;
 
     // Generate sample financial data for each account (with persistence)
     function generateAccountFinancialData() {
-      if (accountFinancialDataCache) {
-        return accountFinancialDataCache;
+      if (window.accountFinancialDataCache) {
+        return window.accountFinancialDataCache;
       }
       
       const accountDataMap = new Map();
@@ -2686,7 +2686,7 @@
       }
       
       // Cache the result
-      accountFinancialDataCache = accountDataMap;
+      window.accountFinancialDataCache = accountDataMap;
       return accountDataMap;
     }
 
@@ -2969,6 +2969,13 @@
       }, 500); // Check every 500ms for account changes
     }
 
+        // Listen for StaticDataLoader events to refresh financial data
+    window.addEventListener('staticDataReady', (event) => {
+      console.log('📊 StaticDataLoader ready, refreshing financial data');
+      window.accountFinancialDataCache = null; // Clear cache
+      filterReportsContent(); // Regenerate with new data
+    });
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         initializeReportsFilter().catch(console.error);
@@ -2976,9 +2983,9 @@
       });
     } else {
           // DOM is already loaded
-    initializeReportsFilter().catch(console.error);
-    monitorAccountSwitches();
-  }
+      initializeReportsFilter().catch(console.error);
+      monitorAccountSwitches();
+    }
 
  </script>
 

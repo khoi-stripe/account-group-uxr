@@ -1804,12 +1804,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Shared financial data cache (same as reporting page)
-    let accountFinancialDataCache = null;
+    window.accountFinancialDataCache = null;
 
     // Generate consistent financial data for each account (shared with reporting page)
     function generateAccountFinancialData() {
-      if (accountFinancialDataCache) {
-        return accountFinancialDataCache;
+      if (window.accountFinancialDataCache) {
+        return window.accountFinancialDataCache;
       }
       
       const accountDataMap = new Map();
@@ -1872,7 +1872,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // Cache the result
-      accountFinancialDataCache = accountDataMap;
+      window.accountFinancialDataCache = accountDataMap;
       return accountDataMap;
     }
 
