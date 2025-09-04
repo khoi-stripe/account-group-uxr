@@ -1783,8 +1783,8 @@
       }
     }
 
-    // Generate deterministic financial data based on account ID
-    function generateAccountFinancialData(account) {
+    // Generate deterministic financial data for a single account
+    function generateSingleAccountFinancialData(account) {
       // Create a deterministic hash from account ID and name
       const seed = account.id + account.name;
       let hash = 0;
@@ -1803,7 +1803,8 @@
         ...account,
         revenue: Math.floor(random1 * 80000) + 15000, // $15K-$95K
         transactions: Math.floor(random2 * 2000) + 250, // 250-2250 transactions
-        growth: ((random3 * 40) - 15).toFixed(1) // -15% to +25% growth
+        revenueGrowth: ((random3 * 40) - 15).toFixed(1), // -15% to +25% growth
+        transactionGrowth: ((random3 * 30) - 10).toFixed(1) // -10% to +20% growth
       };
     }
 
@@ -1904,8 +1905,15 @@
         return;
       }
       
-      // Generate consistent financial data for each account
-      const accountData = accounts.map(account => generateAccountFinancialData(account));
+      // Check if accounts already have financial data, if not generate it
+      let accountData;
+      if (accounts.length > 0 && accounts[0].revenue !== undefined) {
+        // Accounts already have financial data
+        accountData = accounts;
+      } else {
+        // Generate consistent financial data for each account using the single-account function
+        accountData = accounts.map(account => generateSingleAccountFinancialData(account));
+      }
       
       if (isAggregateView) {
         // Show all accounts in organization view
@@ -3009,24 +3017,33 @@
 
         // Listen for StaticDataLoader events to refresh financial data
     window.addEventListener('staticDataReady', (event) => {
+      console.log('🔄 StaticDataReady event received, regenerating financial data...');
       window.accountFinancialDataCache = null; // Clear cache
+      // Ensure data is generated before filtering
+      generateAccountFinancialData();
       filterReportsContent(); // Regenerate with new data
     });
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        // Clear cache and ensure data is generated
+        // Delay initialization to let other events settle first
+        setTimeout(() => {
+          console.log('🚀 Initializing financial reports with delay...');
+          window.accountFinancialDataCache = null;
+          generateAccountFinancialData();
+          initializeReportsFilter().catch(console.error);
+          monitorAccountSwitches();
+        }, 1000); // 1 second delay
+      });
+    } else {
+      // DOM is already loaded - add delay here too
+      setTimeout(() => {
+        console.log('🚀 Initializing financial reports (DOM ready) with delay...');
         window.accountFinancialDataCache = null;
         generateAccountFinancialData();
         initializeReportsFilter().catch(console.error);
         monitorAccountSwitches();
-      });
-    } else {
-      // DOM is already loaded
-      window.accountFinancialDataCache = null;
-      generateAccountFinancialData();
-      initializeReportsFilter().catch(console.error);
-      monitorAccountSwitches();
+      }, 1000); // 1 second delay
     }
 
  </script>
