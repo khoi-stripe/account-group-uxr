@@ -910,7 +910,7 @@
   flex: 1;
   font-size: var(--font-size-14);
   line-height: var(--line-height-20);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-normal);
   color: var(--neutral-900);
   white-space: nowrap;
   overflow: hidden;
@@ -1130,7 +1130,7 @@ button.popover-open,
   flex: 1;
   font-size: var(--font-size-14);
   line-height: var(--line-height-20);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-normal);
   color: var(--neutral-900);
   white-space: nowrap;
   overflow: hidden;
