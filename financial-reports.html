@@ -2633,14 +2633,10 @@
 
     // Generate sample financial data for each account (with persistence)
     function generateAccountFinancialData() {
-      console.log('🔧 generateAccountFinancialData() called, cache exists:', !!window.accountFinancialDataCache);
-      
       if (window.accountFinancialDataCache) {
-        console.log('🔧 Returning cached data with', window.accountFinancialDataCache.size, 'accounts');
         return window.accountFinancialDataCache;
       }
       
-      console.log('🔧 Generating new financial data...');
       const accountDataMap = new Map();
       
       const managerRef = getManagerRef();
@@ -2704,12 +2700,11 @@
           });
         });
         
-        console.log('🔧 Generated fallback data for', accountDataMap.size, 'accounts');
+        // Generated fallback data successfully
       }
       
       // Cache the result with protection
       window.accountFinancialDataCache = accountDataMap;
-      console.log('🔧 Cached financial data for', accountDataMap.size, 'accounts');
       
       // Add protection against cache clearing
       if (!window.protectFinancialCache) {
@@ -2719,7 +2714,6 @@
         // Periodically restore cache if it gets cleared
         setInterval(() => {
           if (!window.accountFinancialDataCache && originalCache) {
-            console.log('🛡️ Financial cache was cleared, restoring...');
             window.accountFinancialDataCache = originalCache;
           }
         }, 100);
@@ -2826,16 +2820,10 @@
     }
     
     function updateAccountBreakdown(accountsData) {
-      console.log('📊 updateAccountBreakdown called with', accountsData.length, 'accounts:', accountsData.map(a => ({name: a.name, revenue: a.revenue, transactions: a.transactions})));
-      
       const container = document.getElementById('account-breakdown');
-      if (!container) {
-        console.warn('❌ Account breakdown container not found!');
-        return;
-      }
+      if (!container) return;
       
       if (accountsData.length === 0) {
-        console.log('📊 No accounts data - showing empty state');
         container.innerHTML = '<p style="color: var(--neutral-500); font-style: italic;">No accounts selected</p>';
         return;
       }
@@ -2845,15 +2833,12 @@
       const enrichedAccounts = accountsData.map(account => {
         const financialData = financialDataCache.get(account.id);
         if (financialData) {
-          console.log('💰 Enriching account', account.name, 'with financial data:', {revenue: financialData.revenue, transactions: financialData.transactions});
           return { ...account, ...financialData };
         } else {
-          console.warn('⚠️ No financial data found for account:', account.name);
           return account;
         }
       });
       
-      console.log('💰 Enriched accounts:', enrichedAccounts.map(a => ({name: a.name, revenue: a.revenue, transactions: a.transactions})));
       accountsData = enrichedAccounts;
       
       const breakdownHTML = accountsData.map(account => {
@@ -3058,15 +3043,11 @@
 
         // Listen for StaticDataLoader events to refresh financial data
     window.addEventListener('staticDataReady', (event) => {
-      console.log('🔄 StaticDataReady event received, IGNORING to prevent data reset');
       // Don't clear cache or regenerate - this was causing the reset to $0
       // Just ensure we have data
       if (!window.accountFinancialDataCache) {
-        console.log('🔄 No cached data found, generating fallback...');
         generateAccountFinancialData();
         filterReportsContent();
-      } else {
-        console.log('🔄 Using existing cached data, skipping regeneration');
       }
     });
 
@@ -3074,7 +3055,6 @@
       document.addEventListener('DOMContentLoaded', () => {
         // Delay initialization to let other events settle first
         setTimeout(() => {
-          console.log('🚀 Initializing financial reports with delay...');
           window.accountFinancialDataCache = null;
           generateAccountFinancialData();
           initializeReportsFilter().catch(console.error);
@@ -3084,7 +3064,6 @@
     } else {
       // DOM is already loaded - add delay here too
       setTimeout(() => {
-        console.log('🚀 Initializing financial reports (DOM ready) with delay...');
         window.accountFinancialDataCache = null;
         generateAccountFinancialData();
         initializeReportsFilter().catch(console.error);
