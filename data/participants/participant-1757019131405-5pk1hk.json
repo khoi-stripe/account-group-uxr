@@ -1,0 +1,362 @@
+{
+  "scenarioName": "Xero",
+  "organizationName": "Xero",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Xero",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "xero_xeroeven_7l1r2b",
+      "name": "Xero Events - CA",
+      "originalName": "Xero Events - CA",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "xero_ukstorex_tyvr7t",
+      "name": "ukstorexero.neto.com",
+      "originalName": "ukstorexero.neto.com",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "xero_xeroeven_wffdzl",
+      "name": "Xero Events - AU",
+      "originalName": "Xero Events - AU",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "xero_xeroeven_djge8q",
+      "name": "Xero Events - UK",
+      "originalName": "Xero Events - UK",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "xero_usstorex_mnadql",
+      "name": "usstorexero.neto.com.au",
+      "originalName": "usstorexero.neto.com.au",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "xero_nzstorex_ay32t9",
+      "name": "nzstorexero.neto.com",
+      "originalName": "nzstorexero.neto.com",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "xero_xeroeven_g81pki",
+      "name": "Xero Events - US",
+      "originalName": "Xero Events - US",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "xero_xeroeven_43i809",
+      "name": "Xero Events - SG",
+      "originalName": "Xero Events - SG",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "xero_xeroeven_8m75bi",
+      "name": "Xero Events - NZ",
+      "originalName": "Xero Events - NZ",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "xero_austorex_vf2bzu",
+      "name": "austorexero.neto.com",
+      "originalName": "austorexero.neto.com",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "xero_hubdocau_pakugw",
+      "name": "Hubdoc Australia",
+      "originalName": "Hubdoc Australia",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "xero_hubdocuk_74rdx2",
+      "name": "Hubdoc UK",
+      "originalName": "Hubdoc UK",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "xero_hubdocne_kntijb",
+      "name": "Hubdoc New Zealand",
+      "originalName": "Hubdoc New Zealand",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "xero_hubdoc_m03bvz",
+      "name": "Hubdoc",
+      "originalName": "Hubdoc",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "xero_plandaya_mrypc6",
+      "name": "Planday A/S (DKK)",
+      "originalName": "Planday A/S (DKK)",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "xero_plandayn_nqix5n",
+      "name": "Planday Norway",
+      "originalName": "Planday Norway",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "xero_plandayg_91cge9",
+      "name": "Planday GmbH",
+      "originalName": "Planday GmbH",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "xero_plandaya_hbruky",
+      "name": "Planday A/S (EUR)",
+      "originalName": "Planday A/S (EUR)",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "xero_plandaya_mlsi2q",
+      "name": "Planday Australia Pty Ltd",
+      "originalName": "Planday Australia Pty Ltd",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "xero_plandayi_aun2ui",
+      "name": "Planday Inc",
+      "originalName": "Planday Inc",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "xero_plandaya_3dmtie",
+      "name": "Planday A/S (SEK)",
+      "originalName": "Planday A/S (SEK)",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "xero_plandayl_dxek4a",
+      "name": "Planday Ltd",
+      "originalName": "Planday Ltd",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "xero_fixeroft_65syh9",
+      "name": "fixerofthenorth.com",
+      "originalName": "fixerofthenorth.com",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "xero_leadkill_vhba76",
+      "name": "LeadKill",
+      "originalName": "LeadKill",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "xero_creative_nikqoj",
+      "name": "CreativeDone",
+      "originalName": "CreativeDone",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "xero_xpmxtuk_lzihpe",
+      "name": "XPM & XT - UK",
+      "originalName": "XPM & XT - UK",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "xero_xpmxtglb_l3rvhv",
+      "name": "XPM & XT - GLB",
+      "originalName": "XPM & XT - GLB",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "xero_xpmxtau_fix1n2",
+      "name": "XPM & XT - AU",
+      "originalName": "XPM & XT - AU",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "xero_xpmxtus_t7f4gw",
+      "name": "XPM & XT - US",
+      "originalName": "XPM & XT - US",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "xero_xpmxtnz_9mm8qm",
+      "name": "XPM & XT - NZ",
+      "originalName": "XPM & XT - NZ",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "xero_xeroukx4_fw9lpl",
+      "name": "Xero UK - X4X",
+      "originalName": "Xero UK - X4X",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "xero_xeronzx4_ffvevs",
+      "name": "Xero NZ - X4X",
+      "originalName": "Xero NZ - X4X",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "xero_xerousno_tykja8",
+      "name": "Xero US (Non Sub Rev)",
+      "originalName": "Xero US (Non Sub Rev)",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "xero_xeroaux4_up48nn",
+      "name": "Xero AU - X4X",
+      "originalName": "Xero AU - X4X",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "xero_xeroglbx_dkx6qi",
+      "name": "Xero GLB - X4X",
+      "originalName": "Xero GLB - X4X",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "xero_xeronzno_ctd3ov",
+      "name": "Xero NZ (Non Sub Rev)",
+      "originalName": "Xero NZ (Non Sub Rev)",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "xero_xeroauno_328mv7",
+      "name": "Xero AU (Non Sub Revenue)",
+      "originalName": "Xero AU (Non Sub Revenue)",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "xero_xeroukno_z6pxbg",
+      "name": "Xero UK (Non Sub Rev)",
+      "originalName": "Xero UK (Non Sub Rev)",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "xero_xerousx4_wui6m3",
+      "name": "Xero US - X4X",
+      "originalName": "Xero US - X4X",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "xero_tickstar_7bbymp",
+      "name": "Tickstar AB",
+      "originalName": "Tickstar AB",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "xero_xeroecos_8y3nx9",
+      "name": "Xero Ecosystem Platform Account",
+      "originalName": "Xero Ecosystem Platform Account",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "xero_ecosyste_ee7upe",
+      "name": "Ecosystem Payment Partners (UK)",
+      "originalName": "Ecosystem Payment Partners (UK)",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "xero_xeroau_sqdhle",
+      "name": "Xero - AU",
+      "originalName": "Xero - AU",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "xero_xerous_ydq0jm",
+      "name": "Xero - US",
+      "originalName": "Xero - US",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "xero_xeroca_578lao",
+      "name": "Xero - CA",
+      "originalName": "Xero - CA",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "xero_xeroglb_meyd06",
+      "name": "Xero - GLB",
+      "originalName": "Xero - GLB",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "xero_xeronz_vuxkbe",
+      "name": "Xero - NZ",
+      "originalName": "Xero - NZ",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "xero_xerouk_1zyyjd",
+      "name": "Xero - UK",
+      "originalName": "Xero - UK",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "xero_xerosg_gtkzyd",
+      "name": "Xero - SG",
+      "originalName": "Xero - SG",
+      "type": "Account",
+      "color": "#F43F5E"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-04T20:52:11.405Z",
+    "scenario": "csv-xero",
+    "description": "CSV-generated participant data for Xero",
+    "participantFile": true,
+    "generatedFrom": "csv-upload-script"
+  }
+}

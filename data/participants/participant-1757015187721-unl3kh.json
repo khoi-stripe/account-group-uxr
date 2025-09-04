@@ -1,0 +1,243 @@
+{
+  "scenarioName": "Ubiquiti DEV & STG",
+  "organizationName": "Ubiquiti DEV & STG",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Ubiquiti DEV & STG",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "ubiq_distukde_pjbedr",
+      "name": "(DIST) UK-DEV-Subscriptions",
+      "originalName": "(DIST) UK-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "ubiq_distukst_yw1gzs",
+      "name": "(DIST) UK-STG-Subcriptions",
+      "originalName": "(DIST) UK-STG-Subcriptions",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "ubiq_ausdevsu_ppw02h",
+      "name": "AUS-DEV-Subscriptions",
+      "originalName": "AUS-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "ubiq_ausstgsu_i3diw8",
+      "name": "AUS-STG-Subscriptions",
+      "originalName": "AUS-STG-Subscriptions",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "ubiq_canstgsu_iow83c",
+      "name": "CAN-STG-Subscriptions",
+      "originalName": "CAN-STG-Subscriptions",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "ubiq_eurowdev_9rbzqi",
+      "name": "EU-(ROW)-DEV-Subscriptions",
+      "originalName": "EU-(ROW)-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "ubiq_eurowstg_e11kwp",
+      "name": "EU-(ROW)-STG-Subscriptions",
+      "originalName": "EU-(ROW)-STG-Subscriptions",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "ubiq_jpnstgsu_cd950c",
+      "name": "JPN-STG-Subscription",
+      "originalName": "JPN-STG-Subscription",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "ubiq_jpndevsu_uutrci",
+      "name": "JPN-DEV-Subscription",
+      "originalName": "JPN-DEV-Subscription",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "ubiq_mexdevsu_4sudw5",
+      "name": "MEX-DEV-Subscriptions",
+      "originalName": "MEX-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "ubiq_mexstgsu_ml3n41",
+      "name": "MEX-STG-Subscriptions",
+      "originalName": "MEX-STG-Subscriptions",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "ubiq_professi_skey81",
+      "name": "Professionals LongDEV",
+      "originalName": "Professionals LongDEV",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "ubiq_professi_nkpxyk",
+      "name": "Professionals Portal DEV",
+      "originalName": "Professionals Portal DEV",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "ubiq_professi_5053xi",
+      "name": "Professionals Portal STG",
+      "originalName": "Professionals Portal STG",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "ubiq_sgpdevsu_bcem2o",
+      "name": "SGP-DEV-Subscriptions",
+      "originalName": "SGP-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "ubiq_sgpstgsu_bb070c",
+      "name": "SGP-STG-Subscriptions",
+      "originalName": "SGP-STG-Subscriptions",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "ubiq_uaedevsu_1g5zk2",
+      "name": "UAE-DEV-Subscriptions",
+      "originalName": "UAE-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "ubiq_uaestgsu_bnqw2p",
+      "name": "UAE-STG-Subscriptions",
+      "originalName": "UAE-STG-Subscriptions",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "ubiq_uiddev_58zbjg",
+      "name": "UID Dev",
+      "originalName": "UID Dev",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "ubiq_bvukdevs_7xwnnn",
+      "name": "(BV) UK-DEV-Subscriptions",
+      "originalName": "(BV) UK-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "ubiq_eudevsub_fldvdz",
+      "name": "EU-DEV-Subscriptions",
+      "originalName": "EU-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "ubiq_eustgsub_u7zycv",
+      "name": "EU-STG-Subscriptions",
+      "originalName": "EU-STG-Subscriptions",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "ubiq_bvukstgs_z9j2nf",
+      "name": "(BV) UK-STG-Subscriptions",
+      "originalName": "(BV) UK-STG-Subscriptions",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "ubiq_usadevsu_f7476y",
+      "name": "USA-DEV-Subscriptions",
+      "originalName": "USA-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "ubiq_candevsu_g27vxs",
+      "name": "CAN-DEV-Subscriptions",
+      "originalName": "CAN-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "ubiq_usastgsu_j286e1",
+      "name": "USA-STG-Subscriptions",
+      "originalName": "USA-STG-Subscriptions",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "ubiq_twstgsub_rtzg2m",
+      "name": "TW-STG-Subscriptions",
+      "originalName": "TW-STG-Subscriptions",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "ubiq_twdevsub_x5w5k7",
+      "name": "TW-DEV-Subscriptions",
+      "originalName": "TW-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "ubiq_brastgsu_naro3p",
+      "name": "BRA-STG-Subscriptions",
+      "originalName": "BRA-STG-Subscriptions",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "ubiq_bradevsu_9ughn0",
+      "name": "BRA-DEV-Subscriptions",
+      "originalName": "BRA-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "ubiq_brabvdev_cqdscc",
+      "name": "BRA (BV)-DEV-Subscriptions",
+      "originalName": "BRA (BV)-DEV-Subscriptions",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "ubiq_brabvstg_6tku3e",
+      "name": "BRA (BV)-STG-Subscriptions",
+      "originalName": "BRA (BV)-STG-Subscriptions",
+      "type": "Account",
+      "color": "#7C2D12"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-04T19:46:27.721Z",
+    "scenario": "csv-ubiquiti-dev---stg",
+    "description": "CSV-generated participant data for Ubiquiti DEV & STG",
+    "participantFile": true,
+    "generatedFrom": "csv-upload-script"
+  }
+}

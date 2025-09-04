@@ -1,0 +1,222 @@
+{
+  "scenarioName": "Prenuvo",
+  "organizationName": "Prenuvo",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Prenuvo",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "pren_atlanta_e7jzez",
+      "name": "Atlanta",
+      "originalName": "Atlanta",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "pren_losangel_7ye6hn",
+      "name": "Los Angeles",
+      "originalName": "Los Angeles",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "pren_bocarato_sqh5lh",
+      "name": "Boca Raton",
+      "originalName": "Boca Raton",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "pren_dallas_9thzu3",
+      "name": "Dallas",
+      "originalName": "Dallas",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "pren_hercules_isv7zv",
+      "name": "Hercules Boston",
+      "originalName": "Hercules Boston",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "pren_newyork_30314f",
+      "name": "New York",
+      "originalName": "New York",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "pren_minneapo_glydpu",
+      "name": "Minneapolis",
+      "originalName": "Minneapolis",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "pren_chicago_gqkfw3",
+      "name": "Chicago",
+      "originalName": "Chicago",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "pren_usagcacc_u11he7",
+      "name": "USA GC Account",
+      "originalName": "USA GC Account",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "pren_cangcacc_ykjd27",
+      "name": "CAN GC Account",
+      "originalName": "CAN GC Account",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "pren_houston_5acwdz",
+      "name": "Houston",
+      "originalName": "Houston",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "pren_bethesda_hgqd19",
+      "name": "Bethesda",
+      "originalName": "Bethesda",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "pren_siliconv_g3szwl",
+      "name": "Silicon Valley",
+      "originalName": "Silicon Valley",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "pren_vancouve_kidc7a",
+      "name": "Vancouver",
+      "originalName": "Vancouver",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "pren_buffalo_4bwol7",
+      "name": "Buffalo",
+      "originalName": "Buffalo",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "pren_denver_iwax5k",
+      "name": "Denver",
+      "originalName": "Denver",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "pren_scottsda_ntnzgz",
+      "name": "Scottsdale",
+      "originalName": "Scottsdale",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "pren_sandiego_52ifnh",
+      "name": "San Diego",
+      "originalName": "San Diego",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "pren_seattle_0e55ke",
+      "name": "Seattle",
+      "originalName": "Seattle",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "pren_lasvegas_og9l2l",
+      "name": "Las Vegas",
+      "originalName": "Las Vegas",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "pren_irvine_p3nrk3",
+      "name": "Irvine",
+      "originalName": "Irvine",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "pren_pasadena_6o3fo1",
+      "name": "Pasadena",
+      "originalName": "Pasadena",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "pren_melbourn_0hdkvo",
+      "name": "Melbourne, Australia",
+      "originalName": "Melbourne, Australia",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "pren_ausgcacc_hy850l",
+      "name": "AUS GC Account",
+      "originalName": "AUS GC Account",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "pren_philadel_vdhs2x",
+      "name": "Philadelphia",
+      "originalName": "Philadelphia",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "pren_stpeters_5m69vg",
+      "name": "St. Petersburg",
+      "originalName": "St. Petersburg",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "pren_miami_w3dtca",
+      "name": "Miami",
+      "originalName": "Miami",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "pren_london_132l9k",
+      "name": "London",
+      "originalName": "London",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "pren_usdclear_yfvo5p",
+      "name": "USD Clearinghouse",
+      "originalName": "USD Clearinghouse",
+      "type": "Account",
+      "color": "#F43F5E"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-04T20:52:11.404Z",
+    "scenario": "csv-prenuvo",
+    "description": "CSV-generated participant data for Prenuvo",
+    "participantFile": true,
+    "generatedFrom": "csv-upload-script"
+  }
+}

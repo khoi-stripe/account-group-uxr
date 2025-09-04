@@ -1,0 +1,320 @@
+{
+  "scenarioName": "Frasers Group",
+  "organizationName": "Frasers Group",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "Frasers Group",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "fras_18montro_170kxv",
+      "name": "18montrose",
+      "originalName": "18montrose",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "fras_acecouk_mqkf87",
+      "name": "ace.co.uk",
+      "originalName": "ace.co.uk",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "fras_amara_63qwiw",
+      "name": "Amara",
+      "originalName": "Amara",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "fras_evanscyc_8r88gn",
+      "name": "Evans Cycles",
+      "originalName": "Evans Cycles",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "fras_chainrea_9tgdd4",
+      "name": "Chainreactioncycles",
+      "originalName": "Chainreactioncycles",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "fras_cruisefa_h0gv1w",
+      "name": "Cruise Fashion",
+      "originalName": "Cruise Fashion",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "fras_everlast_jne03g",
+      "name": "Everlast Gyms",
+      "originalName": "Everlast Gyms",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "fras_flannels_2juqh7",
+      "name": "Flannels",
+      "originalName": "Flannels",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "fras_frasersx_giaeh3",
+      "name": "Frasers X",
+      "originalName": "Frasers X",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "fras_frasersc_eoz63o",
+      "name": "Frasers.Com",
+      "originalName": "Frasers.Com",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "fras_gamecouk_2osuwx",
+      "name": "Game.co.uk",
+      "originalName": "Game.co.uk",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "fras_houseoff_gm3772",
+      "name": "House of Fraser",
+      "originalName": "House of Fraser",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "fras_isawitfi_r9qqpe",
+      "name": "Isawitfirst",
+      "originalName": "Isawitfirst",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "fras_isawitfi_w6vofi",
+      "name": "I Saw It First X",
+      "originalName": "I Saw It First X",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "fras_lillywhi_g50szm",
+      "name": "Lillywhites",
+      "originalName": "Lillywhites",
+      "type": "Account",
+      "color": "#B91C1C"
+    },
+    {
+      "id": "fras_jackwill_2ulkz9",
+      "name": "Jack Wills",
+      "originalName": "Jack Wills",
+      "type": "Account",
+      "color": "#7C2D12"
+    },
+    {
+      "id": "fras_matchesf_eot6er",
+      "name": "Matchesfashion",
+      "originalName": "Matchesfashion",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "fras_missguid_gxfc4o",
+      "name": "Missguided",
+      "originalName": "Missguided",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "fras_scottsme_ha2y4k",
+      "name": "Scotts menswear",
+      "originalName": "Scotts menswear",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "fras_sgsports_nznv5q",
+      "name": "sg.sportsdirect",
+      "originalName": "sg.sportsdirect",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "fras_sportsdi_yflpny",
+      "name": "Sports Direct",
+      "originalName": "Sports Direct",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "fras_sneakerb_bx20t1",
+      "name": "Sneakerboy",
+      "originalName": "Sneakerboy",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "fras_sportsdi_thnn87",
+      "name": "Sports Direct Malaysia",
+      "originalName": "Sports Direct Malaysia",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "fras_sportsdi_zrb6v9",
+      "name": "Sportsdirect.com (US)",
+      "originalName": "Sportsdirect.com (US)",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "fras_studioco_s258hs",
+      "name": "studio.co.uk",
+      "originalName": "studio.co.uk",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "fras_usc_7bp5zd",
+      "name": "USC",
+      "originalName": "USC",
+      "type": "Account",
+      "color": "#84CC16"
+    },
+    {
+      "id": "fras_vanmilde_yobyfn",
+      "name": "Van Mildert",
+      "originalName": "Van Mildert",
+      "type": "Account",
+      "color": "#F43F5E"
+    },
+    {
+      "id": "fras_watchsho_vx4e9r",
+      "name": "Watchshop",
+      "originalName": "Watchshop",
+      "type": "Account",
+      "color": "#EC4899"
+    },
+    {
+      "id": "fras_wiggle_puy2u5",
+      "name": "Wiggle",
+      "originalName": "Wiggle",
+      "type": "Account",
+      "color": "#EF4444"
+    },
+    {
+      "id": "fras_tedbaker_5gb3u6",
+      "name": "Ted Baker",
+      "originalName": "Ted Baker",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "fras_uscx_yub51k",
+      "name": "USC X",
+      "originalName": "USC X",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "fras_slazenge_m5u59l",
+      "name": "Slazenger Padel Club",
+      "originalName": "Slazenger Padel Club",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "fras_cruisefa_xdtt43",
+      "name": "Cruise Fashion X",
+      "originalName": "Cruise Fashion X",
+      "type": "Account",
+      "color": "#BE123C"
+    },
+    {
+      "id": "fras_jackwill_kw1ism",
+      "name": "Jack Wills X",
+      "originalName": "Jack Wills X",
+      "type": "Account",
+      "color": "#6366F1"
+    },
+    {
+      "id": "fras_houseoff_6aqypg",
+      "name": "House of Frasers X",
+      "originalName": "House of Frasers X",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "fras_coggles_0kb29y",
+      "name": "Coggles",
+      "originalName": "Coggles",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "fras_ebuyer_xoqwju",
+      "name": "Ebuyer",
+      "originalName": "Ebuyer",
+      "type": "Account",
+      "color": "#F97316"
+    },
+    {
+      "id": "fras_flannels_dbsb5k",
+      "name": "Flannels X",
+      "originalName": "Flannels X",
+      "type": "Account",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "fras_arcticar_eua2px",
+      "name": "Arctic Army",
+      "originalName": "Arctic Army",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "fras_agentpro_9n0nqr",
+      "name": "Agent Provocateur",
+      "originalName": "Agent Provocateur",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "fras_prettygr_awel2a",
+      "name": "Pretty Green",
+      "originalName": "Pretty Green",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "fras_albam_lzy37o",
+      "name": "Albam",
+      "originalName": "Albam",
+      "type": "Account",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "fras_velvette_2o8mq3",
+      "name": "Velvet Tees",
+      "originalName": "Velvet Tees",
+      "type": "Account",
+      "color": "#BE123C"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-04T20:52:11.407Z",
+    "scenario": "csv-frasers-group",
+    "description": "CSV-generated participant data for Frasers Group",
+    "participantFile": true,
+    "generatedFrom": "csv-upload-script"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "scenarioName": "LMV LumaPay",
+  "organizationName": "LMV LumaPay",
+  "accounts": [
+    {
+      "id": "all_accounts",
+      "name": "LMV LumaPay",
+      "type": "Aggregate view",
+      "isAggregate": true
+    },
+    {
+      "id": "lmvl_auctionf_pggt3o",
+      "name": "AuctionFrogs-AmFund",
+      "originalName": "AuctionFrogs-AmFund",
+      "type": "Account",
+      "color": "#0369A1"
+    },
+    {
+      "id": "lmvl_clubexpr_ggwje0",
+      "name": "Clubexpress",
+      "originalName": "Clubexpress",
+      "type": "Account",
+      "color": "#14B8A6"
+    },
+    {
+      "id": "lmvl_auctionf_ljghwf",
+      "name": "Auction Frogs",
+      "originalName": "Auction Frogs",
+      "type": "Account",
+      "color": "#10B981"
+    },
+    {
+      "id": "lmvl_fundly_gcrasj",
+      "name": "Fundly",
+      "originalName": "Fundly",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "lmvl_fairentr_2jz1zy",
+      "name": "FairEntry",
+      "originalName": "FairEntry",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "lmvl_learning_alwasn",
+      "name": "Learning Stream",
+      "originalName": "Learning Stream",
+      "type": "Account",
+      "color": "#7E22CE"
+    },
+    {
+      "id": "lmvl_registra_f2avyy",
+      "name": "RegistrationMax",
+      "originalName": "RegistrationMax",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "lmvl_membersh_570f23",
+      "name": "Membership Toolkit",
+      "originalName": "Membership Toolkit",
+      "type": "Account",
+      "color": "#166534"
+    },
+    {
+      "id": "lmvl_npelumap_v9qbxo",
+      "name": "NPE: LumaPay",
+      "originalName": "NPE: LumaPay",
+      "type": "Account",
+      "color": "#06B6D4"
+    },
+    {
+      "id": "lmvl_signupge_trpft6",
+      "name": "SignUpGenius",
+      "originalName": "SignUpGenius",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "lmvl_timetap_8v37qn",
+      "name": "TimeTap",
+      "originalName": "TimeTap",
+      "type": "Account",
+      "color": "#8B5A2B"
+    },
+    {
+      "id": "lmvl_sugdonat_ccemjq",
+      "name": "SUG Donations",
+      "originalName": "SUG Donations",
+      "type": "Account",
+      "color": "#059669"
+    },
+    {
+      "id": "lmvl_sugticke_04g44o",
+      "name": "SUG Tickets",
+      "originalName": "SUG Tickets",
+      "type": "Account",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "lmvl_sugaucti_iday8f",
+      "name": "SUG Auctions",
+      "originalName": "SUG Auctions",
+      "type": "Account",
+      "color": "#84CC16"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-09-04T20:52:11.407Z",
+    "scenario": "csv-lmv-lumapay",
+    "description": "CSV-generated participant data for LMV LumaPay",
+    "participantFile": true,
+    "generatedFrom": "csv-upload-script"
+  }
+}
