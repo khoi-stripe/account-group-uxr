@@ -2839,6 +2839,22 @@
         container.innerHTML = '<p style="color: var(--neutral-500); font-style: italic;">No accounts selected</p>';
         return;
       }
+
+      // CRITICAL FIX: Ensure accounts have financial data
+      const financialDataCache = generateAccountFinancialData();
+      const enrichedAccounts = accountsData.map(account => {
+        const financialData = financialDataCache.get(account.id);
+        if (financialData) {
+          console.log('💰 Enriching account', account.name, 'with financial data:', {revenue: financialData.revenue, transactions: financialData.transactions});
+          return { ...account, ...financialData };
+        } else {
+          console.warn('⚠️ No financial data found for account:', account.name);
+          return account;
+        }
+      });
+      
+      console.log('💰 Enriched accounts:', enrichedAccounts.map(a => ({name: a.name, revenue: a.revenue, transactions: a.transactions})));
+      accountsData = enrichedAccounts;
       
       const breakdownHTML = accountsData.map(account => {
         // Add null checks for missing financial data
