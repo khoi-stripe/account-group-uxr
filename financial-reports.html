@@ -2626,17 +2626,15 @@
     // Generate sample financial data for each account (with persistence)
     function generateAccountFinancialData() {
       if (window.accountFinancialDataCache) {
-  
         return window.accountFinancialDataCache;
       }
       
       const accountDataMap = new Map();
       
-    const managerRef = getManagerRef();
-    if (managerRef) {
-      // Exclude the aggregate "All accounts" entry so counts reflect real accounts only
-      const accounts = managerRef.getAllSubAccounts().filter(acc => !acc.isAggregate);
-
+      const managerRef = getManagerRef();
+      if (managerRef) {
+        // Exclude the aggregate "All accounts" entry so counts reflect real accounts only
+        const accounts = managerRef.getAllSubAccounts().filter(acc => !acc.isAggregate);
         
         accounts.forEach((account, index) => {
           // Use account ID to seed random data for consistency
@@ -2660,36 +2658,41 @@
         });
       }
       
-      // Fallback data if no org manager
+      // Always ensure we have fallback data - this should fix the $0 issue
       if (accountDataMap.size === 0) {
-
+        console.log('🔧 No org manager data found, generating fallback account data');
+        
         const fallbackAccounts = [
-          { id: 'mobile-app', name: 'Mobile App' },
-          { id: 'web-platform', name: 'Web Platform' },
-          { id: 'api-services', name: 'API Services' },
-          { id: 'analytics', name: 'Analytics Dashboard' },
-          { id: 'payments', name: 'Payment Processing' }
+          { id: 'urv-cac', name: 'UrV - CAC' },
+          { id: 'urv-ubc', name: 'UrV - UBC' },
+          { id: 'urv-flv', name: 'UrV - FLV' },
+          { id: 'urv-clv', name: 'UrV - CLV' },
+          { id: 'urv-che', name: 'UrV - CHE' },
+          { id: 'urv-uha', name: 'UrV - UHA' },
+          { id: 'urv-gbi', name: 'UrV - GBI' }
         ];
         
         fallbackAccounts.forEach((account, index) => {
           // Use index to create consistent seeded data
-          const seed = index * 1000;
+          const seed = (index + 1) * 1337; // Better seed variation
           const seededRandom1 = (seed * 9301 + 49297) % 233280 / 233280;
           const seededRandom2 = ((seed + 1) * 9301 + 49297) % 233280 / 233280;
           const seededRandom3 = ((seed + 2) * 9301 + 49297) % 233280 / 233280;
           const seededRandom4 = ((seed + 3) * 9301 + 49297) % 233280 / 233280;
           
-          const baseRevenue = Math.floor(seededRandom1 * 50000) + 10000;
-          const baseTransactions = Math.floor(seededRandom2 * 800) + 200;
+          const baseRevenue = Math.floor(seededRandom1 * 45000) + 15000; // $15k-$60k
+          const baseTransactions = Math.floor(seededRandom2 * 900) + 100; // 100-1000 transactions
           
           accountDataMap.set(account.id, {
             name: account.name,
             revenue: baseRevenue,
             transactions: baseTransactions,
-            revenueGrowth: ((seededRandom3 * 40) - 10).toFixed(1),
-            transactionGrowth: ((seededRandom4 * 30) - 5).toFixed(1)
+            revenueGrowth: ((seededRandom3 * 35) - 5).toFixed(1), // -5% to +30%
+            transactionGrowth: ((seededRandom4 * 25) - 2).toFixed(1) // -2% to +23%
           });
         });
+        
+        console.log('🔧 Generated fallback data for', accountDataMap.size, 'accounts');
       }
       
       // Cache the result
@@ -3012,11 +3015,16 @@
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
+        // Clear cache and ensure data is generated
+        window.accountFinancialDataCache = null;
+        generateAccountFinancialData();
         initializeReportsFilter().catch(console.error);
         monitorAccountSwitches();
       });
     } else {
-          // DOM is already loaded
+      // DOM is already loaded
+      window.accountFinancialDataCache = null;
+      generateAccountFinancialData();
       initializeReportsFilter().catch(console.error);
       monitorAccountSwitches();
     }
