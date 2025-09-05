@@ -639,7 +639,6 @@ class FigmaGroupCreationModalV3 {
             if (e.target.type === 'checkbox') {
                 const accountItem = e.target.closest('.account-item');
                 const accountId = accountItem?.dataset.accountId;
-                console.log('🐛 Checkbox change event:', accountId, 'checked:', e.target.checked);
                 if (accountId) {
                     this.toggleAccount(accountId);
                 }
@@ -691,17 +690,11 @@ class FigmaGroupCreationModalV3 {
     }
     
     toggleAccount(accountId) {
-        const wasSelected = this.selectedAccounts.has(accountId);
-        if (wasSelected) {
+        if (this.selectedAccounts.has(accountId)) {
             this.selectedAccounts.delete(accountId);
-            console.log('🐛 REMOVED account:', accountId, 'Total selected:', this.selectedAccounts.size);
         } else {
             this.selectedAccounts.add(accountId);
-            console.log('🐛 ADDED account:', accountId, 'Total selected:', this.selectedAccounts.size);
         }
-        
-        // Log the current state
-        console.log('🐛 Selected accounts:', Array.from(this.selectedAccounts));
         
         this.updateSelectionCount();
         this.updateSelectAllState();
