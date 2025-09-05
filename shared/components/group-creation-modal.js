@@ -316,22 +316,34 @@ class GroupCreationModal {
   }
 
   removeStep2EventListeners() {
+    // Only try to remove listeners if modal exists and handlers are defined
+    if (!this.modal) return;
+    
     // Remove search input listener
-    const searchInput = this.modal.querySelector('.search-input');
-    if (searchInput && this.searchInputHandler) {
-      searchInput.removeEventListener('input', this.searchInputHandler);
+    if (this.searchInputHandler) {
+      const searchInput = this.modal.querySelector('.search-input');
+      if (searchInput) {
+        searchInput.removeEventListener('input', this.searchInputHandler);
+      }
+      this.searchInputHandler = null;
     }
     
     // Remove select all listener
-    const selectAllCheckbox = this.modal.querySelector('.select-all-checkbox');
-    if (selectAllCheckbox && this.selectAllHandler) {
-      selectAllCheckbox.removeEventListener('change', this.selectAllHandler);
+    if (this.selectAllHandler) {
+      const selectAllCheckbox = this.modal.querySelector('.select-all-checkbox');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.removeEventListener('change', this.selectAllHandler);
+      }
+      this.selectAllHandler = null;
     }
     
     // Remove account list listener
-    const accountList = this.modal.querySelector('.account-list');
-    if (accountList && this.accountListHandler) {
-      accountList.removeEventListener('change', this.accountListHandler);
+    if (this.accountListHandler) {
+      const accountList = this.modal.querySelector('.account-list');
+      if (accountList) {
+        accountList.removeEventListener('change', this.accountListHandler);
+      }
+      this.accountListHandler = null;
     }
   }
 
@@ -341,7 +353,9 @@ class GroupCreationModal {
     const accountsList = this.modal.querySelector('.accounts-list');
     
     accountsList.innerHTML = this.renderAccountsList(filteredAccounts);
-    this.addStep2EventListeners();
+    // Don't re-add event listeners - using event delegation now
+    this.updateSelectAllState();
+    this.updatePreviewContent();
   }
 
   updateSelectionSummary() {
@@ -618,7 +632,7 @@ class GroupCreationModal {
         this.modal.parentNode.removeChild(this.modal);
       }
       
-      // Reset state and clear handler references
+      // Reset state (handler references already cleared in removeStep2EventListeners)
       this.currentStep = 1;
       this.groupData = {
         name: '',
@@ -626,9 +640,6 @@ class GroupCreationModal {
         selectedAccounts: [],
       };
       this.searchQuery = '';
-      this.searchInputHandler = null;
-      this.selectAllHandler = null;
-      this.accountListHandler = null;
     }, 300);
   }
 
