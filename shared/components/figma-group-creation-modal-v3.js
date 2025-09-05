@@ -612,8 +612,11 @@ class FigmaGroupCreationModalV3 {
         const accountList = document.getElementById('accountsList-v3');
         if (!accountList) return;
 
+        // Remove existing listeners to prevent duplicates
+        this.removeAccountEvents();
+
         // Use delegation; bind once per render cycle
-        accountList.addEventListener('click', (e) => {
+        this.accountClickHandler = (e) => {
             const item = e.target.closest('.account-item');
             if (item && e.target.type !== 'checkbox') {
                 const checkbox = item.querySelector('input[type="checkbox"]');
@@ -628,10 +631,11 @@ class FigmaGroupCreationModalV3 {
                     console.error('No accountId found on row click');
                 }
             }
-        });
+        };
+        accountList.addEventListener('click', this.accountClickHandler);
         
         // Account checkbox changes
-        accountList.addEventListener('change', (e) => {
+        this.accountChangeHandler = (e) => {
             if (e.target.type === 'checkbox') {
                 const accountItem = e.target.closest('.account-item');
                 const accountId = accountItem?.dataset.accountId;
@@ -639,17 +643,32 @@ class FigmaGroupCreationModalV3 {
                     this.toggleAccount(accountId);
                 }
             }
-        });
+        };
+        accountList.addEventListener('change', this.accountChangeHandler);
 
         // Update overflow shadow state
         this.updateAccountsListOverflowShadow();
 
         // Recalculate on resize (throttled via rAF)
-        const onResize = () => {
-            if (this._overflowRaf) cancelAnimationFrame(this._overflowRaf);
-            this._overflowRaf = requestAnimationFrame(() => this.updateAccountsListOverflowShadow());
-        };
-        window.addEventListener('resize', onResize, { passive: true });
+        if (!this.resizeHandler) {
+            this.resizeHandler = () => {
+                if (this._overflowRaf) cancelAnimationFrame(this._overflowRaf);
+                this._overflowRaf = requestAnimationFrame(() => this.updateAccountsListOverflowShadow());
+            };
+            window.addEventListener('resize', this.resizeHandler, { passive: true });
+        }
+    }
+
+    removeAccountEvents() {
+        const accountList = document.getElementById('accountsList-v3');
+        if (accountList) {
+            if (this.accountClickHandler) {
+                accountList.removeEventListener('click', this.accountClickHandler);
+            }
+            if (this.accountChangeHandler) {
+                accountList.removeEventListener('change', this.accountChangeHandler);
+            }
+        }
     }
 
     updateAccountsListOverflowShadow() {
@@ -873,6 +892,13 @@ class FigmaGroupCreationModalV3 {
     }
 
     close() {
+        // Clean up event listeners
+        this.removeAccountEvents();
+        if (this.resizeHandler) {
+            window.removeEventListener('resize', this.resizeHandler);
+            this.resizeHandler = null;
+        }
+        
         this.modal.hide();
     }
 }
