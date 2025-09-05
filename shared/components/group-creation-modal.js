@@ -249,19 +249,23 @@ class GroupCreationModal {
   }
 
   addStep2EventListeners() {
+    // Remove existing listeners to prevent duplicates
+    this.removeStep2EventListeners();
+    
     // Search input listener
     const searchInput = this.modal.querySelector('.search-input');
     if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
+      this.searchInputHandler = (e) => {
         this.searchQuery = e.target.value;
         this.updateAccountsList();
-      });
+      };
+      searchInput.addEventListener('input', this.searchInputHandler);
     }
     
     // Select all checkbox listener
     const selectAllCheckbox = this.modal.querySelector('.select-all-checkbox');
     if (selectAllCheckbox) {
-      selectAllCheckbox.addEventListener('change', (e) => {
+      this.selectAllHandler = (e) => {
         const accountCheckboxes = this.modal.querySelectorAll('.account-item input[type="checkbox"]');
         const shouldCheck = e.target.checked;
         
@@ -282,29 +286,53 @@ class GroupCreationModal {
         this.updatePreviewContent();
         this.updateSelectAllState();
         this.updateNextButton();
-      });
+      };
+      selectAllCheckbox.addEventListener('change', this.selectAllHandler);
     }
     
-    // Account selection listeners
-    const accountCheckboxes = this.modal.querySelectorAll('.account-item input[type="checkbox"]');
-    accountCheckboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', (e) => {
-        const accountId = e.target.closest('.account-item').dataset.accountId;
-        
-        if (e.target.checked && !this.groupData.selectedAccounts.includes(accountId)) {
-          this.groupData.selectedAccounts.push(accountId);
-        } else if (!e.target.checked) {
-          const index = this.groupData.selectedAccounts.indexOf(accountId);
-          if (index > -1) {
-            this.groupData.selectedAccounts.splice(index, 1);
+    // Use event delegation for account checkboxes to handle dynamic content
+    const accountList = this.modal.querySelector('.account-list');
+    if (accountList) {
+      this.accountListHandler = (e) => {
+        if (e.target.type === 'checkbox' && e.target.closest('.account-item')) {
+          const accountId = e.target.closest('.account-item').dataset.accountId;
+          
+          if (e.target.checked && !this.groupData.selectedAccounts.includes(accountId)) {
+            this.groupData.selectedAccounts.push(accountId);
+          } else if (!e.target.checked) {
+            const index = this.groupData.selectedAccounts.indexOf(accountId);
+            if (index > -1) {
+              this.groupData.selectedAccounts.splice(index, 1);
+            }
           }
+          
+          this.updatePreviewContent();
+          this.updateSelectAllState();
+          this.updateNextButton();
         }
-        
-        this.updatePreviewContent();
-        this.updateSelectAllState();
-        this.updateNextButton();
-      });
-    });
+      };
+      accountList.addEventListener('change', this.accountListHandler);
+    }
+  }
+
+  removeStep2EventListeners() {
+    // Remove search input listener
+    const searchInput = this.modal.querySelector('.search-input');
+    if (searchInput && this.searchInputHandler) {
+      searchInput.removeEventListener('input', this.searchInputHandler);
+    }
+    
+    // Remove select all listener
+    const selectAllCheckbox = this.modal.querySelector('.select-all-checkbox');
+    if (selectAllCheckbox && this.selectAllHandler) {
+      selectAllCheckbox.removeEventListener('change', this.selectAllHandler);
+    }
+    
+    // Remove account list listener
+    const accountList = this.modal.querySelector('.account-list');
+    if (accountList && this.accountListHandler) {
+      accountList.removeEventListener('change', this.accountListHandler);
+    }
   }
 
   refreshAccountsList() {
@@ -504,8 +532,9 @@ class GroupCreationModal {
       const selectAllItem = accountList.querySelector('.select-all-item');
       accountList.innerHTML = selectAllItem.outerHTML + accountItems;
       
-      // Re-add event listeners
-      this.addStep2EventListeners();
+      // Update select all state and preview (no need to re-add listeners due to event delegation)
+      this.updateSelectAllState();
+      this.updatePreviewContent();
     }
   }
 
@@ -579,12 +608,27 @@ class GroupCreationModal {
   }
 
   close() {
+    // Clean up event listeners
+    this.removeStep2EventListeners();
+    
     this.modal.classList.remove('show');
     
     setTimeout(() => {
       if (this.modal && this.modal.parentNode) {
         this.modal.parentNode.removeChild(this.modal);
       }
+      
+      // Reset state and clear handler references
+      this.currentStep = 1;
+      this.groupData = {
+        name: '',
+        description: '',
+        selectedAccounts: [],
+      };
+      this.searchQuery = '';
+      this.searchInputHandler = null;
+      this.selectAllHandler = null;
+      this.accountListHandler = null;
     }, 300);
   }
 
