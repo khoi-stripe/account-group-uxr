@@ -139,13 +139,10 @@ class GroupCreationModal {
   }
 
   renderStep2() {
-    console.log('🐛 renderStep2 called');
     const stepContent = this.modal.querySelector('.step-content');
     const availableAccounts = this.getAvailableAccounts();
     const filteredAccounts = this.filterAccounts(availableAccounts);
     const selectedCount = this.groupData.selectedAccounts.length;
-    
-    console.log('🐛 Available accounts:', availableAccounts.length, 'Filtered:', filteredAccounts.length);
 
     stepContent.innerHTML = `
       <div class="dual-panel-container">
@@ -272,13 +269,9 @@ class GroupCreationModal {
         const accountCheckboxes = this.modal.querySelectorAll('.account-item input[type="checkbox"]');
         const shouldCheck = e.target.checked;
         
-        console.log('🐛 Select all triggered:', shouldCheck, 'Found checkboxes:', accountCheckboxes.length);
-        
         accountCheckboxes.forEach(checkbox => {
           checkbox.checked = shouldCheck;
           const accountId = checkbox.closest('.account-item').dataset.accountId;
-          
-          console.log('🐛 Select all processing:', accountId, shouldCheck);
           
           if (shouldCheck && !this.groupData.selectedAccounts.includes(accountId)) {
             this.groupData.selectedAccounts.push(accountId);
@@ -289,8 +282,6 @@ class GroupCreationModal {
             }
           }
         });
-        
-        console.log('🐛 Select all result - Total selected:', this.groupData.selectedAccounts.length);
         
         this.updatePreviewContent();
         this.updateSelectAllState();
@@ -303,22 +294,16 @@ class GroupCreationModal {
     const accountList = this.modal.querySelector('.account-list');
     if (accountList) {
       this.accountListHandler = (e) => {
-        console.log('🐛 Event delegation triggered:', e.target, e.target.type, e.target.closest('.account-item'));
-        
         if (e.target.type === 'checkbox' && e.target.closest('.account-item')) {
           const accountItem = e.target.closest('.account-item');
           const accountId = accountItem.dataset.accountId;
           
-          console.log('🐛 Processing account checkbox:', accountId, 'checked:', e.target.checked);
-          
           if (e.target.checked && !this.groupData.selectedAccounts.includes(accountId)) {
             this.groupData.selectedAccounts.push(accountId);
-            console.log('🐛 Added account:', accountId, 'Total selected:', this.groupData.selectedAccounts.length);
           } else if (!e.target.checked) {
             const index = this.groupData.selectedAccounts.indexOf(accountId);
             if (index > -1) {
               this.groupData.selectedAccounts.splice(index, 1);
-              console.log('🐛 Removed account:', accountId, 'Total selected:', this.groupData.selectedAccounts.length);
             }
           }
           
@@ -328,7 +313,6 @@ class GroupCreationModal {
         }
       };
       accountList.addEventListener('change', this.accountListHandler);
-      console.log('🐛 Event delegation set up on:', accountList);
     }
   }
 
