@@ -1,8 +1,8 @@
 /**
  * Group Creation Modal Component
  * Simplified 2-step flow for creating account groups
- * Step 1: Group name and description
- * Step 2: Account selection with dual-panel interface
+ * Step 1: Account selection with dual-panel interface
+ * Step 2: Group name and description
  */
 
 class GroupCreationModal {
@@ -29,7 +29,7 @@ class GroupCreationModal {
     this.searchQuery = '';
     
     this.createModal();
-    this.renderStep1();
+    this.renderStep2();
     document.body.appendChild(this.modal);
     
     // Animate in
@@ -451,12 +451,12 @@ class GroupCreationModal {
     
     if (this.currentStep === 1) {
       nextButton.textContent = 'Next';
-      // Only require group name, description is optional
-      nextButton.disabled = !this.groupData.name.trim();
+      nextButton.disabled = this.groupData.selectedAccounts.length === 0;
       backButton.style.display = 'none';
     } else if (this.currentStep === 2) {
       nextButton.textContent = 'Done';
-      nextButton.disabled = this.groupData.selectedAccounts.length === 0;
+      // Only require group name, description is optional
+      nextButton.disabled = !this.groupData.name.trim();
       backButton.style.display = 'block';
     }
   }
@@ -564,18 +564,18 @@ class GroupCreationModal {
 
   handleNext() {
     if (this.currentStep === 1) {
+      if (this.groupData.selectedAccounts.length === 0) {
+        this.showError('Please select at least one account');
+        return;
+      }
+      this.currentStep = 2;
+      this.renderStep1();
+    } else if (this.currentStep === 2) {
       if (!this.groupData.name.trim()) {
         this.showError('Please enter a group name');
         return;
       }
       // Description is optional, no validation needed
-      this.currentStep = 2;
-      this.renderStep2();
-    } else if (this.currentStep === 2) {
-      if (this.groupData.selectedAccounts.length === 0) {
-        this.showError('Please select at least one account');
-        return;
-      }
       this.createGroup();
     }
   }
@@ -583,7 +583,7 @@ class GroupCreationModal {
   handleBack() {
     if (this.currentStep === 2) {
       this.currentStep = 1;
-      this.renderStep1();
+      this.renderStep2();
     }
   }
 

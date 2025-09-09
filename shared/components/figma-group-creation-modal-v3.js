@@ -66,7 +66,7 @@ class FigmaGroupCreationModalV3 {
         }
         
 
-        this.showStep1();
+        this.showStep2();
 
     }
     

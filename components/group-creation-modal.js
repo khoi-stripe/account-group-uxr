@@ -1,7 +1,7 @@
 /**
  * Account Group Creation Modal - 2-step flow for UXR prototype
- * Step 1: Group name and type selection
- * Step 2: Dual-panel account selection with tree visualization
+ * Step 1: Dual-panel account selection with tree visualization
+ * Step 2: Group name and type selection
  */
 
 class GroupCreationModal {
@@ -28,7 +28,7 @@ class GroupCreationModal {
     };
     
     this.createModal();
-    this.renderStep1();
+    this.renderStep2();
     document.body.appendChild(this.modal);
     
     // Animate in
@@ -55,12 +55,12 @@ class GroupCreationModal {
           <div class="step-indicator">
             <div class="step step-1 active">
               <span class="step-number">1</span>
-              <span class="step-label">Group details</span>
+              <span class="step-label">Add accounts</span>
             </div>
             <div class="step-divider"></div>
             <div class="step step-2">
               <span class="step-number">2</span>
-              <span class="step-label">Add accounts</span>
+              <span class="step-label">Group details</span>
             </div>
           </div>
           <div class="step-content"></div>
@@ -167,6 +167,14 @@ class GroupCreationModal {
       });
     });
 
+    // Update step indicator
+    this.modal.querySelector('.step-1').classList.remove('active');
+    this.modal.querySelector('.step-2').classList.add('active');
+    
+    // Update footer buttons
+    this.modal.querySelector('.step-back').style.display = 'inline-block';
+    this.modal.querySelector('.step-next').textContent = 'Create group';
+
     this.updateNextButton();
   }
 
@@ -265,12 +273,12 @@ class GroupCreationModal {
     });
 
     // Update step indicator
-    this.modal.querySelector('.step-1').classList.remove('active');
-    this.modal.querySelector('.step-2').classList.add('active');
+    this.modal.querySelector('.step-2').classList.remove('active');
+    this.modal.querySelector('.step-1').classList.add('active');
     
     // Update footer buttons
-    this.modal.querySelector('.step-back').style.display = 'inline-block';
-    this.modal.querySelector('.step-next').textContent = 'Create group';
+    this.modal.querySelector('.step-back').style.display = 'none';
+    this.modal.querySelector('.step-next').textContent = 'Next';
   }
 
   renderAccountsTree(accountIds) {
@@ -338,10 +346,10 @@ class GroupCreationModal {
     const nextButton = this.modal.querySelector('.step-next');
     
     if (this.currentStep === 1) {
-      const canProceed = this.groupData.name.trim() && this.groupData.type;
+      const canProceed = this.groupData.accountIds.length > 0;
       nextButton.disabled = !canProceed;
     } else if (this.currentStep === 2) {
-      const canCreate = this.groupData.accountIds.length > 0;
+      const canCreate = this.groupData.name.trim() && this.groupData.type;
       nextButton.disabled = !canCreate;
     }
   }
@@ -349,7 +357,7 @@ class GroupCreationModal {
   handleNext() {
     if (this.currentStep === 1) {
       this.currentStep = 2;
-      this.renderStep2();
+      this.renderStep1();
     } else if (this.currentStep === 2) {
       this.createGroup();
     }
@@ -357,7 +365,7 @@ class GroupCreationModal {
 
   handleBack() {
     this.currentStep = 1;
-    this.renderStep1();
+    this.renderStep2();
     
     // Update step indicator
     this.modal.querySelector('.step-2').classList.remove('active');
