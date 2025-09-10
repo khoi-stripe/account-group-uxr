@@ -16,10 +16,12 @@ class GroupCreationModal {
     this.modal = null;
     this.onComplete = null;
     this.searchQuery = '';
+    this.isEditMode = false;
   }
 
   show(options = {}) {
     this.onComplete = options.onComplete;
+    this.isEditMode = !!options.editMode;
     this.currentStep = 1;
     this.groupData = {
       name: '',
@@ -29,7 +31,7 @@ class GroupCreationModal {
     this.searchQuery = '';
     
     this.createModal();
-    this.renderStep2();
+    this.renderStep1();
     document.body.appendChild(this.modal);
     
     // Animate in
@@ -75,6 +77,74 @@ class GroupCreationModal {
   }
 
   renderStep1() {
+    const stepContent = this.modal.querySelector('.step-content');
+    const availableAccounts = this.getAvailableAccounts();
+    const filteredAccounts = this.filterAccounts(availableAccounts);
+    const selectedCount = this.groupData.selectedAccounts.length;
+
+    stepContent.innerHTML = `
+      <div class="dual-panel-container">
+        <div class="account-list-panel">
+          <div class="search-container">
+            <input 
+              type="text" 
+              class="search-input filter" 
+              placeholder="Search"
+              value="${this.searchQuery || ''}"
+            >
+          </div>
+          
+          <div class="account-list">
+            <div class="select-all-item">
+              <label class="checkbox-container">
+                <input type="checkbox" class="select-all-checkbox">
+                <span class="checkmark"></span>
+                <span class="select-all-content">
+                  <span class="select-all-text">Select all</span>
+                  <span class="select-count">${selectedCount} selected</span>
+                </span>
+              </label>
+            </div>
+            
+            ${filteredAccounts.map(account => `
+              <div class="account-item" data-account-id="${account.id}">
+                <label class="checkbox-container">
+                  <input 
+                    type="checkbox" 
+                    ${this.groupData.selectedAccounts.includes(account.id) ? 'checked' : ''}
+                  >
+                  <span class="checkmark"></span>
+                  <span class="account-content">
+                    <span class="account-icon ${account.type}"></span>
+                    <span class="account-name">${account.name}</span>
+                  </span>
+                </label>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="preview-panel">
+          <div class="preview-header">
+            <h3 class="preview-title">${this.groupData.name || 'New group'}</h3>
+          </div>
+          <div class="preview-content">
+            ${this.renderPreviewContent()}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Update header for Step 1
+    this.updateModalHeader();
+    
+    // Add event listeners
+    this.addStep2EventListeners();
+    this.updateSelectAllState();
+    this.updateNextButton();
+  }
+
+  renderStep2() {
     const stepContent = this.modal.querySelector('.step-content');
     
     stepContent.innerHTML = `
@@ -129,80 +199,12 @@ class GroupCreationModal {
       }
     });
 
-    // Update header for Step 1
+    // Update header for Step 2
     this.updateModalHeader();
     
     // Focus the name input
     setTimeout(() => nameInput.focus(), 100);
     
-    this.updateNextButton();
-  }
-
-  renderStep2() {
-    const stepContent = this.modal.querySelector('.step-content');
-    const availableAccounts = this.getAvailableAccounts();
-    const filteredAccounts = this.filterAccounts(availableAccounts);
-    const selectedCount = this.groupData.selectedAccounts.length;
-
-    stepContent.innerHTML = `
-      <div class="dual-panel-container">
-        <div class="account-list-panel">
-          <div class="search-container">
-            <input 
-              type="text" 
-              class="search-input filter" 
-              placeholder="Search"
-              value="${this.searchQuery || ''}"
-            >
-          </div>
-          
-          <div class="account-list">
-            <div class="select-all-item">
-              <label class="checkbox-container">
-                <input type="checkbox" class="select-all-checkbox">
-                <span class="checkmark"></span>
-                <span class="select-all-content">
-                  <span class="select-all-text">Select all</span>
-                  <span class="select-count">${selectedCount} selected</span>
-                </span>
-              </label>
-            </div>
-            
-            ${filteredAccounts.map(account => `
-              <div class="account-item" data-account-id="${account.id}">
-                <label class="checkbox-container">
-                  <input 
-                    type="checkbox" 
-                    ${this.groupData.selectedAccounts.includes(account.id) ? 'checked' : ''}
-                  >
-                  <span class="checkmark"></span>
-                  <span class="account-content">
-                    <span class="account-icon ${account.type}"></span>
-                    <span class="account-name">${account.name}</span>
-                  </span>
-                </label>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        
-        <div class="preview-panel">
-          <div class="preview-header">
-            <h3 class="preview-title">${this.groupData.name || 'New Group'}</h3>
-          </div>
-          <div class="preview-content">
-            ${this.renderPreviewContent()}
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Update header for Step 2
-    this.updateModalHeader();
-    
-    // Add event listeners
-    this.addStep2EventListeners();
-    this.updateSelectAllState();
     this.updateNextButton();
   }
 
@@ -420,13 +422,13 @@ class GroupCreationModal {
     const modalContent = this.modal.querySelector('.modal-content');
     
     if (this.currentStep === 1) {
-      titleElement.textContent = 'Create account group';
-      subtitleElement.textContent = 'Organize accounts with flexible groupings for filtering and reporting.';
-      modalContent.className = 'modal-content small';
-    } else if (this.currentStep === 2) {
-      titleElement.textContent = 'Add accounts';
+      titleElement.textContent = this.isEditMode ? 'Edit accounts in your group' : 'Add accounts';
       subtitleElement.textContent = 'Lorem ipsum dolor';
       modalContent.className = 'modal-content large';
+    } else if (this.currentStep === 2) {
+      titleElement.textContent = 'Name your account group';
+      subtitleElement.textContent = 'Organize accounts with flexible groupings for filtering and reporting.';
+      modalContent.className = 'modal-content small';
     }
   }
 
@@ -453,11 +455,17 @@ class GroupCreationModal {
       nextButton.textContent = 'Next';
       nextButton.disabled = this.groupData.selectedAccounts.length === 0;
       backButton.style.display = 'none';
+      // Reset footer layout for step 1
+      const footerActions = this.modal.querySelector('.footer-actions');
+      if (footerActions) footerActions.style.gap = '';
     } else if (this.currentStep === 2) {
       nextButton.textContent = 'Done';
       // Only require group name, description is optional
       nextButton.disabled = !this.groupData.name.trim();
       backButton.style.display = 'block';
+      // Update footer layout for step 2 - group buttons on the right with 12px spacing
+      const footerActions = this.modal.querySelector('.footer-actions');
+      if (footerActions) footerActions.style.gap = '12px';
     }
   }
 
@@ -569,7 +577,7 @@ class GroupCreationModal {
         return;
       }
       this.currentStep = 2;
-      this.renderStep1();
+      this.renderStep2();
     } else if (this.currentStep === 2) {
       if (!this.groupData.name.trim()) {
         this.showError('Please enter a group name');
@@ -583,7 +591,7 @@ class GroupCreationModal {
   handleBack() {
     if (this.currentStep === 2) {
       this.currentStep = 1;
-      this.renderStep2();
+      this.renderStep1();
     }
   }
 

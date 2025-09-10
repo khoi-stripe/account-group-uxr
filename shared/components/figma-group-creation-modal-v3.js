@@ -1,4 +1,5 @@
 // V3 - Refactored to use shared Modal component
+// Step 1: Account selection, Step 2: Group details
 class FigmaGroupCreationModalV3 {
     constructor() {
         this.modal = null;
@@ -66,7 +67,7 @@ class FigmaGroupCreationModalV3 {
         }
         
 
-        this.showStep2();
+        this.showStep1();
 
     }
     
@@ -107,6 +108,92 @@ class FigmaGroupCreationModalV3 {
     }
 
     showStep1() {
+        if (!this.modal) {
+            this.modal = new Modal({
+                title: ' ', // Use a space to ensure header is visible
+                content: this.getStep2HTML(),
+                size: 'large',
+                footerActions: [],
+                showHeader: true,
+                closable: true,
+                onHide: () => {
+                    // Reset edit mode when modal is closed
+                    this.isEditMode = false;
+                    this.editingGroupId = null;
+                    this.selectedAccounts.clear();
+                    this.groupData = {};
+                }
+            });
+        } else {
+            this.modal.setTitle('');
+            this.modal.setContent(this.getStep2HTML());
+            this.modal.setFooterActions([]);
+        }
+
+        this.modal.show();
+
+        // Maintain same size used in step 1 to avoid visual size change
+        this.modal.getElement().className = this.modal.getElement().className.replace(/modal-step\d-size/g, '') + ' modal-step2-size';
+
+        this.renderAccounts();
+        
+        // Use setTimeout to ensure DOM is fully updated before binding events
+        setTimeout(() => {
+            this.bindStep2Events();
+        }, 0);
+        
+        // Adjust modal content padding for Step 1 custom layout  
+        const modalContent = this.modal.getElement().querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.className = modalContent.className.replace(/modal-content-\w+/g, '') + ' modal-content-flexible';
+        }
+        
+        // Hide the default modal header for Step 1
+        const modalHeader = this.modal.getElement().querySelector('.modal-header');
+        if (modalHeader) {
+            modalHeader.classList.add('modal-element-hidden');
+        }
+        
+        // Hide the default modal footer for Step 1 (we use custom footer)
+        const modalFooter = this.modal.getElement().querySelector('.modal-footer');
+        if (modalFooter) {
+            modalFooter.classList.add('modal-element-hidden');
+        }
+        
+        // Add custom footer directly to modal element (outside modal-content)
+        const modalElement = this.modal.getElement();
+        let customFooter = modalElement.querySelector('.custom-modal-footer');
+        if (!customFooter) {
+            customFooter = document.createElement('div');
+            customFooter.className = 'custom-modal-footer modal-footer';
+            customFooter.innerHTML = `<button class="modal-button modal-button-primary" onclick="window.figmaModalV3.showStep2()">Next</button>`;
+            modalElement.appendChild(customFooter);
+        } else {
+            customFooter.innerHTML = `<button class="modal-button modal-button-primary" onclick="window.figmaModalV3.showStep2()">Next</button>`;
+        }
+        
+        // Set up flexbox layout for the entire modal
+        modalElement.classList.add('modal-flex-column');
+        
+        // Update Next button state based on account selection
+        this.updateStep1NextButton();
+    }
+    
+    updateStep1NextButton() {
+        const nextButton = this.modal?.getElement()?.querySelector('.custom-modal-footer .modal-button-primary');
+        if (nextButton) {
+            const hasSelectedAccounts = this.selectedAccounts.size > 0;
+            nextButton.disabled = !hasSelectedAccounts;
+            nextButton.style.opacity = hasSelectedAccounts ? '1' : '0.5';
+            nextButton.style.cursor = hasSelectedAccounts ? 'pointer' : 'not-allowed';
+        }
+    }
+    
+    showStep2() {
+        if (this.selectedAccounts.size === 0) {
+            alert('Please select at least one account');
+            return;
+        }
 
         const content = `
             <style>
@@ -131,10 +218,12 @@ class FigmaGroupCreationModalV3 {
                 .step1-button:hover { background: #5a4ff0; border-color: #5a4ff0; }
                 .step1-button:disabled { background: var(--neutral-200); border-color: var(--neutral-200); color: var(--neutral-400); cursor: not-allowed; }
                 .step1-button:disabled:hover { background: var(--neutral-200); border-color: var(--neutral-200); }
+                .step1-button-secondary { background: transparent; border-color: #d8dee4; color: #353a44; }
+                .step1-button-secondary:hover { background: #f5f6f7; }
             </style>
             <div class="step1-content">
                 <div class="step1-header">
-                    <h1 class="step1-title">${this.isEditMode ? 'Edit account group' : 'Create an account group'}</h1>
+                    <h1 class="step1-title">${this.isEditMode ? 'Edit account group' : 'Name your account group'}</h1>
                 </div>
                 <div class="step1-form">
                     <div class="step1-field">
@@ -148,47 +237,22 @@ class FigmaGroupCreationModalV3 {
                     </div>
                 </div>
             </div>
-                            <div class="step1-footer">
-                    <button id="step1-next-button" class="step1-button" disabled onclick="window.figmaModalV3.showStep2()">Next</button>
+            <div class="step1-footer">
+                <div style="display: flex; gap: 12px; margin-left: auto;">
+                    <button class="step1-button step1-button-secondary" onclick="window.figmaModalV3.showStep1()">Back</button>
+                    <button id="step1-next-button" class="step1-button" disabled onclick="window.figmaModalV3.createGroup()">${this.isEditMode ? 'Save changes' : 'Done'}</button>
                 </div>
+            </div>
         `;
 
-        if (!this.modal) {
-
-
-            this.modal = new Modal({
-                title: ' ', // Use a space to ensure header is visible
-                content: content,
-                size: 'large',
-                footerActions: [],
-                showHeader: true,
-                closable: true,
-                onHide: () => {
-                    // Reset edit mode when modal is closed
-                    this.isEditMode = false;
-                    this.editingGroupId = null;
-                    this.selectedAccounts.clear();
-                    this.groupData = {};
-                }
-            });
-
-
-            this.modal.show();
-
-        } else {
-
-            this.modal.setTitle('');
-            this.modal.setContent(content);
-            this.modal.setFooterActions([]);
-
-            this.modal.show();
-
-        }
+        this.modal.setTitle('');
+        this.modal.setContent(content);
+        this.modal.setFooterActions([]);
         
-        // Use the same width as Step 2 to avoid any perceived resize/transition
+        // Use the same width as Step 1 to avoid any perceived resize/transition
         this.modal.getElement().className = this.modal.getElement().className.replace(/modal-step\d-size/g, '') + ' modal-step1-size';
         
-        // Restore normal modal styling for Step 1
+        // Restore normal modal styling for Step 2
         const modalContent = this.modal.getElement().querySelector('.modal-content');
         if (modalContent) {
             modalContent.className = modalContent.className.replace(/modal-content-\w+/g, '') + ' modal-content-minimal';
@@ -258,75 +322,12 @@ class FigmaGroupCreationModalV3 {
             }
         }, 0);
     }
-    
-    showStep2() {
-        this.groupData.name = document.getElementById('groupName-v3').value;
-        this.groupData.description = document.getElementById('groupDescription-v3').value;
-        
-        if (!this.groupData.name.trim()) {
-            alert('Group name is required');
-            return;
-        }
-
-        this.modal.setTitle('');
-        this.modal.setContent(this.getStep2HTML());
-        this.modal.setFooterActions([]);
-
-        // Maintain same size used in step 1 to avoid visual size change
-        this.modal.getElement().className = this.modal.getElement().className.replace(/modal-step\d-size/g, '') + ' modal-step2-size';
-
-        this.renderAccounts();
-        
-        // Use setTimeout to ensure DOM is fully updated before binding events
-        setTimeout(() => {
-            this.bindStep2Events();
-        }, 0);
-        
-        // Adjust modal content padding for Step 2 custom layout  
-        const modalContent = this.modal.getElement().querySelector('.modal-content');
-        if (modalContent) {
-            modalContent.className = modalContent.className.replace(/modal-content-\w+/g, '') + ' modal-content-flexible';
-        }
-        
-        // Hide the default modal header for Step 2
-        const modalHeader = this.modal.getElement().querySelector('.modal-header');
-        if (modalHeader) {
-            modalHeader.classList.add('modal-element-hidden');
-        }
-        
-        // Hide the default modal footer for Step 2 (we use custom footer)
-        const modalFooter = this.modal.getElement().querySelector('.modal-footer');
-        if (modalFooter) {
-            modalFooter.classList.add('modal-element-hidden');
-        }
-        
-        // Add custom footer directly to modal element (outside modal-content)
-        const modalElement = this.modal.getElement();
-        let customFooter = modalElement.querySelector('.custom-modal-footer');
-        if (!customFooter) {
-            customFooter = document.createElement('div');
-            customFooter.className = 'custom-modal-footer modal-footer';
-            customFooter.innerHTML = `<button class="modal-button modal-button-primary" onclick="window.figmaModalV3.createGroup()">${this.isEditMode ? 'Save changes' : 'Done'}</button>`;
-            modalElement.appendChild(customFooter);
-        }
-        
-        // Set up flexbox layout for the entire modal
-        modalElement.classList.add('modal-flex-column');
-        
-
-    }
 
     getStep2HTML() {
         return `
             <div class="custom-modal-header" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 24px 24px 0 24px; border: none;">
                 <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
-                    <button style="display: flex; align-items: center; gap: 6px; background: none; border: none; padding: 0; color: #675dff; font-size: 14px; font-weight: 400; cursor: pointer;" onclick="window.figmaModalV3.showStep1()">
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.38128 1.38128C6.72299 1.03957 7.27701 1.03957 7.61872 1.38128C7.96043 1.72299 7.96043 2.27701 7.61872 2.61872L3.11244 7.125H15C15.4833 7.125 15.875 7.51675 15.875 8C15.875 8.48325 15.4833 8.875 15 8.875H3.11244L7.61872 13.3813C7.96043 13.723 7.96043 14.277 7.61872 14.6187C7.27701 14.9604 6.72299 14.9604 6.38128 14.6187L0.381282 8.61872C0.210427 8.44786 0.125 8.22393 0.125 8C0.125 7.77607 0.210427 7.55214 0.381282 7.38128L6.38128 1.38128Z" fill="currentColor"/>
-                        </svg>
-                        Back
-                    </button>
-                    <h2 style="margin: 0; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 24px; font-weight: 700; line-height: 32px; color: #21252c; letter-spacing: 0.3px;">Add accounts</h2>
+                    <h2 style="margin: 0; font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 24px; font-weight: 700; line-height: 32px; color: #21252c; letter-spacing: 0.3px;">${this.isEditMode ? 'Edit accounts in your group' : 'Select accounts'}</h2>
                     <p style="margin: 0; font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; color: #353a44; letter-spacing: -0.31px;">Select accounts from your business to add to this group.</p>
                 </div>
                 <button id="step2-close-button" style="background: none; border: none; padding: 8px; margin: -8px -8px 0 0; cursor: pointer; color: #6c7688;">
@@ -699,6 +700,7 @@ class FigmaGroupCreationModalV3 {
         this.updateSelectionCount();
         this.updateSelectAllState();
         this.updatePreview();
+        this.updateStep1NextButton();
     }
 
     toggleSelectAll() {
@@ -731,6 +733,7 @@ class FigmaGroupCreationModalV3 {
         }
         this.updateSelectionCount();
         this.updatePreview();
+        this.updateStep1NextButton();
     }
     
     updateSelectionCount() {
@@ -786,7 +789,7 @@ class FigmaGroupCreationModalV3 {
                 </svg>
             </div>
             <div class="group-preview-content">
-                <div class="group-preview-title">${this.groupData.name}</div>
+                <div class="group-preview-title">${this.groupData.name || 'New group'}</div>
             </div>
         `;
         
@@ -804,6 +807,15 @@ class FigmaGroupCreationModalV3 {
     }
 
     createGroup() {
+        // Get the group data from the form fields
+        this.groupData.name = document.getElementById('groupName-v3').value;
+        this.groupData.description = document.getElementById('groupDescription-v3').value;
+        
+        if (!this.groupData.name.trim()) {
+            alert('Group name is required');
+            return;
+        }
+        
         if (this.selectedAccounts.size === 0) {
             alert('Please select at least one account.');
             return;

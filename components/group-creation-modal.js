@@ -15,10 +15,12 @@ class GroupCreationModal {
     };
     this.modal = null;
     this.onComplete = null;
+    this.isEditMode = false;
   }
 
   show(options = {}) {
     this.onComplete = options.onComplete;
+    this.isEditMode = !!options.editMode;
     this.currentStep = 1;
     this.groupData = {
       name: '',
@@ -28,7 +30,8 @@ class GroupCreationModal {
     };
     
     this.createModal();
-    this.renderStep2();
+    this.updateStepLabels();
+    this.renderStep1();
     document.body.appendChild(this.modal);
     
     // Animate in
@@ -60,7 +63,7 @@ class GroupCreationModal {
             <div class="step-divider"></div>
             <div class="step step-2">
               <span class="step-number">2</span>
-              <span class="step-label">Group details</span>
+              <span class="step-label">Name your account group</span>
             </div>
           </div>
           <div class="step-content"></div>
@@ -83,7 +86,120 @@ class GroupCreationModal {
     this.modal.querySelector('.step-back').addEventListener('click', () => this.handleBack());
   }
 
+  updateStepLabels() {
+    const step1Label = this.modal.querySelector('.step-1 .step-label');
+    if (step1Label) {
+      step1Label.textContent = this.isEditMode ? 'Edit accounts in your group' : 'Add accounts';
+    }
+  }
+
   renderStep1() {
+    const stepContent = this.modal.querySelector('.step-content');
+    
+    // Clean up any existing event listeners by re-creating the content
+    stepContent.innerHTML = '';
+    
+    const eligibleAccounts = window.OrgDataManager.getEligibleAccounts(this.groupData.type);
+    // Sort accounts alphabetically for better UX
+    eligibleAccounts.sort((a, b) => a.name.localeCompare(b.name));
+    const selectedIds = new Set(this.groupData.accountIds);
+
+    stepContent.innerHTML = `
+      <div class="step2-container">
+        <div class="accounts-selection-panel">
+          <div class="panel-header">
+            <h3>Select accounts</h3>
+            <div class="selection-summary">
+              <span class="selected-count">${selectedIds.size}</span> of 
+              <span class="total-count">${eligibleAccounts.length}</span> accounts selected
+            </div>
+          </div>
+          
+          <div class="accounts-search">
+            <input type="text" placeholder="Search accounts..." class="search-input">
+          </div>
+          
+          <div class="accounts-list">
+            ${eligibleAccounts.map(account => `
+              <label class="account-option ${selectedIds.has(account.id) ? 'selected' : ''}" 
+                     data-account-id="${account.id}">
+                <input type="checkbox" ${selectedIds.has(account.id) ? 'checked' : ''}>
+                <div class="account-info">
+                  <div class="account-name">${account.name}</div>
+                  <div class="account-type">${account.type}</div>
+                </div>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="group-preview-panel">
+          <div class="panel-header">
+            <h3>${this.groupData.name || 'New group'}</h3>
+            <div class="group-type-badge ${this.groupData.type}">
+              ${window.OrgDataManager.getGroupTypesConfig()[this.groupData.type?.toUpperCase()]?.name || this.groupData.type || ''}
+            </div>
+          </div>
+          
+          <div class="selected-accounts-tree">
+            <div class="tree-header">
+              <span class="tree-title">Selected accounts</span>
+              <span class="tree-count">(${selectedIds.size})</span>
+            </div>
+            <div class="tree-content">
+              ${selectedIds.size === 0 ? 
+                '<div class="empty-state">No accounts selected</div>' :
+                this.renderAccountsTree(Array.from(selectedIds))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Event listeners for step 1 (now account selection)
+    const searchInput = stepContent.querySelector('.search-input');
+    const accountOptions = stepContent.querySelectorAll('.account-option');
+
+    searchInput.addEventListener('input', (e) => {
+      this.filterAccounts(e.target.value.toLowerCase());
+    });
+
+    accountOptions.forEach(option => {
+      const checkbox = option.querySelector('input[type="checkbox"]');
+      const accountId = option.dataset.accountId;
+
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          // Prevent duplicate account IDs
+          if (!this.groupData.accountIds.includes(accountId)) {
+            this.groupData.accountIds.push(accountId);
+          } else {
+            console.warn('🐛 Prevented duplicate account selection:', accountId);
+          }
+          option.classList.add('selected');
+        } else {
+          this.groupData.accountIds = this.groupData.accountIds.filter(id => id !== accountId);
+          option.classList.remove('selected');
+        }
+        this.updatePreviewPanel();
+        this.updateNextButton();
+      });
+    });
+
+    // Update step indicator
+    this.modal.querySelector('.step-1').classList.add('active');
+    this.modal.querySelector('.step-2').classList.remove('active');
+    
+    // Update footer buttons
+    this.modal.querySelector('.step-back').style.display = 'none';
+    this.modal.querySelector('.step-next').textContent = 'Next';
+    
+    // Update next button state based on account selection
+    this.updateNextButton();
+  }
+
+  renderStep2() {
     const groupTypes = window.OrgDataManager.getGroupTypesConfig();
     const stepContent = this.modal.querySelector('.step-content');
     
@@ -143,7 +259,7 @@ class GroupCreationModal {
       </div>
     `;
 
-    // Event listeners for step 1
+    // Event listeners for step 2 (now group details)
     const nameInput = stepContent.querySelector('#group-name');
     const descriptionInput = stepContent.querySelector('#group-description');
     const typeOptions = stepContent.querySelectorAll('.group-type-option');
@@ -174,111 +290,12 @@ class GroupCreationModal {
     // Update footer buttons
     this.modal.querySelector('.step-back').style.display = 'inline-block';
     this.modal.querySelector('.step-next').textContent = 'Create group';
+    
+    // Update footer layout for step 2 - group buttons on the right with 12px spacing
+    const footerActions = this.modal.querySelector('.footer-actions');
+    footerActions.style.gap = '12px';
 
     this.updateNextButton();
-  }
-
-  renderStep2() {
-    const stepContent = this.modal.querySelector('.step-content');
-    
-    // Clean up any existing event listeners by re-creating the content
-    stepContent.innerHTML = '';
-    
-    const eligibleAccounts = window.OrgDataManager.getEligibleAccounts(this.groupData.type);
-    // Sort accounts alphabetically for better UX
-    eligibleAccounts.sort((a, b) => a.name.localeCompare(b.name));
-    const selectedIds = new Set(this.groupData.accountIds);
-
-    stepContent.innerHTML = `
-      <div class="step2-container">
-        <div class="accounts-selection-panel">
-          <div class="panel-header">
-            <h3>Select accounts</h3>
-            <div class="selection-summary">
-              <span class="selected-count">${selectedIds.size}</span> of 
-              <span class="total-count">${eligibleAccounts.length}</span> accounts selected
-            </div>
-          </div>
-          
-          <div class="accounts-search">
-            <input type="text" placeholder="Search accounts..." class="search-input">
-          </div>
-          
-          <div class="accounts-list">
-            ${eligibleAccounts.map(account => `
-              <label class="account-option ${selectedIds.has(account.id) ? 'selected' : ''}" 
-                     data-account-id="${account.id}">
-                <input type="checkbox" ${selectedIds.has(account.id) ? 'checked' : ''}>
-                <div class="account-info">
-                  <div class="account-name">${account.name}</div>
-                  <div class="account-type">${account.type}</div>
-                </div>
-              </label>
-            `).join('')}
-          </div>
-        </div>
-
-        <div class="group-preview-panel">
-          <div class="panel-header">
-            <h3>${this.groupData.name}</h3>
-            <div class="group-type-badge ${this.groupData.type}">
-              ${window.OrgDataManager.getGroupTypesConfig()[this.groupData.type.toUpperCase()]?.name || this.groupData.type}
-            </div>
-          </div>
-          
-          <div class="selected-accounts-tree">
-            <div class="tree-header">
-              <span class="tree-title">Selected accounts</span>
-              <span class="tree-count">(${selectedIds.size})</span>
-            </div>
-            <div class="tree-content">
-              ${selectedIds.size === 0 ? 
-                '<div class="empty-state">No accounts selected</div>' :
-                this.renderAccountsTree(Array.from(selectedIds))
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Event listeners for step 2
-    const searchInput = stepContent.querySelector('.search-input');
-    const accountOptions = stepContent.querySelectorAll('.account-option');
-
-    searchInput.addEventListener('input', (e) => {
-      this.filterAccounts(e.target.value.toLowerCase());
-    });
-
-    accountOptions.forEach(option => {
-      const checkbox = option.querySelector('input[type="checkbox"]');
-      const accountId = option.dataset.accountId;
-
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          // Prevent duplicate account IDs
-          if (!this.groupData.accountIds.includes(accountId)) {
-            this.groupData.accountIds.push(accountId);
-          } else {
-            console.warn('🐛 Prevented duplicate account selection:', accountId);
-          }
-          option.classList.add('selected');
-        } else {
-          this.groupData.accountIds = this.groupData.accountIds.filter(id => id !== accountId);
-          option.classList.remove('selected');
-        }
-        this.updatePreviewPanel();
-        this.updateNextButton();
-      });
-    });
-
-    // Update step indicator
-    this.modal.querySelector('.step-2').classList.remove('active');
-    this.modal.querySelector('.step-1').classList.add('active');
-    
-    // Update footer buttons
-    this.modal.querySelector('.step-back').style.display = 'none';
-    this.modal.querySelector('.step-next').textContent = 'Next';
   }
 
   renderAccountsTree(accountIds) {
@@ -357,7 +374,7 @@ class GroupCreationModal {
   handleNext() {
     if (this.currentStep === 1) {
       this.currentStep = 2;
-      this.renderStep1();
+      this.renderStep2();
     } else if (this.currentStep === 2) {
       this.createGroup();
     }
@@ -365,7 +382,7 @@ class GroupCreationModal {
 
   handleBack() {
     this.currentStep = 1;
-    this.renderStep2();
+    this.renderStep1();
     
     // Update step indicator
     this.modal.querySelector('.step-2').classList.remove('active');
